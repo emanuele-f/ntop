@@ -313,7 +313,7 @@ extern void updateDeviceThpt(int deviceToUpdate);
 extern u_int findHostIdxByNumIP(struct in_addr hostIpAddress, u_int actualDeviceId);
 extern void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS][3],
 				u_short *numNetworks, char *localAddresses, 
-				int localAddressesLen);
+				int localAddressesLen, int flagRRD);
 extern void handleFlowsSpecs();
 extern void initPassiveSessions();
 extern void termPassiveSessions();
@@ -495,6 +495,9 @@ extern char **buildargv(const char *argv);
 extern void freeargv(char **argv);
 #endif
 
+/* Formatting for %.2f ... */
+#define xvertDOT00MB(v) (((float)(v)/(float)(1024.0*1024.0))+0.005)
+#define xvertDOT00KB(v) (((float)(v)/(float)(1024.0))+0.005)
 
 /* vendor.c */
 extern char* getVendorInfo(u_char* ethAddress, short encodeString);

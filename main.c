@@ -414,9 +414,7 @@ static int parseOptions(int argc, char* argv []) {
 
     case 't':
       /* Trace Level Initialization */
-      myGlobals.traceLevel = atoi(optarg);
-      if(myGlobals.traceLevel > CONST_DETAIL_TRACE_LEVEL)
-	myGlobals.traceLevel = CONST_DETAIL_TRACE_LEVEL;
+      myGlobals.traceLevel = min(max(1, atoi(optarg)), CONST_DETAIL_TRACE_LEVEL);
       break;
 
 #ifndef WIN32
@@ -931,10 +929,10 @@ int main(int argc, char *argv[]) {
 #endif
 
 /* Above here, the -L value wasn't set, so we use printf(). */
-  traceEvent(CONST_TRACE_INFO, "ntop v.%s %s [%s] (%s build)",
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "ntop v.%s %s [%s] (%s build)",
 	     version, THREAD_MODE, osName, buildDate);
-  traceEvent(CONST_TRACE_INFO, "Copyright 1998-2003 by %s", author);
-  traceEvent(CONST_TRACE_INFO, "Get the freshest ntop from http://www.ntop.org/");
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Copyright 1998-2003 by %s", author);
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Get the freshest ntop from http://www.ntop.org/");
 
 /*  Note that for these critical messages we use both
  *  printf() and traceEvent() - gotta get the message out
@@ -951,11 +949,11 @@ int main(int argc, char *argv[]) {
       printf("WARNING: -w is set to 0. The web interface will be disabled.\n");
 #endif
 
-      traceEvent(CONST_TRACE_WARNING, "INIT: WARNING: The web interface will be disabled");
-      traceEvent(CONST_TRACE_INFO, "INIT: If enabled, the rrd plugin will collect data");
-      traceEvent(CONST_TRACE_INFO, "INIT: If enabled, the netFlow and/or sFlow plugins will collect and/or transmit data");
-      traceEvent(CONST_TRACE_INFO, "INIT: This may or may not be what you want");
-      traceEvent(CONST_TRACE_INFO, "INIT: but without the web interface you can't set plugin parameters");
+      traceEvent(CONST_TRACE_WARNING, "The web interface will be disabled");
+      traceEvent(CONST_TRACE_INFO, "If enabled, the rrd plugin will collect data");
+      traceEvent(CONST_TRACE_INFO, "If enabled, the netFlow and/or sFlow plugins will collect and/or transmit data");
+      traceEvent(CONST_TRACE_INFO, "This may or may not be what you want");
+      traceEvent(CONST_TRACE_INFO, "but without the web interface you can't set plugin parameters");
       /* exit(-1); */
   }
 
@@ -969,7 +967,7 @@ int main(int argc, char *argv[]) {
     printf ("Sorry, %s uses network interface(s) in promiscuous mode, "
 	    "so it needs root permission to run.\n",
 	    myGlobals.program_name);
-    traceEvent(CONST_TRACE_ERROR, "FATAL ERROR: not started as root, required for promiscuous mode");
+    traceEvent(CONST_TRACE_FATALERROR, "Not started as root, required for promiscuous mode");
     exit (-1);
   }
 #endif
@@ -987,12 +985,12 @@ int main(int argc, char *argv[]) {
 #ifdef MAKE_WITH_XMLDUMP
   /* Here is where we place the divergent path for (FUTURE) xmlFileIn */
   if (myGlobals.xmlFileIn != NULL) {
-      traceEvent(CONST_TRACE_INFO, "XMLDUMP: Processing xml input file, %s", myGlobals.xmlFileIn);
-      traceEvent(CONST_TRACE_INFO, "XMLDUMP: SORRY, but that function does not yet exist. Continuing normally.");
+      traceEvent(CONST_TRACE_NOISY, "XMLDUMP: Processing xml input file, %s", myGlobals.xmlFileIn);
+      traceEvent(CONST_TRACE_ERROR, "XMLDUMP: SORRY, but that function does not yet exist. Continuing normally.");
    }
 #endif
 
-  traceEvent(CONST_TRACE_INFO, "INIT: Initializing ntop");
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Initializing ntop");
 
   /*
    * Initialize memory and data for the protocols being monitored trying to access
@@ -1015,13 +1013,13 @@ int main(int argc, char *argv[]) {
 #ifndef WIN32
   if(myGlobals.daemonMode) {
     daemonize();
-    traceEvent(CONST_TRACE_INFO, "INIT: Now running as a daemon");
+    traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Now running as a daemon");
   }
 #endif
 
 #ifdef MAKE_WITH_XMLDUMP
   if (myGlobals.xmlFileOut) {
-      traceEvent(CONST_TRACE_INFO, "XMLDUMP: Removing old xml output file, %s\n", myGlobals.xmlFileOut);
+      traceEvent(CONST_TRACE_NOISY, "XMLDUMP: Removing old xml output file, %s\n", myGlobals.xmlFileOut);
       /* Delete the old one (if present) */
       rc = unlink(myGlobals.xmlFileOut);
       if ( (rc != 0) && (errno != ENOENT) ) {
@@ -1030,7 +1028,7 @@ int main(int argc, char *argv[]) {
       }
   }
   if (myGlobals.xmlFileSnap) {
-      traceEvent(CONST_TRACE_INFO, "XMLDUMP: Removing old xml snapshot file, %s\n", myGlobals.xmlFileSnap);
+      traceEvent(CONST_TRACE_NOISY, "XMLDUMP: Removing old xml snapshot file, %s\n", myGlobals.xmlFileSnap);
       /* Delete the old one (if present) */
       rc = unlink(myGlobals.xmlFileSnap);
       if ( (rc != 0) && (errno != ENOENT) ) {
@@ -1065,7 +1063,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  traceEvent(CONST_TRACE_INFO, "INIT: Listening on [%s]", ifStr);
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Listening on [%s]", ifStr);
 
   /*
    * time to initialize the libpcap
@@ -1073,9 +1071,9 @@ int main(int argc, char *argv[]) {
   initLibpcap();
 
 #ifndef MAKE_MICRO_NTOP
-  traceEvent(CONST_TRACE_INFO, "INIT: loading Plugins");
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Loading Plugins");
   loadPlugins();
-  traceEvent(CONST_TRACE_INFO, "INIT: Plugins loaded... continuing with initialization");
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Plugins loaded... continuing with initialization");
 #endif
 
   /*
@@ -1086,8 +1084,7 @@ int main(int argc, char *argv[]) {
   if((getuid() != geteuid()) || (getgid() != getegid())) {
     /* setuid binary, drop privileges */
     if(setgid(getgid())!=0 || setuid(getuid())!=0) {
-      traceEvent(CONST_TRACE_ERROR,
-		 "FATAL ERROR: Unable to drop privileges.\n");
+      traceEvent(CONST_TRACE_FATALERROR, "Unable to drop privileges");
       exit(-1);
     }
   }
@@ -1098,21 +1095,21 @@ int main(int argc, char *argv[]) {
   if((myGlobals.userId != 0) || (myGlobals.groupId != 0)) {
     /* user id specified on commandline */
     if((setgid(myGlobals.groupId) != 0) || (setuid(myGlobals.userId) != 0)) {
-      traceEvent(CONST_TRACE_ERROR, "FATAL ERROR: Unable to change user ID.");
+      traceEvent(CONST_TRACE_FATALERROR, "Unable to change user ID");
       exit(-1);
     }
   } else {
     if((geteuid() == 0) || (getegid() == 0)) {
       if(!userSpecified) {
-	traceEvent(CONST_TRACE_INFO, "FATAL_ERROR: For security reasons you cannot run ntop as root");
-	traceEvent(CONST_TRACE_INFO, "FATAL_ERROR: Unless you really, really, know what you're doing");
-	traceEvent(CONST_TRACE_INFO, "FATAL_ERROR: Please specify the user name using the -u option!");
+	traceEvent(CONST_TRACE_FATALERROR, "For security reasons you cannot run ntop as root - aborting");
+	traceEvent(CONST_TRACE_INFO, "Unless you really, really, know what you're doing");
+	traceEvent(CONST_TRACE_INFO, "Please specify the user name using the -u option!");
 	exit(0);
       } else {
-	traceEvent(CONST_TRACE_INFO, "INFO: For security reasons you should not run ntop as root (-u)!");
+	traceEvent(CONST_TRACE_ALWAYSDISPLAY, "For security reasons you should not run ntop as root (-u)!");
       }
     } else {
-      traceEvent(CONST_TRACE_INFO, "INFO: Now running as requested user... continuing with initialization");
+      traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Now running as requested user... continuing with initialization");
     }
   }
 #endif
@@ -1145,15 +1142,15 @@ int main(int argc, char *argv[]) {
   initThreads();
 
 #ifndef MAKE_MICRO_NTOP
-  traceEvent(CONST_TRACE_INFO, "INIT: starting Plugins");
+  traceEvent(CONST_TRACE_NOISY, "Starting Plugins");
   startPlugins();
-  traceEvent(CONST_TRACE_INFO, "INIT: Plugins started... continuing with initialization");
+  traceEvent(CONST_TRACE_NOISY, "Plugins started... continuing with initialization");
 #endif
 
   /* create the main listener */
-  traceEvent(CONST_TRACE_INFO, "INIT: starting web server");
+  traceEvent(CONST_TRACE_NOISY, "Starting web server");
   initWeb();
-  traceEvent(CONST_TRACE_INFO, "INIT: web server started... continuing with initialization");
+  traceEvent(CONST_TRACE_NOISY, "Web server started... continuing with initialization");
 
 #if defined(HAVE_MALLINFO_MALLOC_H) && defined(HAVE_MALLOC_H) && defined(__GNUC__)
   {
@@ -1162,15 +1159,21 @@ int main(int argc, char *argv[]) {
     memStats = mallinfo();
     myGlobals.baseMemoryUsage = memStats.arena + memStats.hblkhd;
 
-    traceEvent(CONST_TRACE_INFO, "INIT: Base memory load is %.1fMB (%d+%d)",
-                                 ( (float)(myGlobals.baseMemoryUsage) / (float)(1024*1024)) + 0.05,
+    traceEvent(CONST_TRACE_NOISY, "MEMORY: Base memory load is %.2fMB (%d+%d)",
+                                 xvertDOT00MB(myGlobals.baseMemoryUsage),
                                  memStats.arena,
                                  memStats.hblkhd);
-
   }
 #endif
+    traceEvent(CONST_TRACE_NOISY, "MEMORY: Base interface structure (no hashes loaded) is %.2fMB each",
+               xvertDOT00MB(sizeof(NtopInterface)));
+    traceEvent(CONST_TRACE_NOISY, "MEMORY:     or %.2fMB for %d interfaces",
+               xvertDOT00MB(myGlobals.numDevices*sizeof(NtopInterface)),
+               myGlobals.numDevices);
+    traceEvent(CONST_TRACE_NOISY, "MEMORY: ipTraffixMatrix structure (no TrafficEntry loaded) is %.2fMB",
+               xvertDOT00MB(myGlobals.ipTrafficMatrixMemoryUsage));
 
-  traceEvent(CONST_TRACE_INFO, "Sniffying...");
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Sniffying...");
 
 #ifdef MEMORY_DEBUG
   resetLeaks();

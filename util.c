@@ -100,7 +100,7 @@ char* copy_argv(register char **argv) {
 
   buf = (char*)malloc(len);
   if(buf == NULL) {
-    traceEvent(CONST_TRACE_INFO, "copy_argv: malloc");
+    traceEvent(CONST_TRACE_FATALERROR, "Insufficient memory for copy_argv");
     exit(-1);
   }
 
@@ -165,7 +165,7 @@ unsigned short isLocalAddress(struct in_addr *addr, u_int deviceId) {
   int i;
 
   if(deviceId >= myGlobals.numDevices) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING: Index %u out of range [0..%u]",
+    traceEvent(CONST_TRACE_WARNING, "WARNING: Index %u out of range [0..%u] - address treated as remote",
 	       deviceId, myGlobals.numDevices); 
     return(0);
   }
@@ -236,7 +236,7 @@ static int int2bits(int number) {
   if((number > 255) || (number < 0))
     {
 #ifdef DEBUG
-      traceEvent(CONST_TRACE_ERROR, "DEBUG: int2bits (%3d) = %d\n", number, CONST_INVALIDNETMASK);
+      traceEvent(CONST_TRACE_INFO, "DEBUG: int2bits (%3d) = %d\n", number, CONST_INVALIDNETMASK);
 #endif
       return(CONST_INVALIDNETMASK);
     }
@@ -251,14 +251,14 @@ static int int2bits(int number) {
       if(number != ((~(0xff >> bits)) & 0xff))
 	{
 #ifdef DEBUG
-	  traceEvent(CONST_TRACE_ERROR, "DEBUG: int2bits (%3d) = %d\n", number, CONST_INVALIDNETMASK);
+	  traceEvent(CONST_TRACE_INFO, "DEBUG: int2bits (%3d) = %d\n", number, CONST_INVALIDNETMASK);
 #endif
 	  return(CONST_INVALIDNETMASK);
 	}
       else
 	{
 #ifdef DEBUG
-	  traceEvent(CONST_TRACE_ERROR, "DEBUG: int2bits (%3d) = %d\n", number, bits);
+	  traceEvent(CONST_TRACE_INFO, "DEBUG: int2bits (%3d) = %d\n", number, bits);
 #endif
 	  return(bits);
 	}
@@ -303,7 +303,7 @@ int dotted2bits(char *mask) {
   if((fields_num == 1) && (fields[0] <= 32) && (fields[0] >= 0))
     {
 #ifdef DEBUG
-      traceEvent(CONST_TRACE_ERROR, "DEBUG: dotted2bits (%s) = %d\n", mask, fields[0]);
+      traceEvent(CONST_TRACE_INFO, "DEBUG: dotted2bits (%s) = %d\n", mask, fields[0]);
 #endif
       return(fields[0]);
     }
@@ -320,7 +320,7 @@ int dotted2bits(char *mask) {
 	  /* whenever a 0 bits field is reached there are no more */
 	  /* fields to scan                                       */
 #ifdef DEBUG
-	  traceEvent(CONST_TRACE_ERROR, "DEBUG: dotted2bits (%15s) = %d\n", mask, bits);
+	  traceEvent(CONST_TRACE_INFO, "DEBUG: dotted2bits (%15s) = %d\n", mask, bits);
 #endif
 	  /* In this case we are in a bits (not dotted quad) notation */
 	  return(bits /* fields[0] - L.Deri 08/2001 */);
@@ -330,7 +330,7 @@ int dotted2bits(char *mask) {
 	}
     }
 #ifdef DEBUG
-  traceEvent(CONST_TRACE_ERROR, "DEBUG: dotted2bits (%15s) = %d\n", mask, bits);
+  traceEvent(CONST_TRACE_INFO, "DEBUG: dotted2bits (%15s) = %d\n", mask, bits);
 #endif
   return(bits);
 }
@@ -340,9 +340,12 @@ int dotted2bits(char *mask) {
 /* Example: "131.114.0.0/16,193.43.104.0/255.255.255.0" */
 
 void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS][3],
-			u_short *numNetworks, char *localAddresses, int localAddressesLen) {
+			u_short *numNetworks, char *localAddresses, int localAddressesLen, int flagRRD) {
   char *strtokState, *address;
   int  laBufferPosition = 0, laBufferUsed = 0, i;
+
+  if (flagRRD == FALSE) 
+    traceEvent(CONST_TRACE_NOISY, "Processing -m | --local-subnets parameter '%s'", addresses);
 
   if(addresses == NULL)
     return;
@@ -354,10 +357,10 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
   while(address != NULL) {
     char *mask = strchr(address, '/');
 
-    if(mask == NULL)
-      traceEvent(CONST_TRACE_INFO, "Unknown network '%s' (empty mask!). It has been ignored.\n",
-		 address);
-    else {
+    if(mask == NULL) {
+      if (flagRRD == FALSE)
+        traceEvent(CONST_TRACE_WARNING, "-m: Empty mask '%s' - ignoring entry", address);
+    } else {
       u_int32_t network, networkMask, broadcast;
       int bits, a, b, c, d;
 
@@ -366,17 +369,14 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
       bits = dotted2bits (mask);
 
       if(sscanf(address, "%d.%d.%d.%d", &a, &b, &c, &d) != 4) {
-	traceEvent(CONST_TRACE_ERROR, "Unknown network '%s' .. skipping. Check network numbers.\n",
-		   address);
+	traceEvent(CONST_TRACE_WARNING, "%s: Bad format '%s' - ignoring entry", flagRRD == TRUE ? "RRD" : "-m", address);
 	address = strtok_r(NULL, ",", &strtokState);
 	continue;
       }
 
       if(bits == CONST_INVALIDNETMASK) {
 	/* malformed netmask specification */
-	traceEvent(CONST_TRACE_ERROR,
-		   "The specified netmask %s is not valid. Skipping it..\n",
-		   mask);
+	traceEvent(CONST_TRACE_WARNING, "%s: Net mask '%s' not valid - ignoring entry", flagRRD == TRUE ? "RRD" : "-m", mask);
 	address = strtok_r(NULL, ",", &strtokState);
 	continue;
       }
@@ -401,8 +401,8 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
       if((networkMask >= 0xFFFFFF00) /* Courtesy of Roy-Magne Mo <romo@interpost.no> */
 	 && ((network & networkMask) != network))  {
 	/* malformed network specification */
-	traceEvent(CONST_TRACE_ERROR, "WARNING: %d.%d.%d.%d/%d is not a valid network number\n",
-		   a, b, c, d, bits);
+	traceEvent(CONST_TRACE_WARNING, "%s: %d.%d.%d.%d/%d is not a valid network - correcting mask",
+		   flagRRD == TRUE ? "RRD" : "-m", a, b, c, d, bits);
 
 	/* correcting network numbers as specified in the netmask */
 	network &= networkMask;
@@ -412,7 +412,7 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
 	c = (int) ((network >>  8) & 0xff);
 	d = (int) ((network >>  0) & 0xff);
 
-	traceEvent(CONST_TRACE_ERROR, "Assuming %d.%d.%d.%d/%d [0x%08x/0x%08x]\n\n",
+	traceEvent(CONST_TRACE_NOISY, "Assuming %d.%d.%d.%d/%d [0x%08x/0x%08x]",
 		   a, b, c, d, bits, network, networkMask);
       }
 #ifdef DEBUG
@@ -443,9 +443,10 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
 	    c = (int) ((network >>  8) & 0xff);
 	    d = (int) ((network >>  0) & 0xff);
 
-	    traceEvent(CONST_TRACE_WARNING, "WARNING: Discarded network %d.%d.%d.%d/%d: "
-		       "this is the local network.\n",
-		       a, b, c, d, bits);
+            if (flagRRD == FALSE)
+	      traceEvent(CONST_TRACE_INFO,
+                         "-m: Discarded unnecessary parameter %d.%d.%d.%d/%d - this is the local network",
+		         a, b, c, d, bits);
 	    found = 1;
 	  }
 
@@ -471,8 +472,17 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
 
 	  (*numNetworks)++;
 	}
-      } else
-	traceEvent(CONST_TRACE_WARNING, "Unable to handle network (too many entries!).\n");
+      } else {
+        a = (int) ((network >> 24) & 0xff);
+        b = (int) ((network >> 16) & 0xff);
+        c = (int) ((network >>  8) & 0xff);
+        d = (int) ((network >>  0) & 0xff);
+
+        traceEvent(CONST_TRACE_ERROR, "%s: %d.%d.%d.%d/%d - Too many networks (limit %d) - discarded",
+                   flagRRD == TRUE ? "RRD" : "-m",
+                   a, b, c, d, bits,
+                   MAX_NUM_NETWORKS);
+      }
     }
 
     address = strtok_r(NULL, ",", &strtokState);
@@ -487,7 +497,7 @@ void handleLocalAddresses(char* addresses) {
   localAddresses[0] = '\0';
 
   handleAddressLists(addresses, myGlobals.localNetworks, &myGlobals.numLocalNetworks,
-		     localAddresses, sizeof(localAddresses));
+		     localAddresses, sizeof(localAddresses), FALSE);
 
   /* Not used anymore */
   if(myGlobals.localAddresses != NULL) free(myGlobals.localAddresses);
@@ -1985,9 +1995,9 @@ void traceEvent(int eventTraceLevel, char* file,
   /* Fix courtesy of "Burton M. Strauss III" <BStrauss@acm.org> */
   if(eventTraceLevel <= myGlobals.traceLevel) {
     char theDate[32];
-    char buf[LEN_GENERAL_WORK_BUFFER];
-    time_t theTime = time(NULL);
+    char buf[LEN_GENERAL_WORK_BUFFER], fbuf[LEN_GENERAL_WORK_BUFFER];
     struct tm t;
+    time_t theTime = time(NULL);
 
     /* We have two paths - one if we're logging, one if we aren't
      *   Note that the no-log case is those systems which don't support it (WIN32),
@@ -1996,6 +2006,15 @@ void traceEvent(int eventTraceLevel, char* file,
      */
 
     memset(buf, 0, LEN_GENERAL_WORK_BUFFER);
+    memset(fbuf, 0, LEN_GENERAL_WORK_BUFFER);
+
+    snprintf(fbuf, LEN_GENERAL_WORK_BUFFER, "%s%s", 
+                   eventTraceLevel == CONST_FATALERROR_TRACE_LEVEL  ? "***FATAL_ERROR*** " :
+                       eventTraceLevel == CONST_ERROR_TRACE_LEVEL   ? "**ERROR** " :
+                       eventTraceLevel == CONST_WARNING_TRACE_LEVEL ? "*WARNING* " : "",
+                   format);
+    if (strlen(fbuf) >= LEN_GENERAL_WORK_BUFFER) 
+        fbuf[LEN_GENERAL_WORK_BUFFER] = '\0';
 
 #if defined(WIN32) || !defined(MAKE_WITH_SYSLOG)
     strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &t));
@@ -2011,9 +2030,9 @@ void traceEvent(int eventTraceLevel, char* file,
 
 #if defined(WIN32)
     /* Windows lacks vsnprintf */
-    vsprintf(buf, format, va_ap);
+    vsprintf(buf, fbuf, va_ap);
 #else /* WIN32 - vsnprintf */
-    vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, format, va_ap);
+    vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, fbuf, va_ap);
 #endif /* WIN32 - vsnprintf */
 
     printf("%s%s", buf, (format[strlen(format)-1] != '\n') ? "\n" : "");
@@ -2021,7 +2040,7 @@ void traceEvent(int eventTraceLevel, char* file,
 
 #else /* WIN32 || !MAKE_WITH_SYSLOG */
 
-    vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, format, va_ap);
+    vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, fbuf, va_ap);
 
     if(myGlobals.useSyslog != FLAG_SYSLOG_NONE) {
 
@@ -2057,7 +2076,7 @@ void traceEvent(int eventTraceLevel, char* file,
 	printf("%s ", theDate);
       }
 
-      printf("%s%s", buf, (format[strlen(format)-1] != '\n') ? "\n" : "");
+      printf("%s%s", buf, (fbuf[strlen(fbuf)-1] != '\n') ? "\n" : "");
       fflush(stdout);
 
     }

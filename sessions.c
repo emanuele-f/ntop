@@ -348,7 +348,7 @@ void freeSession(IPSession *sessionToPurge, int actualDeviceId,
      */
      ) {
     HostTraffic *theHost, *theRemHost;
-    char *fmt = "WARNING: detected TCP connection with no data exchanged "
+    char *fmt = "Detected TCP connection with no data exchanged "
       "[%s:%d] -> [%s:%d] (pktSent=%d/pktRcvd=%d) (network mapping attempt?)";
 
     theHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(sessionToPurge->initiatorIdx)];
@@ -531,7 +531,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
   dstHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(dstHostIdx)];
 
   if((srcHost == NULL) || (dstHost == NULL)) {
-    traceEvent(CONST_TRACE_INFO, "Sanity check failed (3) [Low memory?]");
+    traceEvent(CONST_TRACE_ERROR, "Sanity check failed (3) [Low memory?]");
     return(NULL);
   }
 
@@ -1751,7 +1751,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	  a rejected session.
 	*/
 	if(myGlobals.enableSuspiciousPacketDump) {
-	  traceEvent(CONST_TRACE_WARNING, "WARNING: TCP session [%s:%d]<->[%s:%d] reset by %s "
+	  traceEvent(CONST_TRACE_WARNING, "TCP session [%s:%d]<->[%s:%d] reset by %s "
 		     "without completing 3-way handshake",
 		     srcHost->hostSymIpAddress, sport,
 		     dstHost->hostSymIpAddress, dport,
@@ -1792,7 +1792,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	incrementUsageCounter(&srcHost->secHostPkts->ackScanRcvd, dstHostIdx, actualDeviceId);
 	incrementUsageCounter(&dstHost->secHostPkts->ackScanSent, srcHostIdx, actualDeviceId);
 	if(myGlobals.enableSuspiciousPacketDump) {
-	  traceEvent(CONST_TRACE_WARNING, "WARNING: host [%s:%d] performed ACK scan of host [%s:%d]",
+	  traceEvent(CONST_TRACE_WARNING, "Host [%s:%d] performed ACK scan of host [%s:%d]",
 		     dstHost->hostSymIpAddress, dport,
 		     srcHost->hostSymIpAddress, sport);
 	  dumpSuspiciousPacket(actualDeviceId);
@@ -1830,7 +1830,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
       if((srcHostIdx == dstHostIdx)
 	 /* && (sport == dport)  */ /* Caveat: what about Win NT 3.51 ? */
 	 && (tp->th_flags == TH_SYN)) {
-	traceEvent(CONST_TRACE_WARNING, "WARNING: detected Land Attack against host %s:%d",
+	traceEvent(CONST_TRACE_WARNING, "Detected Land Attack against host %s:%d",
 		   srcHost->hostSymIpAddress, sport);
 	dumpSuspiciousPacket(actualDeviceId);
       }
@@ -1861,7 +1861,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	  incrementUsageCounter(&srcHost->secHostPkts->xmasScanRcvd, dstHostIdx, actualDeviceId);
 
 	  if(myGlobals.enableSuspiciousPacketDump) {
-	    traceEvent(CONST_TRACE_WARNING, "WARNING: host [%s:%d] performed XMAS scan of host [%s:%d]",
+	    traceEvent(CONST_TRACE_WARNING, "Host [%s:%d] performed XMAS scan of host [%s:%d]",
 		       dstHost->hostSymIpAddress, dport,
 		       srcHost->hostSymIpAddress, sport);
 	    dumpSuspiciousPacket(actualDeviceId);
@@ -1875,7 +1875,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	  incrementUsageCounter(&srcHost->secHostPkts->finScanRcvd, dstHostIdx, actualDeviceId);
 
 	  if(myGlobals.enableSuspiciousPacketDump) {
-	    traceEvent(CONST_TRACE_WARNING, "WARNING: host [%s:%d] performed FIN scan of host [%s:%d]",
+	    traceEvent(CONST_TRACE_WARNING, "Host [%s:%d] performed FIN scan of host [%s:%d]",
 		       dstHost->hostSymIpAddress, dport,
 		       srcHost->hostSymIpAddress, sport);
 	    dumpSuspiciousPacket(actualDeviceId);
@@ -1891,7 +1891,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	  incrementUsageCounter(&dstHost->secHostPkts->nullScanSent, srcHostIdx, actualDeviceId);
 
 	  if(myGlobals.enableSuspiciousPacketDump) {
-	    traceEvent(CONST_TRACE_WARNING, "WARNING: host [%s:%d] performed NULL scan of host [%s:%d]",
+	    traceEvent(CONST_TRACE_WARNING, "Host [%s:%d] performed NULL scan of host [%s:%d]",
 		       dstHost->hostSymIpAddress, dport,
 		       srcHost->hostSymIpAddress, sport);
 	    dumpSuspiciousPacket(actualDeviceId);
@@ -1980,7 +1980,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
      || (sport == 13) || (dport == 13) /* daytime */
      || (sport == 19) || (dport == 19) /* chargen */
      ) {
-    char *fmt = "WARNING: detected traffic [%s:%d] -> [%s:%d] on "
+    char *fmt = "Detected traffic [%s:%d] -> [%s:%d] on "
       "a diagnostic port (network mapping attempt?)";
 
     if(myGlobals.enableSuspiciousPacketDump) {
@@ -2015,7 +2015,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
   }
 
   if(fragmentedData && (packetDataLength <= 128)) {
-    char *fmt = "WARNING: detected tiny fragment (%d bytes) "
+    char *fmt = "Detected tiny fragment (%d bytes) "
       "[%s:%d] -> [%s:%d] (network mapping attempt?)";
     allocateSecurityHostPkts(srcHost); allocateSecurityHostPkts(dstHost);
     incrementUsageCounter(&srcHost->secHostPkts->tinyFragmentSent, dstHostIdx, actualDeviceId);

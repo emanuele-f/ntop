@@ -589,7 +589,7 @@ int doChangeFilter(int len) {
 			myGlobals.device[i].netmask.s_addr) < 0)
 	   || (pcap_setfilter(myGlobals.device[i].pcapPtr, &fcode) < 0)) {
 	  traceEvent(CONST_TRACE_ERROR,
-		    "ERROR: wrong filter '%s' (%s) on interface %s.\nUsing old filter.\n",
+		    "Wrong filter '%s' (%s) on interface %s - using old filter",
 		    myGlobals.currentFilterExpression, pcap_geterr(myGlobals.device[i].pcapPtr), myGlobals.device[i].name);
 	  err="The syntax of the defined filter is wrong.";
 	} else{
@@ -597,10 +597,10 @@ int doChangeFilter(int len) {
          pcap_freecode(&fcode);
 #endif
 	 if(*myGlobals.currentFilterExpression!='\0'){
-	   traceEvent(CONST_TRACE_INFO, "Set filter \"%s\" on myGlobals.device %s.",
+	   traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Set filter \"%s\" on interface %s",
 		      myGlobals.currentFilterExpression, myGlobals.device[i].name);
 	 }else{
-	   traceEvent(CONST_TRACE_INFO, "Set no kernel (libpcap) filtering on myGlobals.device %s.",
+	   traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Set no kernel (libpcap) filtering on interface %s",
 		      myGlobals.device[i].name);
 	 }
 	}
@@ -665,7 +665,7 @@ int doChangeFilter(int len) {
 			myGlobals.device[i].netmask.s_addr) < 0)) {
 	  if((pcap_setfilter(myGlobals.device[i].pcapPtr, &fcode) < 0)) {
 	    traceEvent(CONST_TRACE_ERROR,
-	  	    "ERROR: wrong filter '%s' (%s) on interface %s.\nUsing old filter.\n",
+	  	    "Wrong filter '%s' (%s) on interface %s - using old filter",
 		    myGlobals.currentFilterExpression, pcap_geterr(myGlobals.device[i].pcapPtr), myGlobals.device[i].name);
 	  }
 #ifdef HAVE_PCAP_FREECODE
@@ -800,7 +800,7 @@ static int readHTTPpostData(int len, char *buf, int buflen) {
   memset(buf, 0, buflen);
 
   if(len > (buflen-8)) {
-    traceEvent(CONST_TRACE_ERROR, "Too much HTTP POST data");
+    BufferTooShort();
     return (-1);
   }
 
@@ -895,7 +895,7 @@ static void addKeyIfMissing(char* key, char* value,
 	 * Courtesy of Ambrose Li <a.c.li@ieee.org>
 	 *
 	 */
-	traceEvent(CONST_TRACE_ERROR, "No password for admin user. Please re-run ntop in non-daemon mode first.\n");
+	traceEvent(CONST_TRACE_FATALERROR, "No password for admin user - please re-run ntop in non-daemon mode first");
 	exit(1);
       }
 
@@ -949,7 +949,7 @@ static void addKeyIfMissing(char* key, char* value,
 
     /* print notice to the user */
     if(memcmp(key,"1admin",6) == 0)
-      traceEvent(CONST_TRACE_INFO, "Admin user password has been set.\n");
+      traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Admin user password has been set");
 
   } else
     free(return_data.dptr);

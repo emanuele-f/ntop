@@ -1684,7 +1684,7 @@ void printHostsInfo(int sortedColumn, int revertOrder, int pageNum) {
 	if(printedEntries > myGlobals.maxNumLines)
 	  break;
       } else {
-	traceEvent(CONST_TRACE_WARNING, "WARNING: quicksort() problem!");
+	traceEvent(CONST_TRACE_WARNING, "quicksort() problem!");
       }
     }
 
@@ -3797,13 +3797,13 @@ static int cmpStatsFctn(const void *_a, const void *_b) {
   int rc;
 
   if((a == NULL) && (b != NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (1)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpStatsFctn() (1)\n");
     return(1);
   } else if((a != NULL) && (b == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (2)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpStatsFctn() (2)\n");
     return(-1);
   } else if((a == NULL) && (b == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (3)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpStatsFctn() (3)\n");
     return(0);
   }
 

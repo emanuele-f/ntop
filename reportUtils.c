@@ -89,7 +89,7 @@ void formatUsageCounter(UsageCounter usageCtr,
 	sendString("\n<li>");
 	sendString(makeHostLink(&el, 0, 0, 0));
       } else
-	traceEvent(CONST_TRACE_INFO, "Unable to find serial %u",
+	traceEvent(CONST_TRACE_WARNING, "Unable to find serial %u - host skipped",
 		   (unsigned int)usageCtr.peersIndexes[i]);
     }
   }
@@ -809,13 +809,13 @@ int sortHostFctn(const void *_a, const void *_b) {
   char *nameA, *nameB, nameA_str[32], nameB_str[32];
 
   if((a == NULL) && (b != NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (1)\n");
+    traceEvent(CONST_TRACE_WARNING, "sortHostFctn() error (1)");
     return(1);
   } else if((a != NULL) && (b == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (2)\n");
+    traceEvent(CONST_TRACE_WARNING, "sortHostFctn() error (2)");
     return(-1);
   } else if((a == NULL) && (b == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (3)\n");
+    traceEvent(CONST_TRACE_WARNING, "sortHostFctn() error (3)");
     return(0);
   }
 
@@ -1007,13 +1007,13 @@ int cmpFctn(const void *_a, const void *_b) {
   short floatCompare=0, columnProtoId;
 
   if((a == NULL) && (b != NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (1)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpFctn() error (1)");
     return(1);
   } else if((a != NULL) && (b == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (2)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpFctn() error (2)");
     return(-1);
   } else if((a == NULL) && (b == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (3)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpFctn() error (3)");
     return(0);
   }
 
@@ -1455,13 +1455,13 @@ int cmpMulticastFctn(const void *_a, const void *_b) {
   int rc;
 
   if((a == NULL) && (b != NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (1)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpMulticastFctn() error (1)");
     return(1);
   } else if((a != NULL) && (b == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (2)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpMulticastFctn() error (2)");
     return(-1);
   } else if((a == NULL) && (b == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (3)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpMulticastFctn() error (3)");
     return(0);
   }
 
@@ -1632,7 +1632,7 @@ int cmpHostsFctn(const void *_a, const void *_b) {
     name_a = (*a)->hostSymIpAddress;
 
     if(name_a == NULL)
-      traceEvent(CONST_TRACE_WARNING, "Warning\n");
+      traceEvent(CONST_TRACE_WARNING, "cmpHostsFctn() error (1)");
     if((name_a == NULL) || (strcmp(name_a, "0.0.0.0") == 0)) {
       name_a = (*a)->hostNumIpAddress;
       if((name_a == NULL) || (name_a[0] == '\0'))
@@ -1642,7 +1642,7 @@ int cmpHostsFctn(const void *_a, const void *_b) {
     name_b = (*b)->hostSymIpAddress;
 
     if(name_b == NULL)
-      traceEvent(CONST_TRACE_WARNING, "Warning\n");
+      traceEvent(CONST_TRACE_WARNING, "cmpHostsFctn() error (2)");
     if((name_b == NULL) || (strcmp(name_b, "0.0.0.0") == 0)) {
       name_b = (*b)->hostNumIpAddress;
       if((name_b == NULL) || (name_b[0] == '\0'))

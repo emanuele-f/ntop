@@ -111,7 +111,9 @@ void* pcapDispatch(void *_i) {
       rc = pcap_dispatch(myGlobals.device[i].pcapPtr, 1, processPacket, (u_char*)_i);
 
       if(rc == -1) {
-	traceEvent(CONST_TRACE_ERROR, "Error while reading packets: %s.\n",
+	traceEvent(CONST_TRACE_ERROR, "Reading packets on device %d(%s): '%s'",
+                   i,
+                   myGlobals.device[i].name,
 		   pcap_geterr(myGlobals.device[i].pcapPtr));
 	break;
       } else if((rc == 0) && (myGlobals.rFileName != NULL)) {
@@ -139,7 +141,9 @@ void* pcapDispatch(void *_i) {
   for(;myGlobals.capturePackets == FLAG_NTOPSTATE_RUN;) {
     rc = pcap_dispatch(myGlobals.device[i].pcapPtr, 1, queuePacket, (u_char*)_i);
     if(rc == -1) {
-      traceEvent(CONST_TRACE_ERROR, "Error while reading packets: %s.\n",
+      traceEvent(CONST_TRACE_ERROR, "Reading packets on device %d(%s): '%s'",
+                 i,
+                 myGlobals.device[i].friendlyName,
 		 pcap_geterr(myGlobals.device[i].pcapPtr));
       break;
     } /* else
@@ -451,7 +455,7 @@ void handleProtocols() {
 
     bufferCurrent = buffer = (char*)malloc(buf.st_size+8) /* just to be safe */;
 
-    traceEvent(CONST_TRACE_INFO, "PROTO_INIT: Processing protocol file: '%s', size: %ld",
+    traceEvent(CONST_TRACE_ALWAYSDISPLAY, "PROTO_INIT: Processing protocol file: '%s', size: %ld",
 	       myGlobals.protoSpecs, buf.st_size+8);
 
     for (;;) {
@@ -759,7 +763,7 @@ void packetCaptureLoop(time_t *lastTime, int refreshRate) {
       rc = pcap_dispatch(myGlobals.device[0].pcapPtr, 1, processPacket, NULL);
 
       if(rc == -1) {
-	traceEvent(CONST_TRACE_ERROR, "Error while reading packets: %s.\n",
+	traceEvent(CONST_TRACE_ERROR, "Reading packets: '%s'",
 		   pcap_geterr(myGlobals.device[0].pcapPtr));
 	continue;
       } else if((rc == 0) && (myGlobals.rFileName != NULL)) {

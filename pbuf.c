@@ -92,7 +92,7 @@ int handleIP(u_short port,
   Counter length = (Counter)_length;
 
   if((srcHost == NULL) || (dstHost == NULL)) {
-    traceEvent(CONST_TRACE_INFO, "Sanity check failed (4) [Low memory?]");
+    traceEvent(CONST_TRACE_ERROR, "Sanity check failed (4) [Low memory?]");
     return(-1);
   }
 
@@ -743,7 +743,7 @@ static void processIpPkt(const u_char *bp,
 
   if(srcHost == NULL) {
     /* Sanity check */
-    traceEvent(CONST_TRACE_INFO, "Sanity check failed (1) [Low memory?] (idx=%d)", srcHostIdx);
+    traceEvent(CONST_TRACE_ERROR, "Sanity check failed (1) [Low memory?] (idx=%d)", srcHostIdx);
     return; /* It might be that there's not enough memory that that
 	       dstHostIdx = getHostInfo(&ip.ip_dst, ether_dst) caused
 	       srcHost to be freed */
@@ -751,7 +751,7 @@ static void processIpPkt(const u_char *bp,
 
   if(dstHost == NULL) {
     /* Sanity check */
-    traceEvent(CONST_TRACE_INFO, "Sanity check failed (2) [Low memory?]");
+    traceEvent(CONST_TRACE_ERROR, "Sanity check failed (2) [Low memory?]");
     return;
   }
 
@@ -861,7 +861,7 @@ static void processIpPkt(const u_char *bp,
 
     if(tcpUdpLen < sizeof(struct tcphdr)) {
       if(myGlobals.enableSuspiciousPacketDump) {
-	traceEvent(CONST_TRACE_WARNING, "WARNING: Malformed TCP pkt %s->%s detected (packet too short)",
+	traceEvent(CONST_TRACE_WARNING, "Malformed TCP pkt %s->%s detected (packet too short)",
 		   srcHost->hostSymIpAddress,
 		   dstHost->hostSymIpAddress);
 	dumpSuspiciousPacket(actualDeviceId);
@@ -1068,7 +1068,7 @@ static void processIpPkt(const u_char *bp,
 
     if(tcpUdpLen < sizeof(struct udphdr)) {
       if(myGlobals.enableSuspiciousPacketDump) {
-	traceEvent(CONST_TRACE_WARNING, "WARNING: Malformed UDP pkt %s->%s detected (packet too short)",
+	traceEvent(CONST_TRACE_WARNING, "Malformed UDP pkt %s->%s detected (packet too short)",
 		   srcHost->hostSymIpAddress,
 		   dstHost->hostSymIpAddress);
 	dumpSuspiciousPacket(actualDeviceId);
@@ -1279,7 +1279,7 @@ static void processIpPkt(const u_char *bp,
 
     if(tcpUdpLen < sizeof(struct icmp)) {
       if(myGlobals.enableSuspiciousPacketDump) {
-	traceEvent(CONST_TRACE_WARNING, "WARNING: Malformed ICMP pkt %s->%s detected (packet too short)",
+	traceEvent(CONST_TRACE_WARNING, "Malformed ICMP pkt %s->%s detected (packet too short)",
 		   srcHost->hostSymIpAddress,
 		   dstHost->hostSymIpAddress);
 	dumpSuspiciousPacket(actualDeviceId);
@@ -1296,7 +1296,7 @@ static void processIpPkt(const u_char *bp,
       incrementTrafficCounter(&dstHost->icmpRcvd, length);
 
       if(off & 0x3fff) {
-	char *fmt = "WARNING: detected ICMP fragment [%s -> %s] (network attack attempt?)";
+	char *fmt = "Detected ICMP fragment [%s -> %s] (network attack attempt?)";
 
 	incrementTrafficCounter(&srcHost->icmpFragmentsSent, length), 
 	  incrementTrafficCounter(&dstHost->icmpFragmentsRcvd, length);
@@ -1874,7 +1874,7 @@ void processPacket(u_char *_deviceId,
        (length > myGlobals.mtuSize[myGlobals.device[deviceId].datalink]) ) {
     /* Sanity check */
     if(myGlobals.enableSuspiciousPacketDump) {
-      traceEvent(CONST_TRACE_INFO, "Packet # %u too long (len = %u)!\n",
+      traceEvent(CONST_TRACE_WARNING, "Packet # %u too long (len = %u)!\n",
 		 (unsigned int)myGlobals.device[deviceId].ethernetPkts.value,
 		 (unsigned int)length);
       dumpSuspiciousPacket(actualDeviceId);
@@ -2080,7 +2080,7 @@ void processPacket(u_char *_deviceId,
 	srcHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(srcHostIdx)];
 	if(srcHost == NULL) {
 	  /* Sanity check */
-	  traceEvent(CONST_TRACE_INFO, "Sanity check failed (5) [Low memory?]");
+	  traceEvent(CONST_TRACE_ERROR, "Sanity check failed (5) [Low memory?]");
 	  return;
 	}
 
@@ -2088,7 +2088,7 @@ void processPacket(u_char *_deviceId,
 	dstHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(dstHostIdx)];
 	if(dstHost == NULL) {
 	  /* Sanity check */
-	  traceEvent(CONST_TRACE_INFO, "Sanity check failed (6) [Low memory?]");
+	  traceEvent(CONST_TRACE_ERROR, "Sanity check failed (6) [Low memory?]");
 	  return;
 	}
 
@@ -2120,7 +2120,7 @@ void processPacket(u_char *_deviceId,
 	srcHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(srcHostIdx)];
 	if(srcHost == NULL) {
 	  /* Sanity check */
-	  traceEvent(CONST_TRACE_INFO, "Sanity check failed (7) [Low memory?]");
+	  traceEvent(CONST_TRACE_ERROR, "Sanity check failed (7) [Low memory?]");
 	  return;
 	}
 
@@ -2128,7 +2128,7 @@ void processPacket(u_char *_deviceId,
 	dstHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(dstHostIdx)];
 	if(dstHost == NULL) {
 	  /* Sanity check */
-	  traceEvent(CONST_TRACE_INFO, "Sanity check failed (8) [Low memory?]");
+	  traceEvent(CONST_TRACE_ERROR, "Sanity check failed (8) [Low memory?]");
 	  return;
 	}
 
@@ -2156,7 +2156,7 @@ void processPacket(u_char *_deviceId,
 	  srcHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(srcHostIdx)];
 	  if(srcHost == NULL) {
 	    /* Sanity check */
-	    traceEvent(CONST_TRACE_INFO, "Sanity check failed (9) [Low memory?]");
+	    traceEvent(CONST_TRACE_ERROR, "Sanity check failed (9) [Low memory?]");
 	    return;
 	  }
 
@@ -2164,7 +2164,7 @@ void processPacket(u_char *_deviceId,
 	  dstHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(dstHostIdx)];
 	  if(dstHost == NULL) {
 	    /* Sanity check */
-	    traceEvent(CONST_TRACE_INFO, "Sanity check failed (10) [Low memory?]");
+	    traceEvent(CONST_TRACE_ERROR, "Sanity check failed (10) [Low memory?]");
 	    return;
 	  }
 
@@ -2183,7 +2183,7 @@ void processPacket(u_char *_deviceId,
 	    dstHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(dstHostIdx)];
 
 	    if((srcHost == NULL) || (dstHost == NULL)) {
-	      traceEvent(CONST_TRACE_INFO, "Sanity check failed (13) [Low memory?]");
+	      traceEvent(CONST_TRACE_ERROR, "Sanity check failed (13) [Low memory?]");
 	      return;
 	    }
 
@@ -2477,7 +2477,7 @@ void processPacket(u_char *_deviceId,
 	srcHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(srcHostIdx)];
 	if(srcHost == NULL) {
 	  /* Sanity check */
-	  traceEvent(CONST_TRACE_INFO, "Sanity check failed (11) [Low memory?]");
+	  traceEvent(CONST_TRACE_ERROR, "Sanity check failed (11) [Low memory?]");
 	  return;
 	}
 
@@ -2485,7 +2485,7 @@ void processPacket(u_char *_deviceId,
 	dstHost = myGlobals.device[actualDeviceId].hash_hostTraffic[checkSessionIdx(dstHostIdx)];
 	if(dstHost == NULL) {
 	  /* Sanity check */
-	  traceEvent(CONST_TRACE_INFO, "Sanity check failed (12) [Low memory?]");
+	  traceEvent(CONST_TRACE_ERROR, "Sanity check failed (12) [Low memory?]");
 	  return;
 	}
 

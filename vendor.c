@@ -275,8 +275,8 @@ char* getMACInfo(int special, u_char* ethAddress, short encodeString) {
   workBuf = etheraddr_string(ethAddress);
   memcpy(&tmpBuf, workBuf, LEN_ETHERNET_ADDRESS_DISPLAY+1);
 #ifdef VENDOR_DEBUG
-  traceEvent(CONST_TRACE_INFO, "VENDOR%s: lookup '%s'\n", 
-                               special == 1 ? "(SPECIAL)" : "",
+  traceEvent(CONST_TRACE_INFO, "VENDOR_DEBUG: %slookup '%s'\n", 
+                               special == 1 ? "special " : "",
                                tmpBuf);
 #endif
 
@@ -380,7 +380,7 @@ void createVendorTable(void) {
 {
   int i, j, best, besti;
 
-  traceEvent(CONST_TRACE_INFO, "TEST_HASHSIZE: Testing ipxSAP (%s) from 51 -> %d...wait\n",
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "TEST_HASHSIZE: Testing ipxSAP (%s) from 51 -> %d...wait\n",
 #ifdef PARM_USE_MACHASH_INVERT
                                "invert",
 #else
@@ -400,11 +400,11 @@ void createVendorTable(void) {
       } else if ( j < best ) {
           best = j;
           besti = i;
-          traceEvent(CONST_TRACE_INFO, "TEST_HASHSIZE: ipxSAP %3d %3d\n", i, j);
+          traceEvent(CONST_TRACE_ALWAYSDISPLAY, "TEST_HASHSIZE: ipxSAP %3d %3d\n", i, j);
       }
       memset(ipxSAPhash, 0, sizeof(ipxSAPhash));
   }
-  traceEvent(CONST_TRACE_INFO, "TEST_HASHSIZE: ipxSAP BEST is %d collisions, size %d\n", best, besti);
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "TEST_HASHSIZE: ipxSAP BEST is %d collisions, size %d\n", best, besti);
 }
 #endif
 
@@ -508,7 +508,7 @@ company_id                      Organization
                        key_data.dptr = tmpMACkey;
                        key_data.dsize = strlen(tmpMACkey)+1;
                        if(gdbm_store(myGlobals.macPrefixFile, key_data, data_data, GDBM_REPLACE) != 0) {
-                           traceEvent(CONST_TRACE_ERROR, "VENDOR: unable to add record '%s': {%d, %s}\n",
+                           traceEvent(CONST_TRACE_WARNING, "VENDOR: unable to add record '%s': {%d, %s} - skipped",
                                       tmpMACkey, macInfoEntry.isSpecial, macInfoEntry.vendorName);
                        } else {
                            numLoaded++;
@@ -530,8 +530,8 @@ company_id                      Organization
            }
        }
        if (configFileFound == 0) {
-           traceEvent(CONST_TRACE_WARNING, "VENDOR: Unable to open file '%s'.\n", macInputFiles[idx]);
-           traceEvent(CONST_TRACE_INFO, "VENDOR: ntop continues ok, but without or with partial MAC->Vendor mapping.\n");
+           traceEvent(CONST_TRACE_WARNING, "VENDOR: Unable to open file '%s'", macInputFiles[idx]);
+           traceEvent(CONST_TRACE_INFO, "VENDOR: ntop continues ok, but without or with partial MAC->Vendor mapping");
        }
    }
        

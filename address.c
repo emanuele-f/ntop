@@ -157,14 +157,14 @@ static void resolveAddress(struct in_addr *hostAddr,
     if(data_data.dptr != NULL) {
 #ifdef GDBM_DEBUG
       if (data_data.dsize == (sizeof(StoredAddress)+1))
-        traceEvent(CONST_TRACE_ERROR, "GDBM_DEBUG: Dropped data for %s [wrong data size]\n", keyBuf);
+        traceEvent(CONST_TRACE_INFO, "GDBM_DEBUG: Dropped data for %s [wrong data size]\n", keyBuf);
       else
-        traceEvent(CONST_TRACE_ERROR, "GDBM_DEBUG: Ignored old record for %s\n", keyBuf);
+        traceEvent(CONST_TRACE_INFO, "GDBM_DEBUG: Ignored old record for %s\n", keyBuf);
 #endif
       free(data_data.dptr);
 #ifdef GDBM_DEBUG
     } else {
-      traceEvent(CONST_TRACE_ERROR, "GDBM_DEBUG: Unable to retrieve %s\n", keyBuf);
+      traceEvent(CONST_TRACE_INFO, "GDBM_DEBUG: Unable to retrieve %s\n", keyBuf);
 #endif
     }
 
@@ -427,7 +427,13 @@ static void resolveAddress(struct in_addr *hostAddr,
       }
 
       if(gdbm_store(myGlobals.dnsCacheFile, key_data, data_data, GDBM_REPLACE) != 0)
-        traceEvent(CONST_TRACE_ERROR, "Error while adding '%s'\n.\n", symAddr);
+        traceEvent(CONST_TRACE_ERROR, "dnsCache error adding '%s', %s", symAddr,
+#if defined(WIN32) && defined(__GNUC__)
+                       "no additional information available"
+#else
+                        gdbm_strerror(gdbm_errno)
+#endif
+                  );
       else {
         myGlobals.dnsCacheStoredLookup++;
 
@@ -478,18 +484,19 @@ static void queueAddress(struct in_addr elem) {
 	myGlobals.addressQueuedMax = myGlobals.addressQueuedCurrent;
 
 #ifdef DNS_DEBUG
-   traceEvent(CONST_TRACE_INFO, "DNS-DEBUG: Queued address '%s' [addr queue=%d/max=%d]\n",
+   traceEvent(CONST_TRACE_INFO, "DNS_DEBUG: Queued address '%s' [addr queue=%d/max=%d]\n",
 	      tmpBuf, myGlobals.addressQueuedCurrent, myGlobals.addressQueuedMax);
 #endif
   } else {
     /* rc = 1 is duplicate key, which is fine.  Other codes are problems... */
     if (rc != 1) {
-      traceEvent(CONST_TRACE_WARNING, "Failed(%d): Queue address '%s' [addr queue=%d/max=%d] (processing continues)\n",
-		 rc, tmpBuf, myGlobals.addressQueuedCurrent, myGlobals.addressQueuedMax);
+      traceEvent(CONST_TRACE_ERROR, "Queue of address '%s' failed, code %d [addr queue=%d/max=%d]",
+		 tmpBuf, rc, myGlobals.addressQueuedCurrent, myGlobals.addressQueuedMax);
+      traceEvent(CONST_TRACE_INFO, "ntop processing continues, address will not be resolved");
     } else {
       myGlobals.addressQueuedDup++;
 #ifdef DNS_DEBUG
-        traceEvent(CONST_TRACE_INFO, "DNS-DEBUG: Queuing of address '%s' - duplicate in queue (ntop continues ok)\n",
+        traceEvent(CONST_TRACE_INFO, "DNS_DEBUG: Duplicate queue of address '%s' ignored",
                            tmpBuf);
 #endif
     }
@@ -522,7 +529,7 @@ void* dequeueAddress(void* notUsed _UNUSED_) {
 
   while(myGlobals.capturePackets == FLAG_NTOPSTATE_RUN) {
 #ifdef DEBUG
-    traceEvent(CONST_TRACE_INFO, "Waiting for address to resolve...\n");
+    traceEvent(CONST_TRACE_INFO, "DEBUG: Waiting for address to resolve...\n");
 #endif
 
 #ifdef MAKE_WITH_SEMAPHORES
@@ -532,7 +539,7 @@ void* dequeueAddress(void* notUsed _UNUSED_) {
 #endif
 
 #ifdef DEBUG
-    traceEvent(CONST_TRACE_INFO, "Address resolution started...\n");
+    traceEvent(CONST_TRACE_INFO, "DEBUG: Address resolution started...\n");
 #endif
 
     data_data = gdbm_firstkey(myGlobals.addressQueueFile);
@@ -545,7 +552,7 @@ void* dequeueAddress(void* notUsed _UNUSED_) {
       HEARTBEAT(1, "dequeueAddress()", NULL);
 
 #ifdef DNS_DEBUG
-      traceEvent(CONST_TRACE_INFO, "DNS-DEBUG: Dequeued address... [%u][key=%s] (#addr=%d)\n",
+      traceEvent(CONST_TRACE_INFO, "DNS_DEBUG: Dequeued address... [%u][key=%s] (#addr=%d)\n",
 		 addr.s_addr, key_data.dptr == NULL ? "<>" : key_data.dptr,
 		 myGlobals.addressQueuedCurrent);
 #endif
@@ -553,7 +560,7 @@ void* dequeueAddress(void* notUsed _UNUSED_) {
       resolveAddress(&addr, 0, 0 /* use default device */);
 
 #ifdef DNS_DEBUG
-      traceEvent(CONST_TRACE_INFO, "DNS-DEBUG: Resolved address %u\n", addr.s_addr);
+      traceEvent(CONST_TRACE_INFO, "DNS_DEBUG: Resolved address %u\n", addr.s_addr);
 #endif
 
       myGlobals.addressQueuedCurrent--;
@@ -564,7 +571,7 @@ void* dequeueAddress(void* notUsed _UNUSED_) {
     }
   } /* endless loop */
 
-  traceEvent(CONST_TRACE_INFO, "THREADMGMT: Address resolution thread terminated...\n");
+  traceEvent(CONST_TRACE_WARNING, "THREADMGMT: Address resolution thread terminated...\n");
   return(NULL); /* NOTREACHED */
 }
 
@@ -670,9 +677,9 @@ void fetchAddressFromCache(struct in_addr hostIpAddress, char *buffer) {
     myGlobals.numFetchAddressFromCacheCallsFAIL++;
 #ifdef GDBM_DEBUG
     if(data_data.dptr != NULL)
-      traceEvent(CONST_TRACE_ERROR, "GDBM_DEBUG: Dropped data for %s [wrong data size]", tmpBuf);
+      traceEvent(CONST_TRACE_WARNING, "GDBM_DEBUG: Dropped data for %s [wrong data size]", tmpBuf);
     else
-      traceEvent(CONST_TRACE_ERROR, "GDBM_DEBUG: Unable to retrieve %s", tmpBuf);
+      traceEvent(CONST_TRACE_WARNING, "GDBM_DEBUG: Unable to retrieve %s", tmpBuf);
 #endif
 
     buffer[0] = '\0';
@@ -681,7 +688,7 @@ void fetchAddressFromCache(struct in_addr hostIpAddress, char *buffer) {
   }
 
 #ifdef DEBUG
-  traceEvent(CONST_TRACE_ERROR, "fetchAddressFromCache(%s) returned '%s'",
+  traceEvent(CONST_TRACE_INFO, "fetchAddressFromCache(%s) returned '%s'",
 	     _intoa(hostIpAddress, buf, sizeof(buf)), buffer);
 #endif
 }

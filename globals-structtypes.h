@@ -1802,6 +1802,7 @@ XML*/
 #if defined(HAVE_MALLINFO_MALLOC_H) && defined(HAVE_MALLOC_H) && defined(__GNUC__)
   u_int baseMemoryUsage;
 #endif
+  u_int ipTrafficMatrixMemoryUsage;
 
   /*
    * local variables

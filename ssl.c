@@ -89,7 +89,7 @@ int init_ssl(void) {
      * well, there's only so much we're going to do...
      */
     traceEvent(CONST_TRACE_INFO, "SSL_PRNG: Initializing.\n");
-    traceEvent(CONST_TRACE_INFO, "SSL_PRNG: see http://www.openssl.org/support/faq.cgi#USER1.\n");
+    traceEvent(CONST_TRACE_NOISY, "SSL_PRNG: see http://www.openssl.org/support/faq.cgi#USER1.\n");
 
     RAND_add(version, strlen(version), (double)4.0);
     RAND_add(buildDate, strlen(buildDate), (double)4.0);
@@ -123,7 +123,7 @@ int init_ssl(void) {
     }
 
     if (RAND_status() == 0) {
-        traceEvent(CONST_TRACE_INFO, "SSL_PRNG: Unsuccessfully initialized - https:// may not work.\n");
+        traceEvent(CONST_TRACE_WARNING, "SSL_PRNG: Unsuccessfully initialized - https:// may not work.\n");
     } else {
         traceEvent(CONST_TRACE_INFO, "SSL_PRNG: Successfully initialized.\n");
     }
@@ -147,7 +147,7 @@ int init_ssl(void) {
   }
 
   if(fd == NULL) {
-    traceEvent(CONST_TRACE_ERROR,
+    traceEvent(CONST_TRACE_WARNING,
 	       "SSL: Unable to find certificate '%s'. SSL support has been disabled\n",
 	       CONST_SSL_CERTF_FILENAME);
     return(-1);

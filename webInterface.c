@@ -4570,20 +4570,20 @@ void initWeb() {
     if(myGlobals.webPort > 0) {
       /* Courtesy of Daniel Savard <daniel.savard@gespro.com> */
       if(myGlobals.webAddr)
-	traceEvent(CONST_TRACE_INFO, "WEB: Waiting for HTTP connections on %s port %d",
+	traceEvent(CONST_TRACE_ALWAYSDISPLAY, "WEB: Waiting for HTTP connections on %s port %d",
 		   myGlobals.webAddr, myGlobals.webPort);
       else
-	traceEvent(CONST_TRACE_INFO, "WEB: Waiting for HTTP connections on port %d",
+	traceEvent(CONST_TRACE_ALWAYSDISPLAY, "WEB: Waiting for HTTP connections on port %d",
 		   myGlobals.webPort);
     }
 
 #ifdef HAVE_OPENSSL
     if(myGlobals.sslInitialized) {
       if(myGlobals.sslAddr)
-	traceEvent(CONST_TRACE_INFO, "WEB: Waiting for HTTPS (SSL) connections on %s port %d",
+	traceEvent(CONST_TRACE_ALWAYSDISPLAY, "WEB: Waiting for HTTPS (SSL) connections on %s port %d",
 		   myGlobals.sslAddr, myGlobals.sslPort);
       else
-	traceEvent(CONST_TRACE_INFO, "WEB: Waiting for HTTPS (SSL) connections on port %d",
+	traceEvent(CONST_TRACE_ALWAYSDISPLAY, "WEB: Waiting for HTTPS (SSL) connections on port %d",
 		   myGlobals.sslPort);
     }
 #endif
@@ -5023,7 +5023,7 @@ void* sslwatchdogChildThread(void* notUsed _UNUSED_) {
 	sslwatchdogDebug("ENDloop", FLAG_SSLWATCHDOG_BOTH, "");
       }
 
-      traceEvent(CONST_TRACE_INFO, "THREADMGMT: web connections thread (%ld) terminated...\n", myGlobals.handleWebConnectionsThreadId);
+      traceEvent(CONST_TRACE_WARNING, "THREADMGMT: web connections thread (%ld) terminated...\n", myGlobals.handleWebConnectionsThreadId);
 
 #endif /* CFG_MULTITHREADED */
 

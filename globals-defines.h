@@ -1132,16 +1132,26 @@
 /*
  * Used in traceEvent()
  */
-#define CONST_TRACE_ERROR                   0, __FILE__, __LINE__
-#define CONST_TRACE_WARNING                 1, __FILE__, __LINE__
-#define CONST_TRACE_NORMAL                  2, __FILE__, __LINE__
-#define CONST_TRACE_INFO                    3, __FILE__, __LINE__
-
-/*
- * Used as both the limiting value (http.c) and (util.c) to define which
- * traceEvent level gets the file/line info reported in addition to the date/time.
- */
+#define CONST_ALWAYSDISPLAY_TRACE_LEVEL     -1
+#define CONST_FATALERROR_TRACE_LEVEL        0
+#define CONST_ERROR_TRACE_LEVEL             1
+#define CONST_WARNING_TRACE_LEVEL           2
+#define CONST_INFO_TRACE_LEVEL              3
+#define CONST_NOISY_TRACE_LEVEL             4
+    /*
+     * Used as both the limiting value (http.c) and (util.c) to define which
+     * traceEvent level gets the file/line info reported in addition to the date/time.
+     */
 #define CONST_DETAIL_TRACE_LEVEL            5
+
+#define CONST_TRACE_ALWAYSDISPLAY           CONST_ALWAYSDISPLAY_TRACE_LEVEL, __FILE__, __LINE__
+#define CONST_TRACE_FATALERROR              CONST_FATALERROR_TRACE_LEVEL, __FILE__, __LINE__
+#define CONST_TRACE_ERROR                   CONST_ERROR_TRACE_LEVEL, __FILE__, __LINE__
+#define CONST_TRACE_WARNING                 CONST_WARNING_TRACE_LEVEL, __FILE__, __LINE__
+#define CONST_TRACE_INFO                    CONST_INFO_TRACE_LEVEL, __FILE__, __LINE__
+#define CONST_TRACE_NOISY                   CONST_NOISY_TRACE_LEVEL, __FILE__, __LINE__
+#define CONST_TRACE_DETAIL                  CONST_DETAIL_TRACE_LEVEL, __FILE__, __LINE__
+
 
 /*
  * Used in sessions to make sure we don't step on the data area.  It doesn't mean

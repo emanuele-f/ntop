@@ -1549,7 +1549,7 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 	    releaseMutex(&myGlobals.hostsHashMutex);
 #endif    
 	    mutexLocked = 0;
-#ifdef HAVE_SCHED_H
+#ifdef MAKE_WITH_SCHED_YIELD
 	    sched_yield(); /* Allow other threads to run */
 #endif
 	  }

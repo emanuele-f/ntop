@@ -265,8 +265,10 @@ static void dissectFlow(char *buffer, int bufferLen) {
     /* traceEvent(CONST_TRACE_INFO, "dissectFlow(%d flows)", numFlows); */
 #endif
 
+#ifdef CFG_MULTITHREADED
     /* Lock white/black lists for duration of this flow packet */
     accessMutex(&whiteblackListMutex, "flowPacket");
+#endif
 
     for(i=0; i<numFlows; i++) {
       int actualDeviceId;
@@ -550,7 +552,9 @@ static void dissectFlow(char *buffer, int bufferLen) {
 #endif
     }
 
+#ifdef CFG_MULTITHREADED
     releaseMutex(&whiteblackListMutex);
+#endif
 
   }
 }
@@ -673,7 +677,9 @@ static int initNetFlowFunct(void) {
   } else 
     myGlobals.netFlowWhiteList=strdup(value);
 
+#ifdef CFG_MULTITHREADED
   accessMutex(&whiteblackListMutex, "initNetFlowFunct()w");
+#endif
   handleWhiteBlackListAddresses((char*)&value,
                                 whiteNetworks,
                                 &numWhiteNets,
@@ -681,7 +687,9 @@ static int initNetFlowFunct(void) {
                                 sizeof(workList));
   if (myGlobals.netFlowWhiteList != NULL) free(myGlobals.netFlowWhiteList);
   myGlobals.netFlowWhiteList = strdup(workList);
+#ifdef CFG_MULTITHREADED
   releaseMutex(&whiteblackListMutex);
+#endif
   traceEvent(CONST_TRACE_INFO, "NETFLOW: White list initialized to '%s'", myGlobals.netFlowWhiteList);
   
   if(fetchPrefsValue("netFlow.blackList", value, sizeof(value)) == -1) {
@@ -690,7 +698,9 @@ static int initNetFlowFunct(void) {
   } else  
     myGlobals.netFlowBlackList=strdup(value);
 
+#ifdef CFG_MULTITHREADED
   accessMutex(&whiteblackListMutex, "initNetFlowFunct()b");
+#endif
   handleWhiteBlackListAddresses((char*)&value,
                                 blackNetworks,
                                 &numBlackNets,
@@ -698,7 +708,9 @@ static int initNetFlowFunct(void) {
                                 sizeof(workList));
   if (myGlobals.netFlowBlackList != NULL) free(myGlobals.netFlowBlackList);
   myGlobals.netFlowBlackList = strdup(workList);
+#ifdef CFG_MULTITHREADED
   releaseMutex(&whiteblackListMutex);
+#endif
   traceEvent(CONST_TRACE_INFO, "NETFLOW: Black list initialized to '%s'", myGlobals.netFlowBlackList);
 
   setNetFlowInSocket();
@@ -790,7 +802,9 @@ static void handleNetflowHTTPrequest(char* url) {
           }
           tPtr[0]='\0';
 
+#ifdef CFG_MULTITHREADED
           accessMutex(&whiteblackListMutex, "handleNetflowHTTPrequest()w");
+#endif
           handleWhiteBlackListAddresses(value,
                                         whiteNetworks,
                                         &numWhiteNets,
@@ -798,7 +812,9 @@ static void handleNetflowHTTPrequest(char* url) {
                                         sizeof(workList));
           if (myGlobals.netFlowWhiteList != NULL) free(myGlobals.netFlowWhiteList);
           myGlobals.netFlowWhiteList=strdup(workList);
+#ifdef CFG_MULTITHREADED
           releaseMutex(&whiteblackListMutex);
+#endif
           storePrefsValue("netFlow.whiteList", myGlobals.netFlowWhiteList);
       } else if(strcmp(device, "blackList") == 0) {
           /* Cleanup the http control char xform */
@@ -813,7 +829,9 @@ static void handleNetflowHTTPrequest(char* url) {
           }
           tPtr[0]='\0';
 
+#ifdef CFG_MULTITHREADED
           accessMutex(&whiteblackListMutex, "handleNetflowHTTPrequest()b");
+#endif
           handleWhiteBlackListAddresses(value,
                                         blackNetworks,
                                         &numBlackNets,
@@ -821,7 +839,9 @@ static void handleNetflowHTTPrequest(char* url) {
                                         sizeof(workList));
           if (myGlobals.netFlowBlackList != NULL) free(myGlobals.netFlowBlackList);
           myGlobals.netFlowBlackList=strdup(workList);
+#ifdef CFG_MULTITHREADED
           releaseMutex(&whiteblackListMutex);
+#endif
           storePrefsValue("netFlow.blackList", myGlobals.netFlowBlackList);
       } else if(strcmp(device, "collectorIP") == 0) {
 	storePrefsValue("netFlow.netFlowDest", value);
@@ -1202,11 +1222,13 @@ static void handleNetflowHTTPrequest(char* url) {
       sendString("</TD></TR>\n");
 #endif
 
+#ifdef CFG_MULTITHREADED
       if (whiteblackListMutex.isLocked) {
           sendString("<TR><TH>List Mutex</TH>\n");
           printMutexStatus(FALSE, &whiteblackListMutex, "White/Black list mutex");
           sendString("&nbsp;</TD></TR>\n");
       }
+#endif
 
     }
 

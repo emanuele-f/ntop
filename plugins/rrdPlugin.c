@@ -1238,7 +1238,7 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 	    }
 	  }	
 
-	  if(((i+1) & CONST_MUTEX_FHS_MASK) == 0) {
+	  if(mutexLocked && (((i+1) & CONST_MUTEX_FHS_MASK) == 0)) {
 #ifdef CFG_MULTITHREADED
 	    releaseMutex(&myGlobals.hostsHashMutex);
 #endif    

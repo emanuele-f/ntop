@@ -2686,9 +2686,10 @@ void printNtopConfigInfo(int textPrintFlag) {
   printFeatureConfigInfo(textPrintFlag, "DNS responses sniffed", buf);
 
 #if defined(CFG_MULTITHREADED) && defined(MAKE_ASYNC_ADDRESS_RESOLUTION)
+  sendString("<tr><td>&nbsp;</td><td><table border=1>\n");
 
   if (textPrintFlag != TRUE) {
-    sendString("<tr><td align=\"center\">Queued</td>\n<td><table>\n");
+    sendString("<tr><th align=left>Queued</th>\n<td width=100%><table width=100% border=1>\n");
   }
 
   if(myGlobals.numericFlag == 0) {
@@ -2709,7 +2710,7 @@ void printNtopConfigInfo(int textPrintFlag) {
 #endif
 
   if (textPrintFlag != TRUE) {
-    sendString("<tr><td align=\"center\">resolveAddress()</td>\n<td><table>\n");
+    sendString("<tr><th align=left>resolveAddress() calls</th>\n<td width=100%><table width=100% border=1>\n");
   }
 
   if(snprintf(buf, sizeof(buf), "%d", myGlobals.numResolveAddressCalls) < 0)
@@ -2752,7 +2753,7 @@ void printNtopConfigInfo(int textPrintFlag) {
 
   if (textPrintFlag != TRUE) {
     sendString("</table></td></tr>\n");
-    sendString("<tr><td align=\"center\">DNS lookup calls</td>\n<td><table>\n");
+    sendString("<tr><th align=left>DNS lookup calls</th>\n<td width=100%><table width=100% border=1>\n");
   }
  
   if(snprintf(buf, sizeof(buf), "%d", myGlobals.numResolvedWithDNSAddresses) < 0)
@@ -2782,6 +2783,7 @@ void printNtopConfigInfo(int textPrintFlag) {
   if (textPrintFlag != TRUE) {
     sendString("</table></td></tr>\n");
   }
+  sendString("</table></td></tr>\n");
 
   if(snprintf(buf, sizeof(buf), "%d", myGlobals.numKeptNumericAddresses) < 0)
     BufferTooShort();

@@ -163,7 +163,7 @@ static void updateFileList(char *fileName, u_char upDownloadMode, HostTraffic *t
       FD_ZERO(&list->fileFlags);
       FD_SET(upDownloadMode, &list->fileFlags);
       list->next = NULL;
-      
+
       if(numEntries >= MAX_NUM_LIST_ENTRIES) {
 	FileList *ptr = theRemHost->protocolInfo->fileList->next;
 
@@ -191,7 +191,7 @@ static void updateHostUsers(char *userName, int userType, HostTraffic *theHost) 
       not really meaningful
     */
 
-    if((theHost->protocolInfo != NULL) 
+    if((theHost->protocolInfo != NULL)
        && (theHost->protocolInfo->userList != NULL)) {
       UserList *list = theHost->protocolInfo->userList;
 
@@ -254,9 +254,9 @@ void updateUsedPorts(HostTraffic *srcHost,
 
   /* traceEvent(CONST_TRACE_INFO, "%d\n", length); */
 
-  if((srcHost == dstHost) 
-     || broadcastHost(srcHost) 
-     || broadcastHost(dstHost)) 
+  if((srcHost == dstHost)
+     || broadcastHost(srcHost)
+     || broadcastHost(dstHost))
     return;
 
   /* Now let's update the list of ports recently used by the hosts */
@@ -472,7 +472,7 @@ void scanTimedoutTCPSessions(int actualDeviceId) {
 	    thought that the session was already started) since 120 seconds */
 	 || ((theSession->sessionState >= FLAG_STATE_ACTIVE)
 	     && ((theSession->bytesSent.value == 0) || (theSession->bytesRcvd.value == 0))
-	     && ((theSession->lastSeen+120) < myGlobals.actTime))		 
+	     && ((theSession->lastSeen+120) < myGlobals.actTime))
 	 ) {
 
 	if(myGlobals.device[actualDeviceId].tcpSession[idx] == theSession) {
@@ -480,7 +480,7 @@ void scanTimedoutTCPSessions(int actualDeviceId) {
 	  prevSession = myGlobals.device[actualDeviceId].tcpSession[idx];
 	} else
 	  prevSession->next = nextSession;
-	
+
 	freeSessionCount++;
 	freeSession(theSession, actualDeviceId, 1);
 	theSession = prevSession;
@@ -768,7 +768,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	    incrementTrafficCounter(&srcHost->protocolInfo->httpStats->numNegativeReplSent, 1);
 	    incrementTrafficCounter(&dstHost->protocolInfo->httpStats->numNegativeReplRcvd, 1);
 	  }
-	    
+
 	  if(microSecTimeDiff > 0) {
 	    if(subnetLocalHost(dstHost)) {
 	      if((srcHost->protocolInfo->httpStats->fastestMicrosecLocalReqMade == 0)
@@ -894,14 +894,18 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 		  printf("DEBUG: OS='%s'\n", os);
 #endif
 
+#ifdef CFG_MULTITHREADED
 		  accessAddrResMutex("makeHostLink");
+#endif
 		  if(srcHost->fingerprint == NULL) {
 		    char buffer[64];
-		    
+
 		    snprintf(buffer, sizeof(buffer), ":%s", os);
 		    srcHost->fingerprint = strdup(buffer);
 		  }
-		  releaseAddrResMutex();	  
+#ifdef CFG_MULTITHREADED
+		  releaseAddrResMutex();
+#endif
 		}
 		break;
 	      }	else if(strncmp(row, "Host:", 5) == 0) {
@@ -998,7 +1002,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	    /* printf("==>\n\n%s\n\n", rcStr); */
 	  }
 	  free(rcStr);
-	} else if((theSession->bytesProtoSent.value > 0) 
+	} else if((theSession->bytesProtoSent.value > 0)
 		  || (theSession->bytesProtoSent.value < 32)) {
 	  char *strtokState, *row;
 
@@ -1102,7 +1106,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 #endif
 
 	      if(theSession->bytesProtoSent.value == 3) {
-		/* GET */ 
+		/* GET */
 		updateFileList(file,  BITFLAG_P2P_DOWNLOAD_MODE, srcHost);
 		updateFileList(file,  BITFLAG_P2P_UPLOAD_MODE,   dstHost);
 		updateHostUsers(user, BITFLAG_P2P_USER, srcHost);
@@ -1120,11 +1124,11 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
       } else if(((sport == 1863) ||(dport == 1863)) /* MS Messenger */
 		&& (packetDataLength > 0)) {
 	  char *strtokState, *row;
-	  
+
 	  rcStr = (char*)malloc(packetDataLength+1);
 	  memcpy(rcStr, packetData, packetDataLength);
 	  rcStr[packetDataLength] = '\0';
-	  
+
 	  if((dport == 1863) && (strncmp(rcStr, "USR 6 TWN I ", 12) == 0)) {
 	    row = strtok(&rcStr[12], "\n\r");
 	    if(strstr(row, "@")) {
@@ -1233,7 +1237,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	else
 	  FD_SET(FLAG_HOST_TYPE_SVC_POP, &dstHost->flags);
 
-	if(((theSession->bytesProtoRcvd.value < 64) 
+	if(((theSession->bytesProtoRcvd.value < 64)
 	    || (theSession->bytesProtoSent.value < 64)) /* The user name is sent at the beginning of the communication */
 	   && (packetDataLength > 4)) {
 	  rcStr = (char*)malloc(packetDataLength+1);
@@ -1316,12 +1320,12 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	     || (!strncmp(rcStr, "$Quit", 5))) {
 	    /* See dcplusplus.sourceforge.net */
 
-	    theSession->isP2P = FLAG_P2P_DIRECTCONNECT;	      
+	    theSession->isP2P = FLAG_P2P_DIRECTCONNECT;
 	    if(!strncmp(rcStr, "$MyNick", 7)) {
 	      updateHostUsers(strtok(&rcStr[8], "|"), BITFLAG_P2P_USER, srcHost);
 	    } else if(!strncmp(rcStr, "$Get", 4)) {
 	      char *file = strtok(&rcStr[5], "$");
-		
+
 	      updateFileList(file, BITFLAG_P2P_DOWNLOAD_MODE, srcHost);
 	      updateFileList(file, BITFLAG_P2P_UPLOAD_MODE,   dstHost);
 	    }
@@ -1935,7 +1939,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	myGlobals.device[actualDeviceId].tcpSession[idx] = theSession->next;
       } else
 	prevSession->next = theSession->next;
-      
+
       freeSession(theSession, actualDeviceId, 1);
 #ifdef CFG_MULTITHREADED
       releaseMutex(&myGlobals.tcpSessionsMutex);

@@ -267,6 +267,10 @@ dnetter:
 	mv $(ETTER_PASSIVE) $(ETTER_PASSIVE).old
 	wget -O $(ETTER_PASSIVE) http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/~checkout~/ettercap/ettercap/etter.passive.os.fp?rev=HEAD\&content-type=text/plain
 
+# download the data for and make the p2c.opt.table
+p2ctable:
+	@utils/p2c
+
 # run ./configure with --showoses
 showoses:
 	@echo "Processing request... please wait..."

@@ -259,7 +259,7 @@ static void initIPCountryTable(void) {
       }
 
       fclose(fd);
-      traceEvent(CONST_TRACE_NOISY, "IP2CC: ......%d records read.\n", myGlobals.ipCountryCount);
+      traceEvent(CONST_TRACE_INFO, "IP2CC: ......%d records read.\n", myGlobals.ipCountryCount);
     } else 
       traceEvent(CONST_TRACE_NOISY, "IP2CC: ...not found at %s.\n", tmpStr);
   }

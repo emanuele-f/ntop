@@ -23,7 +23,7 @@
 /* Global */
 static char hex[] = "0123456789ABCDEF";
 
-#if !defined(WIN32) && !defined(AIX)
+#ifdef HAVE_NETDB_H
 extern int h_errno; /* netdb.h */
 #endif
 
@@ -178,7 +178,7 @@ static void resolveAddress(struct in_addr *hostAddr,
 
     theAddr.s_addr = ntohl(hostAddr->s_addr); /* big/little endian crap */
 
-#if !defined(WIN32) &&  !defined(AIX)
+#ifdef HAVE_NETDB_H
     h_errno = NETDB_SUCCESS;
 #endif
 
@@ -264,7 +264,7 @@ static void resolveAddress(struct in_addr *hostAddr,
 #endif
 
     if (
-#if !defined(WIN32) &&  !defined(AIX)
+#ifdef HAVE_NETDB_H
 	(h_errno == NETDB_SUCCESS) &&
 #endif
 	(hp != NULL) && (hp->h_name != NULL)) {

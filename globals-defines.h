@@ -343,6 +343,13 @@
  #undef MAKE_WITH_FORK_COPYONWRITE
 #endif
 
+/*
+ * This flag turns on a signal trap in rrdPlugin.c.  If you're seeing
+ * rrd simply and silently die, this might catch the signal and log
+ * it for analysis.
+ */
+/* #define MAKE_WITH_RRDSIGTRAP */
+
 /* EXPERIMENTAL */
 /* Define MAKE_WITH_LOG_XXXXXX if you want log messages to use more than just
  * LOG_ERR for ntop's messages.

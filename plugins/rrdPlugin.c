@@ -1181,6 +1181,70 @@ static void handleRRDHTTPrequest(char* url) {
 }
 
 /* ****************************** */
+#ifdef MAKE_WITH_RRDSIGTRAP
+RETSIGTYPE rrdcleanup(int signo) {
+  static int msgSent = 0;
+  int i;
+  void *array[20];
+  size_t size;
+  char **strings;
+
+  if(msgSent<10) {
+    traceEvent(CONST_TRACE_FATALERROR, "RRD: caught signal %d %s", signo,
+               signo == SIGHUP ? "SIGHUP" :
+                 signo == SIGINT ? "SIGINT" :
+                 signo == SIGQUIT ? "SIGQUIT" : 
+                 signo == SIGILL ? "SIGILL" :
+                 signo == SIGABRT ? "SIGABRT" :
+                 signo == SIGFPE ? "SIGFPE" :
+                 signo == SIGKILL ? "SIGKILL" :
+                 signo == SIGSEGV ? "SIGSEGV" :
+                 signo == SIGPIPE ? "SIGPIPE" :
+                 signo == SIGALRM ? "SIGALRM" :
+                 signo == SIGTERM ? "SIGTERM" :
+                 signo == SIGUSR1 ? "SIGUSR1" :
+                 signo == SIGUSR2 ? "SIGUSR2" :
+                 signo == SIGCHLD ? "SIGCHLD" :
+ #ifdef SIGCONT
+                 signo == SIGCONT ? "SIGCONT" :
+ #endif
+ #ifdef SIGSTOP
+                 signo == SIGSTOP ? "SIGSTOP" :
+ #endif
+ #ifdef SIGBUS
+                 signo == SIGBUS ? "SIGBUS" :
+ #endif
+ #ifdef SIGSYS
+                 signo == SIGSYS ? "SIGSYS"
+ #endif
+               : "other");
+    msgSent++;
+  }
+
+ #ifdef HAVE_BACKTRACE
+  /* Don't double fault... */
+  /* signal(signo, SIG_DFL); */
+
+  /* Grab the backtrace before we do much else... */
+  size = backtrace(array, 20);
+  strings = (char**)backtrace_symbols(array, size);
+
+  traceEvent(CONST_TRACE_FATALERROR, "RRD: BACKTRACE:     backtrace is:\n");
+  if (size < 2) {
+      traceEvent(CONST_TRACE_FATALERROR, "RRD: BACKTRACE:         **unavailable!\n");
+  } else {
+      /* Ignore the 0th entry, that's our cleanup() */
+      for (i=1; i<size; i++) {
+          traceEvent(CONST_TRACE_FATALERROR, "RRD: BACKTRACE:          %2d. %s\n", i, strings[i]);
+      }
+    }
+ #endif /* HAVE_BACKTRACE */
+
+  exit(0);
+}
+#endif /* MAKE_WITH_RRDSIGTRAP */
+
+/* ****************************** */
 
 static void* rrdMainLoop(void* notUsed _UNUSED_) {
   char value[512 /* leave it big for hosts filter */];
@@ -1203,6 +1267,35 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
  #endif
 #endif
 
+#ifdef MAKE_WITH_RRDSIGTRAP
+  signal(SIGSEGV, rrdcleanup);
+  signal(SIGHUP,  rrdcleanup);
+  signal(SIGINT,  rrdcleanup);
+  signal(SIGQUIT, rrdcleanup);
+  signal(SIGILL,  rrdcleanup);
+  signal(SIGABRT, rrdcleanup);
+  signal(SIGFPE,  rrdcleanup);
+  signal(SIGKILL, rrdcleanup);
+  signal(SIGPIPE, rrdcleanup);
+  signal(SIGALRM, rrdcleanup);
+  signal(SIGTERM, rrdcleanup);
+  signal(SIGUSR1, rrdcleanup);
+  signal(SIGUSR2, rrdcleanup);
+  /* signal(SIGCHLD, rrdcleanup); */
+ #ifdef SIGCONT
+  signal(SIGCONT, rrdcleanup);
+ #endif
+ #ifdef SIGSTOP
+  signal(SIGSTOP, rrdcleanup);
+ #endif
+ #ifdef SIGBUS 
+  signal(SIGBUS,  rrdcleanup);
+ #endif
+ #ifdef SIGSYS
+  signal(SIGSYS,  rrdcleanup); 
+ #endif
+#endif /* MAKE_WITH_RRDSIGTRAP */
+ 
   if (initialized == 0)
     commonRRDinit();
 

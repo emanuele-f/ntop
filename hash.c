@@ -268,6 +268,17 @@ void freeHostInfo(int theDevice, HostTraffic *host, int actualDeviceId) {
       list = next;
     }
   }
+ 
+  if(host->userList != NULL) {
+    UserList *list = host->userList;
+    
+    while(list != NULL) {
+      UserList *next = list->next;
+      free(list->userName);
+      free(list);
+      list = next;
+    }
+  }
 
   /* ************************************* */
 
@@ -765,6 +776,7 @@ u_int getHostInfo(struct in_addr *hostIpAddress,
       }
 
       if(hostIpAddress != NULL) {
+	if(myGlobals.dontTrustMACaddr) memcpy(el->lastEthAddress, ether_addr, ETHERNET_ADDRESS_LEN);
 	el->hostIpAddress.s_addr = hostIpAddress->s_addr;
 	strncpy(el->hostNumIpAddress,
 		_intoa(*hostIpAddress, buf, sizeof(buf)),

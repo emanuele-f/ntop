@@ -2812,7 +2812,8 @@ void printHostDetailedInfo(HostTraffic *el, int actualDeviceId) {
     sendString(buf);
   }
 
-  if((el->ethAddressString[0] != '\0')
+  if((!myGlobals.dontTrustMACaddr)
+     && (el->ethAddressString[0] != '\0')
      && strcmp(el->ethAddressString, "00:00:00:00:00:00")
      && strcmp(el->ethAddressString, "00:01:02:03:04:05") /* dummy address */) {
     char *vendorName;
@@ -3171,7 +3172,6 @@ void printHostDetailedInfo(HostTraffic *el, int actualDeviceId) {
 
   checkHostProvidedServices(el);
 
-  /* **************************** */
   /*
     Fix courtesy of
     Albert Chin-A-Young <china@thewrittenword.com>
@@ -3179,6 +3179,29 @@ void printHostDetailedInfo(HostTraffic *el, int actualDeviceId) {
   if(printedHeader > 1)
     sendString("</OL></TD></TR>\n");
 
+  /* **************************** */
+
+  if(el->userList != NULL) {
+    UserList *list = el->userList;
+
+    if(snprintf(buf, sizeof(buf), "<TR %s><TH "TH_BG" ALIGN=LEFT>"
+		"Known&nbsp;Users&nbsp;<IMG ALT=Users SRC=/users.gif BORDER=0></TH><TD "TD_BG" ALIGN=RIGHT>\n",
+		getRowColor()) < 0)
+      BufferTooShort();
+    sendString(buf);
+
+    while(list != NULL) {
+      if(snprintf(buf, sizeof(buf), "%s<BR>\n", list->userName) < 0)
+	BufferTooShort();
+      sendString(buf);
+
+      list = list->next;
+    }
+
+    sendString("</TD></TR>\n");
+  }
+
+  /* **************************** */
 
   if((el->hostNumIpAddress[0] != '\0')
      && (!subnetPseudoLocalHost(el))

@@ -1905,15 +1905,17 @@ typedef struct icmpHostInfo {
    32, 512, 1024, 2048, 4069, 8192, 12288 ...
  */
  
-#define HASH_INITIAL_SIZE         32
-#define HASH_MINIMUM_SIZE         512  /* Minimum after 1st entend */
+#define HASH_INITIAL_SIZE           32
+#define HASH_MINIMUM_SIZE          512  /* Minimum after 1st entend */
 #define HASH_FACTOR_MAXIMUM       4096 /* After it gets this big */
 #define HASH_TERMINAL_INCREASE    4096 /*      grow by */
-#define HASH_INCREASE_FACTOR      2    /* Between MINIMUM and TERMINAL, grow by... */
+#define HASH_INCREASE_FACTOR         2    /* Between MINIMUM and TERMINAL, grow by... */
 
-#define MAX_HOST_SYM_NAME_LEN     64
+#define MAX_HOST_SYM_NAME_LEN       64
 #define MAX_HOST_SYM_NAME_LEN_HTML 256 /* Fully tricked out html version - hash.c */
-#define MAX_NODE_TYPES             8
+#define MAX_NODE_TYPES               8
+
+#define MAX_NUM_LIST_ENTRIES        32
 
 typedef struct virtualHostList {
   char *virtualHostName;
@@ -1921,6 +1923,10 @@ typedef struct virtualHostList {
   struct virtualHostList *next;
 } VirtualHostList;
 
+typedef struct userList {
+  char *userName;
+  struct userList *next;
+} UserList;
 
 typedef struct storedAddress {
   char   symAddress[MAX_HOST_SYM_NAME_LEN];
@@ -1994,6 +2000,9 @@ typedef struct hostTraffic {
 
   /* HTTP */
   VirtualHostList *httpVirtualHosts;
+
+  /* POP3/SMTP... */
+  UserList *userList;
 
   /* Interesting Packets */
   SecurityHostProbes *secHostPkts;

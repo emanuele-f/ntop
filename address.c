@@ -39,6 +39,45 @@ static int _ns_name_unpack(const u_char *msg,
 			  const u_char *eom, const u_char *src,
 			  u_char *dst, size_t dstsiz);
 
+/* **************************************** */
+
+void updateHostNameInfo(unsigned long numeric, 
+			char* symbolic, int actualDeviceId) {
+  char *hostName;
+  struct in_addr addr;
+  char buf[32];
+  char sqlBuf[BUF_SIZE];
+  u_int idx;
+
+  if(!myGlobals.capturePackets) return;
+
+  addr.s_addr = numeric;
+  hostName = _intoa(addr, buf, sizeof(buf));
+
+  /* Search the instance and update its name */
+
+#ifdef MULTITHREADED
+  if(myGlobals.numericFlag == 0) 
+    accessMutex(&myGlobals.addressResolutionMutex, "updateHostNameInfo");
+#endif
+    
+  idx = findHostIdxByNumIP(addr, actualDeviceId);
+
+  if(idx != NO_PEER) {
+    if(myGlobals.device[actualDeviceId].hash_hostTraffic[idx] != NULL) {
+
+      if(strlen(symbolic) >= (MAX_HOST_SYM_NAME_LEN-1)) 
+	symbolic[MAX_HOST_SYM_NAME_LEN-2] = '\0';
+      strcpy(myGlobals.device[actualDeviceId].hash_hostTraffic[idx]->hostSymIpAddress, symbolic);
+    }
+  }
+
+#ifdef MULTITHREADED
+  if(myGlobals.numericFlag == 0) 
+    releaseMutex(&myGlobals.addressResolutionMutex);
+#endif
+}
+
 /* ************************************ */
 
 static void resolveAddress(struct in_addr *hostAddr,
@@ -108,6 +147,7 @@ static void resolveAddress(struct in_addr *hostAddr,
     } else
       strncpy(symAddr, retrievedAddress->symAddress, MAX_HOST_SYM_NAME_LEN-1);
 
+    updateHostNameInfo(addr, retrievedAddress->symAddress, actualDeviceId);
     myGlobals.numResolvedOnCacheAddresses++;
 #ifdef DEBUG
     traceEvent(TRACE_INFO, "Leaving resolveAddress()");
@@ -293,6 +333,8 @@ static void resolveAddress(struct in_addr *hostAddr,
   /* key_data has been set already */
   data_data.dptr = (void*)&storedAddress;
   data_data.dsize = sizeof(storedAddress)+1;
+
+  updateHostNameInfo(addr, symAddr, actualDeviceId);
 
   if(myGlobals.gdbm_file == NULL) {
 #ifdef DEBUG
@@ -584,7 +626,9 @@ void ipaddr2str(struct in_addr hostIpAddress, int actualDeviceId) {
 
   fetchAddressFromCache(hostIpAddress, buf);
 
-  if(buf[0] == '\0') {
+  if(buf[0] != '\0') {
+    updateHostNameInfo(hostIpAddress.s_addr, buf, actualDeviceId);
+  } else {
 #ifndef MULTITHREADED
     resolveAddress(&hostIpAddress, 0, actualDeviceId);
 #else

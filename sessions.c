@@ -96,9 +96,10 @@ static void updatePortList(HostTraffic *theHost,
 static void updateHTTPVirtualHosts(char *virtualHostName,
 				   HostTraffic *theRemHost,
 				   TrafficCounter bytesSent, TrafficCounter bytesRcvd) {
-  
+
   if(virtualHostName != NULL) {
     VirtualHostList *list = theRemHost->httpVirtualHosts;
+    int numEntries = 0;
 
 #ifdef DEBUG
     traceEvent(TRACE_INFO, "updateHTTPVirtualHosts: %s for host %s [s=%u,r=%u]",
@@ -110,16 +111,73 @@ static void updateHTTPVirtualHosts(char *virtualHostName,
       if(strcmp(list->virtualHostName, virtualHostName) == 0) {
 	list->bytesSent += bytesSent, list->bytesRcvd += bytesRcvd;
 	break;
-      } else
+      } else {
 	list = list->next;
+	numEntries++;
+      }
     }
-    
-    if(list == NULL) {
+
+    if((list == NULL) && (numEntries < MAX_NUM_LIST_ENTRIES)) {
       list = (VirtualHostList*)malloc(sizeof(VirtualHostList));
       list->virtualHostName = strdup(virtualHostName);
       list->bytesSent = bytesSent, list->bytesRcvd = bytesRcvd;
       list->next = theRemHost->httpVirtualHosts;
       theRemHost->httpVirtualHosts = list;
+    }
+  }
+}
+
+/* ************************************ */
+
+static void updateHostUsers(char *userName, HostTraffic *theHost) {
+
+  if(isSMTPhost(theHost)) {
+    /*
+      If this is a SMTP server the local users are
+      not really meaningful
+    */
+
+    if(theHost->userList != NULL) {
+      UserList *list = theHost->userList;
+
+      /*
+	It might be that ntop added users before it
+	realized this host was a SMTP server. They must
+	be removed.
+      */
+
+      while(list != NULL) {
+	UserList *next = list->next;
+
+	free(list->userName);
+	free(list);
+	list = next;
+      }
+
+      theHost->userList = NULL;
+    }
+
+    return; /* That's all for now */
+  }
+
+  if(userName != NULL) {
+    UserList *list = theHost->userList;
+    int numEntries = 0;
+
+    while(list != NULL) {
+      if(strcmp(list->userName, userName) == 0) {
+	return; /* Nothing to do: this user is known */
+      } else {
+	list = list->next;
+	numEntries++;
+      }
+    }
+
+    if((list == NULL) && (numEntries < MAX_NUM_LIST_ENTRIES)) {
+      list = (UserList*)malloc(sizeof(UserList));
+      list->userName = strdup(userName);
+      list->next = theHost->userList;
+      theHost->userList = list;
     }
   }
 }
@@ -272,7 +330,7 @@ void freeSession(IPSession *sessionToPurge, int actualDeviceId,
    */
   sessionToPurge->magic = 0;
 
-  if(sessionToPurge->virtualPeerName != NULL) 
+  if(sessionToPurge->virtualPeerName != NULL)
     free(sessionToPurge->virtualPeerName);
 
   myGlobals.numTerminatedSessions++;
@@ -559,6 +617,10 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
       len = packetDataLength;
 
     if(myGlobals.enablePacketDecoding) {
+
+      if(sport == 80) 	FD_SET(HOST_SVC_HTTP, &srcHost->flags);
+      if(dport == 80) 	FD_SET(HOST_SVC_HTTP, &dstHost->flags);
+	    
       if((sport == 80 /* HTTP */)
 	 && (theSession->bytesProtoRcvd == 0)
 	 && (packetDataLength > 0)) {
@@ -602,8 +664,6 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	    srcHost->httpStats->numNegativeReplSent++;
 	    dstHost->httpStats->numNegativeReplRcvd++;
 	  }
-
-	  FD_SET(HOST_SVC_HTTP, &srcHost->flags);
 
 	  if(microSecTimeDiff > 0) {
 	    if(subnetLocalHost(dstHost)) {
@@ -739,9 +799,12 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 		row[strlen(row)-1] = '\0';
 
 		host = &row[6];
-		if(strlen(host) > 48) 
+		if(strlen(host) > 48)
 		  host[48] = '\0';
 
+#ifdef DEBUG
+		printf("DEBUG: HOST='%s'\n", host);
+#endif
 		if(theSession->virtualPeerName == NULL)
 		  theSession->virtualPeerName = strdup(host);
 	    }
@@ -771,6 +834,76 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	  FD_SET(HOST_SVC_SMTP, &srcHost->flags);
 	else
 	  FD_SET(HOST_SVC_SMTP, &dstHost->flags);
+
+	if(((theSession->bytesProtoRcvd <64)
+	    || (theSession->bytesProtoSent <64)) /* The sender name is sent at the beginning of the communication */
+	   && (packetDataLength > 7)) {
+	  char *rcStr;
+	  int beginIdx = 11, i;
+
+	  rcStr = (char*)malloc(packetDataLength+1);
+	  strncpy(rcStr, packetData, packetDataLength);
+	  rcStr[packetDataLength-1] = '\0';
+
+	  if(strncmp(rcStr, "MAIL FROM:", 10) == 0) {
+	    if(iscntrl(rcStr[strlen(rcStr)-1])) rcStr[strlen(rcStr)-1] = '\0';
+	    rcStr[strlen(rcStr)-1] = '\0';
+	    if(rcStr[beginIdx] == '<') beginIdx++;
+
+	    i=beginIdx+1;
+	    while(rcStr[i] != '\0') {
+	      if(rcStr[i] == '>') {
+		rcStr[i] = '\0';
+		break;
+	      }
+
+	      i++;
+	    }
+	    if(sport == 25)
+	      updateHostUsers(&rcStr[beginIdx], dstHost);
+	    else
+	      updateHostUsers(&rcStr[beginIdx], srcHost);
+
+#ifdef SMTP_DEBUG
+	    printf("SMTP_DEBUG: %s:%d->%s:%d [%s]\n",
+		   srcHost->hostNumIpAddress, sport, dstHost->hostNumIpAddress, dport,
+		   &rcStr[beginIdx]);
+#endif
+	  }
+
+	  free(rcStr);
+	}
+      } else if(((sport == 21 /* FTP */)  || (dport == 21 /* FTP */))
+		&& (theSession->sessionState == STATE_ACTIVE)) {
+	if(sport == 21)
+	  FD_SET(HOST_SVC_FTP, &srcHost->flags);
+	else
+	  FD_SET(HOST_SVC_FTP, &dstHost->flags);
+
+	if(((theSession->bytesProtoRcvd <64)
+	    || (theSession->bytesProtoSent <64)) /* The sender name is sent at the beginning of the communication */
+	   && (packetDataLength > 7)) {
+	  char *rcStr;
+
+	  rcStr = (char*)malloc(packetDataLength+1);
+	  strncpy(rcStr, packetData, packetDataLength);
+	  rcStr[packetDataLength-1] = '\0';
+
+	  if((strncmp(rcStr, "USER ", 5) == 0) && strcmp(&rcStr[5], "anonymous")) {
+	    if(sport == 21)
+	      updateHostUsers(&rcStr[5], dstHost);
+	    else
+	      updateHostUsers(&rcStr[5], srcHost);
+
+#ifndef FTP_DEBUG
+	    printf("FTP_DEBUG: %s:%d->%s:%d [%s]\n",
+		   srcHost->hostNumIpAddress, sport, dstHost->hostNumIpAddress, dport,
+		   &rcStr[5]);
+#endif
+	  }
+
+	  free(rcStr);
+	}
       } else if(((dport == 515 /* printer */) || (sport == 515))
 		&& (theSession->sessionState == STATE_ACTIVE)) {
 	if(sport == 515)
@@ -785,12 +918,73 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	else
 	  FD_SET(HOST_SVC_POP, &dstHost->flags);
 
+	if(((theSession->bytesProtoRcvd <64) || (theSession->bytesProtoSent <64)) /* The user name is sent at the beginning of the communication */
+	   && (packetDataLength > 4)) {
+	  char *rcStr;
+
+	  rcStr = (char*)malloc(packetDataLength+1);
+	  strncpy(rcStr, packetData, packetDataLength);
+	  rcStr[packetDataLength-1] = '\0';
+
+	  if(strncmp(rcStr, "USER ", 5) == 0) {
+	    if(iscntrl(rcStr[strlen(rcStr)-1])) rcStr[strlen(rcStr)-1] = '\0';
+	    if((sport == 109) || (sport == 110))
+	      updateHostUsers(&rcStr[5], dstHost);
+	    else
+	      updateHostUsers(&rcStr[5], srcHost);
+
+#ifdef POP_DEBUG
+	    printf("POP_DEBUG: %s->%s [%s]\n",
+		   srcHost->hostNumIpAddress, dstHost->hostNumIpAddress,
+		   &rcStr[5]);
+#endif
+	  }
+
+	  free(rcStr);
+	}
       } else if(((sport == 143 /* imap */) || (dport == 143 /* imap */))
 		&& (theSession->sessionState == STATE_ACTIVE)) {
+
 	if(sport == 143)
 	  FD_SET(HOST_SVC_IMAP, &srcHost->flags);
 	else
 	  FD_SET(HOST_SVC_IMAP, &dstHost->flags);
+
+	if(((theSession->bytesProtoRcvd <64)
+	    || (theSession->bytesProtoSent <64)) /* The sender name is sent at the beginning of the communication */
+	   && (packetDataLength > 7)) {
+	  char *rcStr;
+
+	  rcStr = (char*)malloc(packetDataLength+1);
+	  strncpy(rcStr, packetData, packetDataLength);
+	  rcStr[packetDataLength-1] = '\0';
+
+	  if(strncmp(rcStr, "2 login ", 8) == 0) {
+	    int beginIdx = 10;
+	      
+	    while(rcStr[beginIdx] != '\0') {
+	      if(rcStr[beginIdx] == '\"') { 
+		rcStr[beginIdx] = '\0';
+		break;
+	      }
+	      beginIdx++;
+	    }
+
+	    if(sport == 143)
+	      updateHostUsers(&rcStr[9], dstHost);
+	    else
+	      updateHostUsers(&rcStr[9], srcHost);
+
+#ifdef IMAP_DEBUG
+	    printf("IMAP_DEBUG: %s:%d->%s:%d [%s]\n",
+		   srcHost->hostNumIpAddress, sport, dstHost->hostNumIpAddress, dport,
+		   &rcStr[9]);
+#endif
+	  }
+
+	  free(rcStr);
+	}
+
       }
     } else {
       /* !myGlobals.enablePacketDecoding */
@@ -1223,10 +1417,10 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 		      (u_int)(theSession->bytesSent+theSession->bytesRcvd));
 
       if(sport == 80)
-	updateHTTPVirtualHosts(theSession->virtualPeerName, srcHost, 
+	updateHTTPVirtualHosts(theSession->virtualPeerName, srcHost,
 			       theSession->bytesSent, theSession->bytesRcvd);
       else
-	updateHTTPVirtualHosts(theSession->virtualPeerName, dstHost, 
+	updateHTTPVirtualHosts(theSession->virtualPeerName, dstHost,
 			       theSession->bytesRcvd, theSession->bytesSent);
     }
 
@@ -1408,7 +1602,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
     memset(&tmpSession, 0, sizeof(IPSession));
 
     updateUsedPorts(srcHost, dstHost, sport, dport, length);
-    
+
     tmpSession.lastSeen = myGlobals.actTime;
     tmpSession.initiatorIdx = checkSessionIdx(srcHostIdx),
       tmpSession.remotePeerIdx = checkSessionIdx(dstHostIdx);

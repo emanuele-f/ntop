@@ -535,6 +535,7 @@ void addDefaultProtocols(void) {
   /* Peer-to-Peer Protocols */
   handleProtocolList("Gnutella", "6346|6347|6348|");
   handleProtocolList("Morpheus", "1214|");
+  handleProtocolList("Messenger", "1863|5000|5001|5190-5193|");
   handleProtocolList("WinMX",    "6699|7730|");
   handleProtocolList("Audiogalaxy",    "41000-41900|");
   /* handleProtocolList("Napster",  "8888|8875|"); */

@@ -4366,7 +4366,7 @@ void printNtopProblemReport(void) {
     SSL fix courtesy of Curtis Doty <curtis@greenkey.net>
   */
 void initWeb() {
-    int sockopt = 1;
+    int i, sockopt = 1;
     struct sockaddr_in sockIn;
     char value[8];
 
@@ -4393,6 +4393,35 @@ void initWeb() {
       }
     }
     
+    if (myGlobals.device[myGlobals.actualReportDeviceId].virtualDevice) {
+      /* Bad idea, set to 1st non-virtual device */
+      for(i=0; i<myGlobals.numDevices; i++) {
+#ifdef DEBUG
+        traceEvent(CONST_TRACE_INFO, "DEBUG: Device %d[%s] is v%d d%d a%d",
+                   i, myGlobals.device[i].name,
+                   myGlobals.device[i].virtualDevice,
+                   myGlobals.device[i].dummyDevice,
+                   myGlobals.device[i].activeDevice);
+#endif
+        if(!myGlobals.device[i].virtualDevice) {
+            myGlobals.actualReportDeviceId = i;
+#ifdef DEBUG
+            traceEvent(CONST_TRACE_INFO, "DEBUG: actualReportDeviceId invalid, changed to %d[%s]",
+                                         myGlobals.actualReportDeviceId,
+                                         myGlobals.device[myGlobals.actualReportDeviceId].name);
+#endif
+            break;
+        }
+      }
+    }
+    traceEvent(CONST_TRACE_INFO,
+               "Note: Reporting device set to %d[%s]",
+               myGlobals.actualReportDeviceId,
+               myGlobals.device[myGlobals.actualReportDeviceId].humanFriendlyName != NULL ?
+                   myGlobals.device[myGlobals.actualReportDeviceId].humanFriendlyName :
+                   myGlobals.device[myGlobals.actualReportDeviceId].name
+              );
+
     if(myGlobals.webPort > 0) {
       sockIn.sin_family = AF_INET;
       sockIn.sin_port   = (int)htons((unsigned short int)myGlobals.webPort);

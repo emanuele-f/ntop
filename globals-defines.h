@@ -1053,6 +1053,13 @@
 #define MAX_DLT_ARRAY                       123
 
 /*
+ * handleAddressLists() constants
+ */
+#define CONST_HANDLEADDRESSLISTS_MAIN       0
+#define CONST_HANDLEADDRESSLISTS_RRD        1
+#define CONST_HANDLEADDRESSLISTS_NETFLOW    2
+
+/*
  * Protocol types
  */
 #define CONST_GRE_PROTOCOL_TYPE             0x2F

@@ -313,7 +313,7 @@ extern void updateDeviceThpt(int deviceToUpdate);
 extern u_int findHostIdxByNumIP(struct in_addr hostIpAddress, u_int actualDeviceId);
 extern void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS][3],
 				u_short *numNetworks, char *localAddresses, 
-				int localAddressesLen, int flagRRD);
+				int localAddressesLen, int flagWhat);
 extern void handleFlowsSpecs();
 extern void initPassiveSessions();
 extern void termPassiveSessions();
@@ -444,6 +444,9 @@ extern u_int numActiveSenders(u_int deviceId);
 extern u_int32_t xaton(char *s);
 extern void addNodeInternal(u_int32_t ip, int prefix, char *country);
 extern char *ip2CountryCode(u_int32_t ip);
+#ifdef CFG_MULTITHREADED
+extern void printMutexStatus(int textPrintFlag, PthreadMutex *mutexId, char *mutexName);
+#endif
 
 #ifdef MAKE_WITH_I18N
 char *i18n_xvert_locale2common(const char *input);

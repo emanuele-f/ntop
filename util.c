@@ -338,12 +338,16 @@ int dotted2bits(char *mask) {
 /* Example: "131.114.0.0/16,193.43.104.0/255.255.255.0" */
 
 void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS][3],
-			u_short *numNetworks, char *localAddresses, int localAddressesLen, int flagRRD) {
+			u_short *numNetworks, char *localAddresses, int localAddressesLen, int flagWhat) {
   char *strtokState, *address;
   int  laBufferPosition = 0, laBufferUsed = 0, i;
 
-  if (flagRRD == FALSE) 
-    traceEvent(CONST_TRACE_NOISY, "Processing -m | --local-subnets parameter '%s'", addresses);
+  traceEvent(CONST_TRACE_NOISY,
+             "Processing %s parameter '%s'",
+             flagWhat == CONST_HANDLEADDRESSLISTS_MAIN ? "-m | --local-subnets"  :
+                 flagWhat == CONST_HANDLEADDRESSLISTS_RRD ? "RRD" :
+                 flagWhat == CONST_HANDLEADDRESSLISTS_NETFLOW ? "Netflow white/black list" : "unknown",
+             addresses);
 
   if(addresses == NULL)
     return;
@@ -356,7 +360,7 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
     char *mask = strchr(address, '/');
 
     if(mask == NULL) {
-      if (flagRRD == FALSE)
+      if (flagWhat == CONST_HANDLEADDRESSLISTS_MAIN)
         traceEvent(CONST_TRACE_WARNING, "-m: Empty mask '%s' - ignoring entry", address);
     } else {
       u_int32_t network, networkMask, broadcast;
@@ -367,14 +371,22 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
       bits = dotted2bits (mask);
 
       if(sscanf(address, "%d.%d.%d.%d", &a, &b, &c, &d) != 4) {
-	traceEvent(CONST_TRACE_WARNING, "%s: Bad format '%s' - ignoring entry", flagRRD == TRUE ? "RRD" : "-m", address);
+        traceEvent(CONST_TRACE_WARNING, "%s: Bad format '%s' - ignoring entry",
+                     flagWhat == CONST_HANDLEADDRESSLISTS_MAIN ? "-m"  :
+                         flagWhat == CONST_HANDLEADDRESSLISTS_RRD ? "RRD" :
+                         flagWhat == CONST_HANDLEADDRESSLISTS_NETFLOW ? "Netflow" : "unknown",
+                      address);
 	address = strtok_r(NULL, ",", &strtokState);
 	continue;
       }
 
       if(bits == CONST_INVALIDNETMASK) {
 	/* malformed netmask specification */
-	traceEvent(CONST_TRACE_WARNING, "%s: Net mask '%s' not valid - ignoring entry", flagRRD == TRUE ? "RRD" : "-m", mask);
+        traceEvent(CONST_TRACE_WARNING, "%s: Net mask '%s' not valid - ignoring entry",
+                     flagWhat == CONST_HANDLEADDRESSLISTS_MAIN ? "-m | --local-subnets"  :
+                         flagWhat == CONST_HANDLEADDRESSLISTS_RRD ? "RRD" :
+                         flagWhat == CONST_HANDLEADDRESSLISTS_NETFLOW ? "Netflow white/black list" : "unknown",
+                     mask);
 	address = strtok_r(NULL, ",", &strtokState);
 	continue;
       }
@@ -400,7 +412,10 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
 	 && ((network & networkMask) != network))  {
 	/* malformed network specification */
 	traceEvent(CONST_TRACE_WARNING, "%s: %d.%d.%d.%d/%d is not a valid network - correcting mask",
-		   flagRRD == TRUE ? "RRD" : "-m", a, b, c, d, bits);
+                   flagWhat == CONST_HANDLEADDRESSLISTS_MAIN ? "-m | --local-subnets"  :
+                       flagWhat == CONST_HANDLEADDRESSLISTS_RRD ? "RRD" :
+                       flagWhat == CONST_HANDLEADDRESSLISTS_NETFLOW ? "Netflow white/black list" : "unknown",
+                   a, b, c, d, bits);
 
 	/* correcting network numbers as specified in the netmask */
 	network &= networkMask;
@@ -431,27 +446,32 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
 #endif
 
       if((*numNetworks) < MAX_NUM_NETWORKS) {
-	int found = 0;
+        int found = 0;
+        /* If this is the real list, we check against the actual network addresses
+         * and warn the user of superfluous entries - for the other lists, rrd and netflow
+         * the local address is valid, it's NOT assumed.
+         */
+        if (flagWhat == CONST_HANDLEADDRESSLISTS_MAIN) {
+          for(i=0; i<myGlobals.numDevices; i++) {
+            if((network == myGlobals.device[i].network.s_addr) &&
+               (myGlobals.device[i].netmask.s_addr == networkMask)) {
+              a = (int) ((network >> 24) & 0xff);
+              b = (int) ((network >> 16) & 0xff);
+              c = (int) ((network >>  8) & 0xff);
+              d = (int) ((network >>  0) & 0xff);
 
-	for(i=0; i<myGlobals.numDevices; i++)
-	  if((network == myGlobals.device[i].network.s_addr)
-	     && (myGlobals.device[i].netmask.s_addr == networkMask)) {
-	    a = (int) ((network >> 24) & 0xff);
-	    b = (int) ((network >> 16) & 0xff);
-	    c = (int) ((network >>  8) & 0xff);
-	    d = (int) ((network >>  0) & 0xff);
-
-            if (flagRRD == FALSE)
-	      traceEvent(CONST_TRACE_INFO,
+              traceEvent(CONST_TRACE_INFO,
                          "-m: Discarded unnecessary parameter %d.%d.%d.%d/%d - this is the local network",
 		         a, b, c, d, bits);
-	    found = 1;
-	  }
+              found = 1;
+            }
+          }
+        }
 
 	if(found == 0) {
-	  theNetworks[(*numNetworks)][CONST_NETWORK_ENTRY]   = network;
-	  theNetworks[(*numNetworks)][CONST_NETMASK_ENTRY]   = networkMask;
-	  theNetworks[(*numNetworks)][CONST_BROADCAST_ENTRY] = broadcast;
+          theNetworks[(*numNetworks)][CONST_NETWORK_ENTRY]   = network;
+          theNetworks[(*numNetworks)][CONST_NETMASK_ENTRY]   = networkMask;
+          theNetworks[(*numNetworks)][CONST_BROADCAST_ENTRY] = broadcast;
 
           a = (int) ((network >> 24) & 0xff);
           b = (int) ((network >> 16) & 0xff);
@@ -459,17 +479,19 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
           d = (int) ((network >>  0) & 0xff);
 
           if ((laBufferUsed = snprintf(&localAddresses[laBufferPosition],
-				       localAddressesLen,
-				       "%s%d.%d.%d.%d/%d",
-				       (*numNetworks) == 0 ? "" : ", ",
-				       a, b, c, d,
-				       bits)) < 0)
-	    BufferTooShort();
+                                       localAddressesLen,
+                                       "%s%d.%d.%d.%d/%d",
+                                       (*numNetworks) == 0 ? "" : ", ",
+                                       a, b, c, d,
+                                       bits)) < 0)
+            BufferTooShort();
+
           laBufferPosition  += laBufferUsed;
           localAddressesLen -= laBufferUsed;
-
-	  (*numNetworks)++;
-	}
+	  
+          (*numNetworks)++;
+	
+        }
       } else {
         a = (int) ((network >> 24) & 0xff);
         b = (int) ((network >> 16) & 0xff);
@@ -477,7 +499,9 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
         d = (int) ((network >>  0) & 0xff);
 
         traceEvent(CONST_TRACE_ERROR, "%s: %d.%d.%d.%d/%d - Too many networks (limit %d) - discarded",
-                   flagRRD == TRUE ? "RRD" : "-m",
+                   flagWhat == CONST_HANDLEADDRESSLISTS_MAIN ? "-m"  :
+                       flagWhat == CONST_HANDLEADDRESSLISTS_RRD ? "RRD" :
+                       flagWhat == CONST_HANDLEADDRESSLISTS_NETFLOW ? "Netflow" : "unknown",
                    a, b, c, d, bits,
                    MAX_NUM_NETWORKS);
       }
@@ -495,7 +519,7 @@ void handleLocalAddresses(char* addresses) {
   localAddresses[0] = '\0';
 
   handleAddressLists(addresses, myGlobals.localNetworks, &myGlobals.numLocalNetworks,
-		     localAddresses, sizeof(localAddresses), FALSE);
+                     localAddresses, sizeof(localAddresses), CONST_HANDLEADDRESSLISTS_MAIN);
 
   /* Not used anymore */
   if(myGlobals.localAddresses != NULL) free(myGlobals.localAddresses);
@@ -3292,6 +3316,90 @@ char *ip2CountryCode(u_int32_t ip) {
 
 /* ******************************************************** */
 
+#ifdef CFG_MULTITHREADED
+void printMutexStatus(int textPrintFlag, PthreadMutex *mutexId, char *mutexName) {
+  char buf[LEN_GENERAL_WORK_BUFFER];
+
+  if(mutexId->lockLine == 0) /* Mutex never used */
+    return;
+  if(textPrintFlag == TRUE) {
+    if(mutexId->lockAttemptLine > 0) {
+        if(snprintf(buf, sizeof(buf),
+                    "Mutex %s, is %s.\n"
+                    "     locked: %u times, last was %s:%d(%d)\n"
+                    "     Blocked: at %s:%d%(d)\n",
+                    "     unlocked: %u times, last was %s:%d(%d)\n"
+                    "     longest: %d sec from %s:%d\n",
+                    mutexName,
+                    mutexId->isLocked ? "locked" : "unlocked",
+                    mutexId->numLocks,
+                    mutexId->lockFile, mutexId->lockLine, mutexId->lockPid,
+                    mutexId->lockAttemptFile, mutexId->lockAttemptLine, mutexId->lockAttemptPid,
+                    mutexId->numReleases,
+                    mutexId->unlockFile, mutexId->unlockLine, mutexId->unlockPid,
+                    mutexId->maxLockedDuration,
+                    mutexId->maxLockedDurationUnlockFile,
+                    mutexId->maxLockedDurationUnlockLine) < 0)
+          BufferTooShort();
+    } else {
+        if(snprintf(buf, sizeof(buf),
+                    "Mutex %s, is %s.\n"
+                    "     locked: %u times, last was %s:%d(%d)\n"
+                    "     unlocked: %u times, last was %s:%d(%d)\n"
+                    "     longest: %d sec from %s:%d\n",
+                    mutexName,
+                    mutexId->isLocked ? "locked" : "unlocked",
+                    mutexId->numLocks,
+                    mutexId->lockFile, mutexId->lockLine, mutexId->lockPid,
+                    mutexId->numReleases,
+                    mutexId->unlockFile, mutexId->unlockLine, mutexId->unlockPid,
+                    mutexId->maxLockedDuration,
+                    mutexId->maxLockedDurationUnlockFile,
+                    mutexId->maxLockedDurationUnlockLine) < 0)
+          BufferTooShort();
+    }
+  } else {
+    if (mutexId->lockAttemptLine > 0) {
+        if(snprintf(buf, sizeof(buf),
+                    "<TR><TH ALIGN=\"LEFT\">%s</TH><TD ALIGN=\"CENTER\">%s</TD>"
+                    "<TD ALIGN=\"RIGHT\">%s:%d(%d)</TD>"
+                    "<TD ALIGN=\"RIGHT\">%s:%d(%d)</TD>"
+                    "<TD ALIGN=\"RIGHT\">%s:%d(%d)</TD>"
+                    "<TD ALIGN=\"RIGHT\">%u</TD><TD ALIGN=\"LEFT\">%u</TD>"
+                    "<TD ALIGN=\"RIGHT\">%d sec [%s:%d]</TD></TR>",
+                    mutexName,
+                    mutexId->isLocked ? "<FONT COLOR=\"RED\">locked</FONT>" : "unlocked",
+                    mutexId->lockFile, mutexId->lockLine, mutexId->lockPid,
+                    mutexId->lockAttemptFile, mutexId->lockAttemptLine, mutexId->lockAttemptPid,
+                    mutexId->unlockFile, mutexId->unlockLine, mutexId->unlockPid,
+                    mutexId->numLocks, mutexId->numReleases,
+                    mutexId->maxLockedDuration,
+                    mutexId->maxLockedDurationUnlockFile,
+                    mutexId->maxLockedDurationUnlockLine) < 0)
+          BufferTooShort();
+    } else {
+        if(snprintf(buf, sizeof(buf),
+                    "<TR><TH ALIGN=\"LEFT\">%s</TH><TD ALIGN=\"CENTER\">%s</TD>"
+                    "<TD ALIGN=\"RIGHT\">%s:%d(%d)</TD>"
+                    "<TD ALIGN=\"RIGHT\">&nbsp;</TD>"
+                    "<TD ALIGN=\"RIGHT\">%s:%d(%d)</TD>"
+                    "<TD ALIGN=\"RIGHT\">%u</TD><TD ALIGN=\"LEFT\">%u</TD>"
+                    "<TD ALIGN=\"RIGHT\">%d sec [%s:%d]</TD></TR>",
+                    mutexName,
+                    mutexId->isLocked ? "<FONT COLOR=\"RED\">locked</FONT>" : "unlocked",
+                    mutexId->lockFile, mutexId->lockLine, mutexId->lockPid,
+                    mutexId->unlockFile, mutexId->unlockLine, mutexId->unlockPid,
+                    mutexId->numLocks, mutexId->numReleases,
+                    mutexId->maxLockedDuration,
+                    mutexId->maxLockedDurationUnlockFile,
+                    mutexId->maxLockedDurationUnlockLine) < 0)
+          BufferTooShort();
+    }
+  }
+
+  sendString(buf);
+}
+#endif
 
 /* ********************************************************
  *  The following code is taken from GNU's gcc libiberty,

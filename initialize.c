@@ -382,7 +382,6 @@ void resetDevice(int devIdx) {
 /* ******************************* */
 
 static void allocateOtherHosts() {
-  if(myGlobals.trackOnlyLocalHosts) {
     myGlobals.otherHostEntry = (HostTraffic*)malloc(sizeof(HostTraffic));
     memset(myGlobals.otherHostEntry, 0, sizeof(HostTraffic));
 
@@ -396,12 +395,6 @@ static void allocateOtherHosts() {
     myGlobals.otherHostEntry->hostSerial = myGlobals.otherHostEntryIdx;
     myGlobals.otherHostEntry->portsUsage = (PortUsage**)calloc(sizeof(PortUsage*), 
 							       MAX_ASSIGNED_IP_PORTS);
-  } else {
-    /* We let ntop think that otherHostEntryIdx does not exist */
-    myGlobals.otherHostEntry = NULL;
-    myGlobals.otherHostEntryIdx = myGlobals.broadcastEntryIdx;
-  }
-
 }
 
 /* ******************************************* */

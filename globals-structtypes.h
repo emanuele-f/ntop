@@ -1829,12 +1829,18 @@ XML*/
   int netFlowOutSocket;
   u_int32_t globalFlowSequence, globalFlowPktCount;
   struct in_addr netFlowIfAddress, netFlowIfMask;
+  char *netFlowWhiteList, *netFlowBlackList;
   NetFlow5Record theRecord;
   struct sockaddr_in netFlowDest;
   /* Flow reception */
   int netFlowInSocket, netFlowDeviceId;
   u_short netFlowInPort;
-  u_long numNetFlowsPktsRcvd, numNetFlowsPktsSent, numNetFlowsRcvd, numBadFlowsVersionsRcvd;
+  u_long numNetFlowsPktsRcvd, numNetFlowsPktsSent, numNetFlowsRcvd, numNetFlowsProcessed;
+  u_long numBadFlowsVersionsRcvd, numBadFlowPkts, numBadFlowBytes, numBadFlowReality;
+  u_long numSrcFlowsEntryFailedBlackList, numSrcFlowsEntryFailedWhiteList,
+         numSrcFlowsEntryAccepted,
+         numDstFlowsEntryFailedBlackList, numDstFlowsEntryFailedWhiteList,
+         numDstFlowsEntryAccepted;
 
   /* sFlow */
   int sflowOutSocket, sflowInSocket, sflowDeviceId;

@@ -3936,12 +3936,9 @@ void printLocalHostsStats() {
   HostTraffic *el, **tmpTable;
   OsNumInfo theOSs[256];
   int numOSs = 0, i, j;
-  char buf[LEN_GENERAL_WORK_BUFFER], *str=NULL, *sign, *title=NULL;
-  Counter totalBytesSent, totalBytesRcvd, totalBytes, a=0, b=0;
-  float sentpct, rcvdpct;
+  char buf[LEN_GENERAL_WORK_BUFFER], *str=NULL, *title=NULL;
+  Counter a=0, b=0;
   time_t timeDiff = time(NULL)-myGlobals.initialSniffTime;
-  char *arrowGif, *arrow[48], *theAnchor[48];
-  char htmlAnchor[64], htmlAnchor1[64];
 
   memset(theOSs, 0, sizeof(theOSs));
 

@@ -368,11 +368,11 @@ char* getSpecialMacInfo(HostTraffic* el, short encodeString) {
 /* *********************************** */
 
 void createVendorTable(void) {
-  int idx, idx2, idx3, configFileFound, numRead, numLoaded;
+  int idx, idx2, configFileFound, numRead, numLoaded;
   FILE *fd = NULL;
   char tmpLine[LEN_GENERAL_WORK_BUFFER];
   char tmpMACkey[LEN_ETHERNET_ADDRESS_DISPLAY+1];
-  char *tmpMAC, *tmpMACcpy, *tmpTag1, *tmpTag2, *tmpVendor, *strtokState;
+  char *tmpMAC, *tmpTag1, *tmpTag2, *tmpVendor, *strtokState;
   struct macInfo macInfoEntry;
   datum data_data, key_data;
 

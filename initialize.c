@@ -240,7 +240,7 @@ static void initIPCountryTable(void) {
       traceEvent(CONST_TRACE_NOISY, "IP2CC: ...found at %s.\n", tmpStr);
       while (!feof(fd)) {
         char buff[256];
-        char *strtokState, *token, *cc, *ip, *prefix;
+        char *strtokState, *cc, *ip, *prefix;
 
         if (fgets(buff, sizeof(buff), fd)==NULL)
           continue;
@@ -827,8 +827,6 @@ void initSingleGdbm(GDBM_FILE *database, char *dbName, char *directory, int doUn
 }
 
 void initGdbm(char *directory) {
-  char tmpBuf[200];
-
   traceEvent(CONST_TRACE_INFO, "Initializing gdbm databases");
 
   initSingleGdbm(&myGlobals.addressQueueFile, "addressQueue.db", directory, TRUE);

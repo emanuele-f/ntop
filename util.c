@@ -162,8 +162,6 @@ unsigned short isMulticastAddress(struct in_addr *addr) {
 /* ********************************* */
 
 unsigned short isLocalAddress(struct in_addr *addr, u_int deviceId) {
-  int i;
-
   if(deviceId >= myGlobals.numDevices) {
     traceEvent(CONST_TRACE_WARNING, "WARNING: Index %u out of range [0..%u] - address treated as remote",
 	       deviceId, myGlobals.numDevices); 
@@ -4325,8 +4323,6 @@ datum ntop_gdbm_firstkey(GDBM_FILE g) {
 /* ****************************************** */
 
 void ntop_gdbm_close(GDBM_FILE g) {
-  datum theData;
-
 #ifdef CFG_MULTITHREADED
   if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
     accessMutex(&myGlobals.gdbmMutex, "ntop_gdbm_close");

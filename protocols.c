@@ -573,7 +573,6 @@ u_int16_t processDNSPacket(const u_char *packetData,
 			   short *isRequest,
 			   short *positiveReply) {
   DNSHostInfo hostPtr;
-  struct in_addr hostIpAddress;
   datum key_data, data_data;
   char tmpBuf[96];
   u_int16_t transactionId = 0;

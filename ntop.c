@@ -143,7 +143,7 @@ void* pcapDispatch(void *_i) {
     if(rc == -1) {
       traceEvent(CONST_TRACE_ERROR, "Reading packets on device %d(%s): '%s'",
                  i,
-                 myGlobals.device[i].friendlyName,
+                 myGlobals.device[i].humanFriendlyName,
 		 pcap_geterr(myGlobals.device[i].pcapPtr));
       break;
     } /* else

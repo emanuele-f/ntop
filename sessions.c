@@ -665,7 +665,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	*/
       } else
 #endif
-	if ( (theSession = (IPSession*)malloc(sizeof(IPSession))) == NULL) return;
+	if ( (theSession = (IPSession*)malloc(sizeof(IPSession))) == NULL) return(NULL);
 
       memset(theSession, 0, sizeof(IPSession));
       addedNewEntry = 1;
@@ -805,7 +805,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	}
       } else if((dport == 80 /* HTTP */) && (packetDataLength > 0)) {
 	if(theSession->bytesProtoSent.value == 0) {
-	  if ( (rcStr = (char*)malloc(packetDataLength+1)) == NULL) return;
+	  if ( (rcStr = (char*)malloc(packetDataLength+1)) == NULL) return(NULL);
 	  memcpy(rcStr, packetData, packetDataLength);
 	  rcStr[packetDataLength] = '\0';
 

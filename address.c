@@ -326,6 +326,9 @@ static void resolveAddress(struct in_addr *hostAddr,
       res = tmpBuf;
       myGlobals.numResolvedWithDNSAddresses++;
     } else {
+#ifdef WIN32
+	  h_errnop = h_errno;
+#endif
       myGlobals.numKeptNumericAddresses++;
       /* Failed, but why? */
       switch (

@@ -1423,7 +1423,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-SCRIPTVER="v1.104-2003-03-29"
+SCRIPTVER="v1.105-2003-03-29"
 
 umask 002
 # Add the stamp file to the list of files AC keeps track of,
@@ -3621,8 +3621,9 @@ case "${target}:${CC}" in
       ;;
 
     *-*-solaris2.8*:* )
-        VERIFIED1="2.1.51:2002-10-21:Burton Strauss <burton@ntopsupport.com:Solaris 8 i86"
+        VERIFIED1="2.1.90:2003-03-28:Burton Strauss <burton@ntopsupport.com:Solaris 8 i86"
         NOTE1="Requires various gnu tools from SunFreeware.com"
+        NOTE2="--enable-i18n is disabled"
         DEFINEOS="SOLARIS";   STATUS="SUPPORTED"
       ;;
 
@@ -6575,7 +6576,7 @@ test "x$enable_libtool_lock" != xno && enable_libtool_lock=yes
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6578 "configure"' > conftest.$ac_ext
+  echo '#line 6579 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7111,7 +7112,7 @@ chmod -w .
 save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -o out/conftest2.$ac_objext"
 compiler_c_o=no
-if { (eval echo configure:7114: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
+if { (eval echo configure:7115: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
   # The compiler can only warn and ignore the option if not recognized
   # So say no if there are warnings
   if test -s out/conftest.err; then
@@ -8904,7 +8905,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8907 "configure"
+#line 8908 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9002,7 +9003,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9005 "configure"
+#line 9006 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10636,11 +10637,31 @@ echo
 echo "Internationalization (i18n)?"
 if test ".$ac_enable_i18n" = ".yes"; then
     echo "    ...Requested via ./configure command line option --enable-i18n."
+    case "${target}" in
+
+        *-*-solaris* )
+          echo
+          echo "*******************************************************************"
+          echo "*"
+          echo "* WARNING: Unable to make i18n code under Solaris"
+          echo "*          due to library differences."
+          echo "*"
+          echo "*"
+          echo "*>>> Continuing without i18n."
+          echo "*"
+          echo "*******************************************************************"
+          echo
+          ;;
+
+        * )
 
 cat >>confdefs.h <<_ACEOF
 #define MAKE_WITH_I18N 1
 _ACEOF
 
+          ;;
+
+    esac
 else
     echo "    ...(Default) Disabled. Request via ./configure command line option --enable-i18n"
 fi

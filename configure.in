@@ -44,7 +44,7 @@ dnl>       into the stamp.
 dnl>
 AC_INIT([ntop],[2.1.90])
 AC_PREREQ([2.50])
-SCRIPTVER="v1.104-2003-03-29"
+SCRIPTVER="v1.105-2003-03-29"
 
 dnl>
 dnl> generate the config header
@@ -631,8 +631,9 @@ case "${target}:${CC}" in
       ;;
 
     *-*-solaris2.8*:* )
-        VERIFIED1="2.1.51:2002-10-21:Burton Strauss <burton@ntopsupport.com:Solaris 8 i86"
+        VERIFIED1="2.1.90:2003-03-28:Burton Strauss <burton@ntopsupport.com:Solaris 8 i86"
         NOTE1="Requires various gnu tools from SunFreeware.com"
+        NOTE2="--enable-i18n is disabled"
         DEFINEOS="SOLARIS";   STATUS="SUPPORTED"
       ;;
 
@@ -1104,7 +1105,27 @@ echo
 echo "Internationalization (i18n)?"
 if test ".$ac_enable_i18n" = ".yes"; then
     echo "    ...Requested via ./configure command line option --enable-i18n."
-    AC_DEFINE_UNQUOTED(MAKE_WITH_I18N, 1, [Define for internationalization])
+    case "${target}" in
+
+        *-*-solaris* )
+          echo
+          echo "*******************************************************************"
+          echo "*"
+          echo "* WARNING: Unable to make i18n code under Solaris"
+          echo "*          due to library differences."
+          echo "*"
+          echo "*"
+          echo "*>>> Continuing without i18n."
+          echo "*"
+          echo "*******************************************************************"
+          echo
+          ;;
+
+        * )
+          AC_DEFINE_UNQUOTED(MAKE_WITH_I18N, 1, [Define for internationalization])
+          ;;
+
+    esac
 else
     echo "    ...(Default) Disabled. Request via ./configure command line option --enable-i18n"
 fi

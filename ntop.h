@@ -2403,4 +2403,11 @@ typedef struct serialCacheEntry {
   u_long creationTime;
 } SerialCacheEntry;
 
+#define MAX_NUM_PROBES 16
+
+typedef struct probeInfo {
+  struct in_addr probeAddr;
+  u_int32_t      pkts;
+} ProbeInfo;
+
 #endif /* NTOP_H */

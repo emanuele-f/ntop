@@ -188,12 +188,6 @@ void freeHostInfo(int theDevice, HostTraffic *host, int actualDeviceId) {
   traceEvent(TRACE_INFO, "Entering freeHostInfo(%u)", host->hostTrafficBucket);
 #endif
 
-  /* Courtesy of Roberto F. De Luca <deluca@tandar.cnea.gov.ar> */
-  updateHostTraffic(host);
-#ifdef HAVE_MYSQL
-  mySQLupdateHostTraffic(host);
-#endif
-
   myGlobals.device[theDevice].hostsno--;
 
 #ifdef HOST_FREE_DEBUG

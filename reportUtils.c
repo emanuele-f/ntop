@@ -110,11 +110,11 @@ void printTableDoubleEntry(char *buf, int bufLen,
     break;
   default:
     if(snprintf(buf, bufLen, "<TR "TR_ON" %s><TH WIDTH=100 "TH_BG" ALIGN=LEFT>%s</TH>"
-	     "<TD WIDTH=100 "TD_BG" ALIGN=RIGHT>%s</TD>"
-	     "<TD WIDTH=100 "TD_BG"><TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=\"100\">"
-	     "<TR "TR_ON"><TD><IMG  ALT=\"%d%%\" ALIGN=MIDDLE SRC=/gauge.jpg WIDTH=\"%d\" HEIGHT=12></TD>"
-	     "<TD "TD_BG" ALIGN=CENTER WIDTH=\"%d\">"
-	     "<P>&nbsp;</TD></TR></TABLE></TD>\n",
+		"<TD WIDTH=100 "TD_BG" ALIGN=RIGHT>%s</TD>"
+		"<TD WIDTH=100 "TD_BG"><TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=\"100\">"
+		"<TR "TR_ON"><TD><IMG  ALT=\"%d%%\" ALIGN=MIDDLE SRC=/gauge.jpg WIDTH=\"%d\" HEIGHT=12></TD>"
+		"<TD "TD_BG" ALIGN=CENTER WIDTH=\"%d\">"
+		"<P>&nbsp;</TD></TR></TABLE>"TABLE_OFF"</TD>\n",
 	     getRowColor(), label, formatKBytes(totalS),
 	     int_perc, (100*int_perc)/100, (100*(100-int_perc))/100) < 0)
       BufferTooShort();
@@ -1553,7 +1553,7 @@ void printPacketStats(HostTraffic *el, int actualDeviceId) {
     sendString("</CENTER>\n");
   }
 
-  if(headerSent) { sendString("</TD></TR></TABLE></center>"); }
+  if(headerSent) { sendString("</TD></TR></TABLE>"TABLE_OFF"</CENTER>"); }
 }
 
 /* ************************************ */
@@ -1723,7 +1723,6 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
   actTotalSent = el->udpSentLoc+el->udpSentRem;
   actTotalRcvd = el->udpRcvdLoc+el->udpRcvdFromRem;
 
-/*#if 0 */
   printTableDoubleEntry(buf, sizeof(buf), "UDP", COLOR_1, (float)actTotalSent/1024,
 			100*((float)SD(actTotalSent, totalSent)),
 			(float)actTotalRcvd/1024,
@@ -1793,7 +1792,6 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
 			100*((float)SD(el->otherSent, totalSent)),
 			(float)el->otherRcvd/1024,
 			100*((float)SD(el->otherRcvd, totalRcvd)));
-/*#endif */
 
 #ifdef HAVE_GDCHART
   {
@@ -1989,7 +1987,7 @@ void printHostIcmpStats(HostTraffic *el) {
     BufferTooShort();
   sendString(buf);
 
-  sendString("</TABLE></CENTER>\n");
+  sendString("</TABLE>"TABLE_OFF"</CENTER>\n");
 }
 
 /* ************************************ */
@@ -2019,7 +2017,7 @@ void printHostHTTPVirtualHosts(HostTraffic *el, int actualDeviceId) {
       sendString(buf);
       list = list->next;
     }
-    sendString("</TABLE>\n");
+    sendString("</TABLE>"TABLE_OFF"\n");
     sendString("<H5>NOTE: The above table is not updated in realtime but when connections are terminated.</H5>\n");
     sendString("</CENTER><P>\n");
   }
@@ -2791,7 +2789,7 @@ void printHostDetailedInfo(HostTraffic *el, int actualDeviceId) {
 	BufferTooShort();
       sendString(buf);
 
-      sendString("</TABLE></TD></TR>\n");
+      sendString("</TABLE>"TABLE_OFF"</TD></TR>\n");
     }
   }
 
@@ -3417,7 +3415,7 @@ void printTableEntry(char *buf, int bufLen,
 		"<TD "TD_BG" WIDTH=250><TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=\"250\">"
 		"<TR "TR_ON"><TD><IMG ALIGN=MIDDLE ALT=\"%d%%\" SRC=/gauge.jpg WIDTH=\"%d\" HEIGHT=12>"
 		"</TD><TD "TD_BG" ALIGN=CENTER WIDTH=\"%d\" %s>"
-		"<P>&nbsp;</TD></TR></TABLE></TD></TR>\n",
+		"<P>&nbsp;</TD></TR></TABLE>"TABLE_OFF"</TD></TR>\n",
 		getRowColor(), label, formatKBytes(total),
 		int_perc, (250*int_perc)/100,
 		(250*(100-int_perc))/100, getActualRowColor()) < 0)

@@ -108,7 +108,6 @@ static void resolveAddress(struct in_addr *hostAddr,
     } else
       strncpy(symAddr, retrievedAddress->symAddress, MAX_HOST_SYM_NAME_LEN-1);
 
-    updateHostNameInfo(addr, retrievedAddress->symAddress, actualDeviceId);
     myGlobals.numResolvedOnCacheAddresses++;
 #ifdef DEBUG
     traceEvent(TRACE_INFO, "Leaving resolveAddress()");
@@ -294,8 +293,6 @@ static void resolveAddress(struct in_addr *hostAddr,
   /* key_data has been set already */
   data_data.dptr = (void*)&storedAddress;
   data_data.dsize = sizeof(storedAddress)+1;
-
-  updateHostNameInfo(addr, symAddr, actualDeviceId);
 
   if(myGlobals.gdbm_file == NULL) {
 #ifdef DEBUG
@@ -587,9 +584,7 @@ void ipaddr2str(struct in_addr hostIpAddress, int actualDeviceId) {
 
   fetchAddressFromCache(hostIpAddress, buf);
 
-  if(buf[0] != '\0') {
-    updateHostNameInfo(hostIpAddress.s_addr, buf, actualDeviceId);
-  } else {
+  if(buf[0] == '\0') {
 #ifndef MULTITHREADED
     resolveAddress(&hostIpAddress, 0, actualDeviceId);
 #else

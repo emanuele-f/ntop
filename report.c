@@ -403,7 +403,7 @@ void printTrafficStatistics() {
 
     /* ****************** */
 
-    sendString("</TABLE></TR><TR><TH "TH_BG">Traffic</TH><TD "TH_BG">\n<TABLE BORDER=1 WIDTH=100%>");
+    sendString("</TABLE>"TABLE_OFF"</TR><TR><TH "TH_BG">Traffic</TH><TD "TH_BG">\n<TABLE BORDER=1 WIDTH=100%>");
     if(snprintf(buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left>Total</th>"
 		"<TD "TD_BG" align=right COLSPAN=2>%s [%s Pkts]</td></TR>\n",
 		getRowColor(),
@@ -535,7 +535,7 @@ void printTrafficStatistics() {
       }
     }
 
-    sendString("</TABLE></TR>");
+    sendString("</TABLE>"TABLE_OFF"</TR>");
 
     /* ************************ */
 
@@ -592,7 +592,7 @@ void printTrafficStatistics() {
 
   }
 
-  sendString("</TABLE></TR></TABLE></CENTER>\n");
+  sendString("</TABLE>"TABLE_OFF"</TR></TABLE></CENTER>\n");
 }
 
 /* ******************************* */
@@ -1615,7 +1615,7 @@ void printAllSessionsHTML(char* host, int actualDeviceId) {
     }
 
     if(numPrinted == 0) sendString("&nbsp;");
-    sendString("</UL></TR></TABLE></CENTER>");
+    sendString("</UL></TR></TABLE>"TABLE_OFF"</CENTER>");
   }
 
   printHostSessions(el, elIdx, actualDeviceId);
@@ -2585,7 +2585,7 @@ void printProtoTraffic(void) {
 		  (float)myGlobals.device[myGlobals.actualReportDeviceId].otherIpBytes/1024,
 		  ((float)myGlobals.device[myGlobals.actualReportDeviceId].otherIpBytes/myGlobals.device[myGlobals.actualReportDeviceId].ipBytes));
 
-  sendString("</TABLE></TR>");
+  sendString("</TABLE>"TABLE_OFF"</TR>");
 
   printTableEntry(buf, sizeof(buf), "(R)ARP", COLOR_1,
 		  (float)myGlobals.device[myGlobals.actualReportDeviceId].arpRarpBytes/1024,
@@ -3130,7 +3130,7 @@ void printThptStatsMatrix(int sortedColumn) {
       /* ************************* */
 
       if(!dataSent) sendString("&nbsp;");
-      sendString("</TABLE></TD><TD "TD_BG" ALIGN=LEFT><TABLE BORDER=1 WIDTH=100%%>\n");
+      sendString("</TABLE>"TABLE_OFF"</TD><TD "TD_BG" ALIGN=LEFT><TABLE BORDER=1 WIDTH=100%%>\n");
       dataSent = 0;
 
       /* ************************* */

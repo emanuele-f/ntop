@@ -498,12 +498,10 @@ int initGlobalValues(void) {
     myGlobals.numDequeueThreads      = MAX_NUM_DEQUEUE_THREADS;
 #endif
     myGlobals.trackOnlyLocalHosts    = 1;
-    myGlobals.enableDBsupport        = NTOP_DEFAULT_DB_SUPPORT;
   } else {
 #ifdef MULTITHREADED
     myGlobals.numDequeueThreads = 1;
 #endif
-    myGlobals.dontTrustMACaddr  = 0;
   }
 
   if(myGlobals.enableSessionHandling)
@@ -668,17 +666,6 @@ void initThreads(void) {
     traceEvent(TRACE_INFO, "Started thread (%ld) for idle hosts detection.",
 	       myGlobals.scanIdleThreadId);
   }
-
-#ifndef MICRO_NTOP
-  /*
-   * Create the thread (5) - DBU - DB Update - optional
-   */
-  if (myGlobals.enableDBsupport) {
-    createThread(&myGlobals.dbUpdateThreadId, updateDBHostsTrafficLoop, NULL);
-    traceEvent(TRACE_INFO, "Started thread (%ld) for DB update.", 
-	       myGlobals.dbUpdateThreadId);
-  }
-#endif /* MICRO_NTOP */
 
 #ifdef ASYNC_ADDRESS_RESOLUTION
   if(myGlobals.numericFlag == 0) {

@@ -568,43 +568,6 @@ int mapGlobalToLocalIdx(int port) {
 
 /* **************************************** */
 
-#ifdef MULTITHREADED
-void* updateDBHostsTrafficLoop(void* notUsed _UNUSED_) {
-  u_short updateTime = DEFAULT_DB_UPDATE_TIME; /* This should be user configurable */
-
-  for(;;) {
-    int i;
-
-#ifdef DEBUG
-    traceEvent(TRACE_INFO, "Sleeping for %d seconds\n", updateTime);
-#endif
-
-    sleep(updateTime);
-
-    if(!myGlobals.capturePackets) break;
-
-#ifdef DEBUG
-    traceEvent(TRACE_INFO, "Calling updateDbHostsTraffic");
-#endif
-
-    for(i=0; i<myGlobals.numDevices; i++)
-      if(!myGlobals.device[i].virtualDevice) {
-#ifdef MULTITHREADED
-	accessMutex(&myGlobals.hashResizeMutex, "updateDbHostsTraffic");
-#endif /* MULTITHREADED */
-	updateDbHostsTraffic(i);
-#ifdef MULTITHREADED
-	releaseMutex(&myGlobals.hashResizeMutex);
-#endif /* MULTITHREADED */
-      }
-  }
-  return(NULL);
-
-}
-#endif
-
-/* **************************************** */
-
 void* scanIdleLoop(void* notUsed _UNUSED_) {
   for(;;) {
     int i;
@@ -795,10 +758,7 @@ RETSIGTYPE cleanup(int signo) {
 #ifdef MULTITHREADED
 
   killThread(&myGlobals.dequeueThreadId);
-
-  if(myGlobals.enableDBsupport)
-    killThread(&myGlobals.dbUpdateThreadId);
-
+  
   if(myGlobals.isLsofPresent)
     killThread(&myGlobals.lsofThreadId);
 
@@ -1019,13 +979,6 @@ RETSIGTYPE cleanup(int signo) {
 	free(myGlobals.tcpSvc[i]);
 
     free(myGlobals.tcpSvc);
-  }
-
-  if(myGlobals.enableDBsupport) {
-    closeSQLsocket(); /* *** SQL Engine *** */
-#ifdef HAVE_MYSQL
-    closemySQLsocket();
-#endif
   }
 
 #ifdef WIN32

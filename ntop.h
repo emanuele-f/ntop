@@ -344,11 +344,6 @@ int getdomainname(char *name, size_t len);
 #include <gdbm.h>
 #endif
 
-/* MySQL support */
-#if defined(HAVE_MYSQL)
-#include <mysql/mysql.h>
-#endif
-
 /*
  * thread management
  */
@@ -680,9 +675,9 @@ extern const char *gdbm_strerror (int);
 
 #define MAX_NUM_PROTOS      64   /* Maximum number of protocols for graphs */
 
-#define MAX_SUBNET_HOSTS                1024 /* used in util.c */
+#define MAX_SUBNET_HOSTS                    1024 /* used in util.c */
 
-#define NUM_SESSION_INFO                 128 /* used in util.c */
+#define NUM_SESSION_INFO                     384  /* used in util.c */
 #define MAX_NUM_SESSION_INFO  2*NUM_SESSION_INFO  /* Not yet used */
 
 /* SSLWATCHDOG stuff *************************** */
@@ -697,7 +692,6 @@ extern const char *gdbm_strerror (int);
 #define SSLWATCHDOG_STATE_HTTPREQUEST    2  /* http request received */
 #define SSLWATCHDOG_STATE_HTTPCOMPLETE   3  /* Parent done w/ http */
 #define SSLWATCHDOG_STATE_FINISHED       9
- 
 #endif
 
 #ifdef HAVE_OPENSSL

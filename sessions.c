@@ -1626,6 +1626,5 @@ void handlePluginSessionTermination(IPSession *sessionToPurge, int actualDeviceI
 #endif
 
   sendTCPSessionFlow(sessionToPurge, actualDeviceId);
-  notifyTCPSession(sessionToPurge, actualDeviceId);
 }
 

@@ -298,11 +298,6 @@ dnl>
 AC_ARG_ENABLE(mt, [  --disable-mt            disable multithread support also if available [default=enabled]], ac_disable_multithread="yes", ac_disable_multithread="no")
 
 dnl>
-dnl> Give the user an option to compile without MySQL support
-dnl>
-AC_ARG_ENABLE(mysql, [  --enable-mysql         enable MySQL support also if available [default=disabled]], ac_mysql="yes", ac_mysql="no")
-
-dnl>
 dnl> Give the user an option to compile without the HTTPS support provided by OpenSSL.
 dnl>
 AC_ARG_ENABLE(ssl, [  --disable-ssl           disable HTPPS support also if OpenSSL is available [default=enabled]], ac_disable_openssl="yes", ac_disable_openssl="no")
@@ -490,37 +485,6 @@ if test $ac_cv_in6_addr_has_ea = yes ; then
         AC_DEFINE(HAVE_IN6_ADDR)
 fi
 
-
-dnl>
-dnl> OPTIONAL MySQL library - check for mysql.h and mysqlclient.so
-dnl>
-
-if test ".$ac_mysql" = ".yes"; then
-        have_mysql=no
-        AC_CHECK_HEADERS(mysql/mysql.h, [
-                AC_MSG_CHECKING([for library for mySQL (client)])
-                _libs=${LIBS}
-                LIBS="${LIBS} -lmysqlclient"
-                AC_TRY_LINK([#include <mysql/mysql.h>], [MYSQL *mysql; mysql_shutdown(mysql);], 
-		[ AC_MSG_RESULT(yes)
-		  have_mysql=yes],
-		[ LIBS="${_libs} -L/usr/lib/mysql -lmysqlclient"
-                AC_TRY_LINK([#include <mysql/mysql.h>], 
-		[MYSQL *mysql;mysql_shutdown(mysql);], [
-                    AC_MSG_RESULT(yes - /usr/lib/mysql)
-                    have_mysql=yes], [
-
-                    have_mysql=no
-                    LIBS=${_libs}])])], [
-
-                have_mysql=no])
-
-        if test ".$have_mysql" = ".yes"; then
-                AC_DEFINE(HAVE_MYSQL)
-        else
-                AC_MSG_ERROR([could not find -lmysqlclient, rerun without --enable-mysql])
-        fi
-fi
 
 dnl> OPTIONAL curses headers
 if test ".$ac_disable_curses" = ".no"; then

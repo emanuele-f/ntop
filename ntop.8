@@ -68,6 +68,7 @@ Unix options:
 .RB [ -d | --daemon ]
 .RB [ -i | --interface
 .IR <name> ]
+.RB [ -o | --no-mac ]
 .RB [ -u | --user 
 .IR <user> ]
 .RB [ -E | --enable-external-tools ]
@@ -81,13 +82,6 @@ Win32 option:
 
 .RB [ -i | --interface
 .IR <number> ]
-
-mySQL options:
-
-.RB [ -b | --sql-host
-.IR <host:port> ]
-.RB [ -v | --mysql-host
-.IR <username:password:dbName> ]
 
 OpenSSL option:
 
@@ -118,11 +112,6 @@ logs HTTP accesses in the file ntop.access.log in the current directory. Use thi
 is that
 .B ntop
 added a new column has been added. Such column contains the time (in milliseconds) that ntop needed in order to serve the request. 
-
-.It2 -b --sql-host
-Exports
-.B ntop
-traffic information into a SQL database. The flag specifies (in http-like host format) the address (IP:port) of a SQL client. The database/ directory part of ntop contains a few clients. Please use one of those.
 
 .It2 -c --sticky-hosts
 By default idle hosts are periodically purged from memory. Use this flag to prevent idle hosts from being purged from memory. NOTE: if idle hosts are kept in memory you can experience severe memory usage.
@@ -206,8 +195,10 @@ should run as after it initializes. The value specified may be either a
 username or a numeric user id. The group id used will be the primary group of
 the user specified.
 
-.It2 -v --mysql-host
-Specifies the mySQL database connection information (user:password:database:host).
+.It2 -o --no-mac
+Specifies the user
+.B ntop
+should not trust MAC addresses but just IP addresses. This option is useful whenever ntop is started on an interface where MAC addresses cannot be really trusted (e.g. port/VLAN mirror).
 
 .It2 -w --http-server
 .B ntop
@@ -371,9 +362,6 @@ The
 .B libpng
 library, for the creation of png files, available at 
 .
-
-.B mySQL
-available at http://www.mysql.com/
 
 .B openSSL
 from the OpenSSL project, if an https:// server is desired, available at http://www.openssl.org.

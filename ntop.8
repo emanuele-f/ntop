@@ -180,7 +180,7 @@ will monitor. The format is <label>=<protocol list> [, <label>=<protocol list>],
 label is used to symbolically identify the <protocol list>. The format of <protocol list>
 is <protocol>[|<protocol>], where <protocol> is either a valid protocol specified inside the
 /etc/services file or a numeric port range (e.g. 80, or 6000-6500). If the -p flag is omitted the following 
-default value is used: "FTP=ftp|ftp-data,HTTP=http|www|https,DNS=name|domain,Telnet=telnet|login,NBios-IP=netbios-ns|netbios-dgm|netbios-ssn,Mail=pop-2|pop-3|kpop|smtp|imap|imap2,SNMP=snmp|snmp-trap,NEWS=nntp,NFS=mount|pcnfs|bwnfs|nfs|nfsd-status,X11=6000-6010,SSH=ssh". If the <protocol list> is very long you may store in a file (for instance protocol.list) the value of the <protocol list> and specify the file name instead of the <protocol list> (in above example you will invoke 'ntop -p protocol.list').
+default value is used: "FTP=ftp|ftp-data,HTTP=http|www|https|3128,DNS=name|domain,Telnet=telnet|login,NBios-IP=netbios-ns|netbios-dgm|netbios-ssn,Mail=pop-2|pop-3|pop3|kpop|smtp|imap|imap2,DHCP/BOOTP=67-68,SNMP=snmp|snmp-trap,NNTP=nntp,NFS=mount|pcnfs|bwnfs|nfsd|nfsd-status,X11=6000-6010,SSH=22,Gnutella=6346|6347|6348,Morpheus=1214,WinMX=6699|7730,Audiogalaxy=41000-41900,Napster=8888|8875" If the <protocol list> is very long you may store in a file (for instance protocol.list) the value of the <protocol list> and specify the file name instead of the <protocol list> (in above example you will invoke 'ntop -p protocol.list').
 
 .It2 -q --create-suspicious-packets
 Forces ntop to create a file ntop-suspicious-pkts.XXX.pcap (XXX is the interface name) for each network interface where are stored suspicious packets. The file is in pcap format (tcpdump).

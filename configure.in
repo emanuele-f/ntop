@@ -680,7 +680,7 @@ case "${target}:${CC}" in
       ;;
 
     *-*-hpux11*:gcc* )
-        DEFINEOS="HPUX";      STATUS="SUPPORTED"
+        DEFINEOS="HPUX";      STATUS="WILLFAIL"
         CFLAGS="${CFLAGS}"
       ;;
 
@@ -820,7 +820,10 @@ esac
 echo "*"
 echo "*    Please keep the ntop-dev mailing list updated with any"
 echo "*    successes you have or problems you encounter..."
- echo "*"
+echo "*"
+
+dnl> Leave this: it causes showoses to stop
+dnl> showoses END
 
 if test ".${VERIFIED1}" != "."; then
     echo "*   Support for this platform was most recently verified for"
@@ -844,9 +847,6 @@ fi
 echo "*"
 echo "*******************************************************************"
 echo
-
-dnl> Leave this: it causes showoses to stop
-dnl> showoses END
 
 case "${STATUS}" in
     WILLFAIL)

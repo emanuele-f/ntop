@@ -1307,9 +1307,9 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	   && ((theSession->bytesProtoSent.value > 0) || (theSession->bytesProtoSent.value < 32))
 	   ) {
 
-	  rcStr = (char*)malloc(packetDataLength+1);
-	  memcpy(rcStr, packetData, packetDataLength);
-	  rcStr[packetDataLength-1] = '\0';
+	  rcStr = (char*)malloc(len+1);
+	  memcpy(rcStr, packetData, len);
+	  rcStr[len-1] = '\0';
 
 	  /* traceEvent(CONST_TRACE_INFO, "rcStr '%s'", rcStr); */
 	  if((!strncmp(rcStr, "$Get", 4))
@@ -1611,7 +1611,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
      *
      */
     if(tp->th_flags & TH_FIN) {
-      u_int32_t fin = ntohl(tp->th_seq)+packetDataLength;
+      u_int32_t fin = ntohl(tp->th_seq);
 
       if(sport < dport) /* Server->Client */
 	check = (fin != theSession->lastSCFin);
@@ -1621,7 +1621,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
       if(check) {
 	/* This is not a duplicated (retransmitted) FIN */
 	theSession->finId[theSession->numFin] = fin;
-	theSession->numFin = (theSession->numFin+1) % MAX_NUM_FIN;;
+	theSession->numFin = (theSession->numFin+1) % MAX_NUM_FIN;
 
 	if(sport < dport) /* Server->Client */
 	  theSession->lastSCFin = fin;

@@ -1,0 +1,73 @@
+#!/bin/sh
+echo ""
+echo "Making p2c table..."
+echo ""
+work="/tmp/p2c"
+dest=`pwd`
+year=`date +%Y`
+month=`date +%m`
+apnic="ftp://ftp.apnic.net/pub/stats/apnic/apnic-${year}-${month}-01"
+arin="ftp://ftp.arin.net/pub/stats/arin/arin.${year}${month}01"
+lacnic="ftp://ftp.lacnic.net/pub/stats/lacnic/lacnic.${year}${month}01"
+ripe="ftp://ftp.ripe.net/ripe/stats/ripencc.${year}${month}01"
+ripealt="ftp://ftp.ripe.net/ripe/dbase/split/ripe.db.inetnum.gz"
+
+echo ""
+echo "  Destination: ${dest}, work directory: ${work}"
+echo ""
+echo "  Clean up work directory..."
+echo ""
+if test -d $work; then
+  rm -rf $work
+else
+  mkdir $work
+fi
+
+echo ""
+echo "  Preparing work directory..."
+echo ""
+cp utils/prefixtablegen.c $work
+cp utils/inetnum2countryalloc.c $work
+
+cd $work
+
+echo ""
+echo "  Downloading data..."
+echo ""
+gcc -lm  -o prefixtablegen prefixtablegen.c
+gcc -o inetnum2countryalloc inetnum2countryalloc.c
+
+wget -O apnic.data $apnic
+wget -O arin.data $arin
+wget -O lacnic.data $lacnic
+wget -O ripe.data $ripe
+
+echo ""
+echo "  Downloading alternate RIPE data..."
+echo ""
+wget -O ripealt.data.gz $ripealt
+
+echo ""
+echo "  Processing alternate RIPE data..."
+echo ""
+zcat ripealt.data.gz | ./inetnum2countryalloc > ripealt.data
+
+echo ""
+echo "  Processing downloaded data..."
+echo ""
+cat *.data | ./prefixtablegen
+
+echo ""
+echo "  Copying file to ntop directory..."
+echo ""
+cp p2c.*.table $pwd
+
+echo ""
+echo "  Cleanup work directory..."
+echo ""
+cd $pwd
+rm -rf $work
+
+echo ""
+echo "Done!"
+echo ""

@@ -484,6 +484,11 @@ AC_ARG_WITH(  gdome-root,
               GDOME_ROOT="$withval",
               GDOME_ROOT=)
 
+AC_ARG_ENABLE(  static-plugins,
+              [  --enable-static-plugins            Statically link plugins into sntop (make sntop)],
+              ac_enable_static_plugins="yes",
+	      ac_enable_static_plugins="no")
+
 AC_ARG_ENABLE(showoses,
               [  --enable-showoses           display OS Support information.],
               [echo
@@ -527,12 +532,16 @@ EXEEXT=
 INCS=
 INTOP=
 LIBCURSES=
-LIBREADLINE=
+LIBREADLINE=1
 LIBTERMCAP=
 OBJDUMP=
 OBJEXT=o
 RRDLIB=
 SO_VERSION_PATCH=
+
+if test "${ac_enable_static_plugins}" = "yes"; then	
+   AC_DEFINE_UNQUOTED(MAKE_STATIC_PLUGIN, 1, [Statically build plugins into sntop])
+fi
 
 dnl>
 dnl> Yes, we want to minimize the amount of work before we tell

@@ -107,18 +107,30 @@ THINGS_TO_DISTRIBUTE = $(DISTFILES) $(NTOPHTML) $(PLUGINSFILES) \
 # The Games
 #
 bin_PROGRAMS   = ntop
-EXTRA_PROGRAMS = ntops
+EXTRA_PROGRAMS = ntops sntop
 bin_SCRIPTS    = 
 
 ntop_SOURCES       = main.c admin.c
 ntop_DEPENDENCIES  = libntopreport.la libntop.la
 ntop_LDADD         = libntopreport.la libntop.la
 ntop_LDFLAGS       = $(AM_LDFLAGS)
+ntop_CFLAGS        = 
 
 ntops_SOURCES      = $(ntop_SOURCES)
 ntops_DEPENDENCIES = $(ntop_DEPENDENCIES)
-ntops_LDADD        = $(ntop_LDADD)
+ntops_LDADD        = $(ntop_LDADD) -lrrd
 ntops_LDFLAGS      = $(ntop_LDFLAGS) -static
+
+#
+# Static ntop: everything is linked in
+#
+sntop_SOURCES      = $(ntop_SOURCES) plugins/icmpPlugin.c plugins/lastSeenPlugin.c \
+		     plugins/netflowPlugin.c plugins/nfsPlugin.c plugins/pdaPlugin.c  \
+		     plugins/sflowPlugin.c plugins/rrdPlugin.c
+
+sntop_DEPENDENCIES = $(ntop_DEPENDENCIES)
+sntop_LDADD        = $(ntop_LDADD) -lrrd
+sntop_LDFLAGS      = $(ntop_LDFLAGS) -static
 
 noinst_HEADERS     = globals-core.h globals-report.h ntop.h regex.h
 

@@ -649,15 +649,8 @@ u_int16_t processDNSPacket(const u_char *packetData,
 #endif
 
       if(myGlobals.dnsCacheFile == NULL) return(-1); /* ntop is quitting... */
-#ifdef CFG_MULTITHREADED
-      accessMutex(&myGlobals.gdbmMutex, "processDNSPacket");
-#endif
       gdbm_store(myGlobals.dnsCacheFile, key_data, data_data, GDBM_REPLACE);
-      myGlobals.dnsSniffStoredInCache++;
-#ifdef CFG_MULTITHREADED
-      releaseMutex(&myGlobals.gdbmMutex);
-#endif
- 
+      myGlobals.dnsSniffStoredInCache++; 
     }
   }
 

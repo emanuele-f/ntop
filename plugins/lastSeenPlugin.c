@@ -88,19 +88,11 @@ static void handleLsPacket(u_char *_deviceId _UNUSED_,
   data_data.dptr = (char *)&HostI;
   data_data.dsize = sizeof(HostI)+1;
 
-#ifdef CFG_MULTITHREADED
-  accessMutex(&myGlobals.gdbmMutex, "handleLSPackage");
-#endif 
-
   /* Test for disabled inside the protection of the mutex, also, so that if
    * we disabled the plugin since the test above, we don't seg fault
    */
   if (!disabled )
       gdbm_store(LsDB, key_data, data_data, GDBM_REPLACE);
-
-#ifdef CFG_MULTITHREADED
-  releaseMutex(&myGlobals.gdbmMutex);
-#endif 
 }
 
  /* Record sort */
@@ -180,34 +172,17 @@ static void handleLsHTTPrequest(char* url) {
 			
   /* Finding hosts... */
 
-#ifdef CFG_MULTITHREADED
-  accessMutex(&myGlobals.gdbmMutex, "handleLSHTTPrequest");
-#endif 
   ret_data = gdbm_firstkey(LsDB);
-#ifdef CFG_MULTITHREADED
-  releaseMutex(&myGlobals.gdbmMutex);
-#endif 
+
   while ( ret_data.dptr !=NULL ) {
     key_data = ret_data;
-#ifdef CFG_MULTITHREADED
-    accessMutex(&myGlobals.gdbmMutex, "handleLSHTTPrequest");
-#endif 
     content = gdbm_fetch(LsDB,key_data);
-#ifdef CFG_MULTITHREADED
-    releaseMutex(&myGlobals.gdbmMutex);
-#endif 
     if ( (key_data.dptr[1]!='_') && (entry < MAX_LASTSEEN_TABLE_SIZE) ) {
       memcpy(&tablehost[entry],(struct LsHostInfo *)content.dptr,sizeof(struct LsHostInfo)); 	
       entry++;
     }
     free(content.dptr);
-#ifdef CFG_MULTITHREADED
-    accessMutex(&myGlobals.gdbmMutex, "handleLSHTTPrequest");
-#endif 
     ret_data = gdbm_nextkey(LsDB,key_data);
-#ifdef CFG_MULTITHREADED
-    releaseMutex(&myGlobals.gdbmMutex);
-#endif 
     free(key_data.dptr); 
   }
 
@@ -235,13 +210,7 @@ static void handleLsHTTPrequest(char* url) {
     key_data.dptr = tmpStr;
     key_data.dsize = strlen(key_data.dptr)+1;
 		
-#ifdef CFG_MULTITHREADED
-    accessMutex(&myGlobals.gdbmMutex, "quicksort");
-#endif 
     content = gdbm_fetch(LsDB,key_data);
-#ifdef CFG_MULTITHREADED
-    releaseMutex(&myGlobals.gdbmMutex);
-#endif 
     strncpy(HostN.note, no_note, sizeof(HostN.note));	
     if ( content.dptr ) {
       memcpy(&HostN,(struct LsHostNote *)content.dptr,sizeof(struct LsHostNote)); 	
@@ -304,16 +273,10 @@ static void addNotes(char *addr, char *PostNotes) {
   data_data.dptr = (char *)&HostN;
   data_data.dsize = sizeof(HostN)+1;
 
-#ifdef CFG_MULTITHREADED
-  accessMutex(&myGlobals.gdbmMutex, "addNotes");
-#endif 
-  if ( strlen(PostNotes)>2 )
+  if (strlen(PostNotes) > 2)
     gdbm_store(LsDB, key_data, data_data, GDBM_REPLACE);	
   else
     gdbm_delete(LsDB,key_data);
-#ifdef CFG_MULTITHREADED
-  releaseMutex(&myGlobals.gdbmMutex);
-#endif 
 }
 
 /* Prepearing the page */
@@ -327,13 +290,7 @@ static void NotesURL(char *addr, char *ip_addr) {
   key_data.dptr = tmpStr;
   key_data.dsize = strlen(key_data.dptr)+1;
 
-#ifdef CFG_MULTITHREADED
-  accessMutex(&myGlobals.gdbmMutex, "NotesURL");
-#endif 
   content = gdbm_fetch(LsDB,key_data);
-#ifdef CFG_MULTITHREADED
-  releaseMutex(&myGlobals.gdbmMutex);
-#endif 
 
   snprintf(tmp, sizeof(tmp), "Notes for %s", ip_addr);
   printHTMLheader(tmp, 0);
@@ -370,33 +327,18 @@ static void deletelastSeenURL( char *addr ) {
   key_data.dptr = addr;
   key_data.dsize = strlen(key_data.dptr)+1;
 
-#ifdef CFG_MULTITHREADED
-  accessMutex(&myGlobals.gdbmMutex,"deletelastSeenURL");
-#endif 
-
   gdbm_delete(LsDB,key_data);  /* Record */
   key_data.dptr = tmpStr;
   key_data.dsize = strlen(key_data.dptr)+1;
   gdbm_delete(LsDB,key_data);  /* Notes */
-
-#ifdef CFG_MULTITHREADED
-  releaseMutex(&myGlobals.gdbmMutex);
-#endif 
-
 }
 
 static void termLsFunct(void) {
   traceEvent(CONST_TRACE_INFO, "Thanks for using LsWatch..."); fflush(stdout);
     
   if(LsDB != NULL) {
-#ifdef CFG_MULTITHREADED
-    accessMutex(&myGlobals.gdbmMutex, "termLsFunct");
-#endif 
     gdbm_close(LsDB);
     disabled = 1;
-#ifdef CFG_MULTITHREADED
-    releaseMutex(&myGlobals.gdbmMutex);
-#endif 
     LsDB = NULL;
   }
 

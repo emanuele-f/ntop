@@ -191,6 +191,20 @@ extern datum          ntop_gdbm_nextkey(GDBM_FILE g, datum d, char* file, int li
 extern datum          ntop_gdbm_fetch(GDBM_FILE g, datum d, char* file, int line);
 
 #else
+extern int   ntop_gdbm_delete(GDBM_FILE g, datum d);
+extern datum ntop_gdbm_firstkey(GDBM_FILE g);
+extern datum ntop_gdbm_nextkey(GDBM_FILE g, datum d);
+extern datum ntop_gdbm_fetch(GDBM_FILE g, datum d);
+extern int   ntop_gdbm_store(GDBM_FILE g, datum d, datum v, int r);
+extern void  ntop_gdbm_close(GDBM_FILE g);
+
+#define gdbm_firstkey(a)             ntop_gdbm_firstkey(a)
+#define gdbm_nextkey(a, b)           ntop_gdbm_nextkey(a, b)
+#define gdbm_fetch(a, b)             ntop_gdbm_fetch(a, b)
+#define gdbm_delete(a, b)            ntop_gdbm_delete(a, b)
+#define gdbm_store(a, b, c, d)       ntop_gdbm_store(a, b, c, d)
+#define gdbm_close(a)                ntop_gdbm_close(a)
+
 /* Fix to the free prototype courtesy of Tanner Lovelace <lovelace@opennms.org> */
 #define free(a)       ntop_safefree((void**)&(a), __FILE__, __LINE__)
 extern void           ntop_safefree(void **ptr, char* file, int line);

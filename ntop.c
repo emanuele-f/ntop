@@ -627,11 +627,7 @@ static void purgeIpPorts(int theDevice) {
   /* 
      I know that this semaphore has been designed for other tasks
      however it allows me to save memory/time... 
-  */
-#ifdef CFG_MULTITHREADED
-  accessMutex(&myGlobals.gdbmMutex, "purgeIpPorts");
-#endif
-  
+  */  
   for(i=1; i<MAX_IP_PORT; i++) {
     if((marker[i] == 0) && (myGlobals.device[theDevice].ipPorts[i] != NULL)) {
       free(myGlobals.device[theDevice].ipPorts[i]);
@@ -642,10 +638,6 @@ static void purgeIpPorts(int theDevice) {
     }
   }
   
-#ifdef CFG_MULTITHREADED
-  releaseMutex(&myGlobals.gdbmMutex);
-#endif
-
   free(marker);
 }
 
@@ -967,9 +959,6 @@ RETSIGTYPE cleanup(int signo) {
 #endif
 
 #ifdef HAVE_GDBM_H
-#ifdef CFG_MULTITHREADED
-  accessMutex(&myGlobals.gdbmMutex, "cleanup");
-#endif
   gdbm_close(myGlobals.dnsCacheFile);     myGlobals.dnsCacheFile = NULL;
   gdbm_close(myGlobals.addressQueueFile); myGlobals.addressQueueFile = NULL;
   gdbm_close(myGlobals.pwFile);           myGlobals.pwFile = NULL;
@@ -981,10 +970,6 @@ RETSIGTYPE cleanup(int signo) {
     gdbm_close(myGlobals.eventFile);
     myGlobals.eventFile = NULL;
   }
-#ifdef CFG_MULTITHREADED
-  releaseMutex(&myGlobals.gdbmMutex);
-#endif
-
 #ifdef CFG_MULTITHREADED
   deleteMutex(&myGlobals.gdbmMutex);
 #endif

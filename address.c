@@ -119,15 +119,7 @@ static void resolveAddress(struct in_addr *hostAddr,
     return; /* ntop is quitting... */
   }
 
-#ifdef CFG_MULTITHREADED
-  accessMutex(&myGlobals.gdbmMutex, "resolveAddress");
-#endif
-
   data_data = gdbm_fetch(myGlobals.dnsCacheFile, key_data);
-
-#ifdef CFG_MULTITHREADED
-  releaseMutex(&myGlobals.gdbmMutex);
-#endif
 
   myGlobals.numResolveCacheDBLookups++;
   /* First check whether the address we search for is cached... */
@@ -422,10 +414,6 @@ static void resolveAddress(struct in_addr *hostAddr,
         return; /* ntop is quitting... */
       }
 
-#ifdef CFG_MULTITHREADED
-      accessMutex(&myGlobals.gdbmMutex, "resolveAddress-4");
-#endif
-
       if(gdbm_store(myGlobals.dnsCacheFile, key_data, data_data, GDBM_REPLACE) != 0)
         traceEvent(CONST_TRACE_ERROR, "Error while adding '%s'\n.\n", symAddr);
       else {
@@ -435,10 +423,6 @@ static void resolveAddress(struct in_addr *hostAddr,
         traceEvent(CONST_TRACE_INFO, "GDBM_DEBUG: Added data: '%s' [%s]\n", symAddr, keyBuf);
 #endif
       }
-
-#ifdef CFG_MULTITHREADED
-      releaseMutex(&myGlobals.gdbmMutex);
-#endif
 
 #ifdef DNS_DEBUG
       traceEvent(CONST_TRACE_INFO, "DNS_DEBUG: Leaving Resolveaddress()");
@@ -459,10 +443,6 @@ static void queueAddress(struct in_addr elem) {
 
   if(myGlobals.trackOnlyLocalHosts && (!_pseudoLocalAddress(&elem)))
     return;
-
-#ifdef CFG_MULTITHREADED
-  accessMutex(&myGlobals.gdbmMutex, "queueAddress");
-#endif
 
   /* Fix - Burton Strauss (BStrauss@acm.org) 2002-04-04
            Make sure tmpBuf has a value and
@@ -502,10 +482,6 @@ static void queueAddress(struct in_addr elem) {
 #endif
     }
   }
-
-#ifdef CFG_MULTITHREADED
-  releaseMutex(&myGlobals.gdbmMutex);
-#endif
 
 #ifdef MAKE_WITH_SEMAPHORES
   incrementSem(&myGlobals.queueAddressSem);
@@ -547,13 +523,7 @@ void* dequeueAddress(void* notUsed _UNUSED_) {
     traceEvent(CONST_TRACE_INFO, "Address resolution started...\n");
 #endif
 
-#ifdef CFG_MULTITHREADED
-    accessMutex(&myGlobals.gdbmMutex, "queueAddress");
-#endif
     data_data = gdbm_firstkey(myGlobals.addressQueueFile);
-#ifdef CFG_MULTITHREADED
-    releaseMutex(&myGlobals.gdbmMutex);
-#endif
 
     while(data_data.dptr != NULL) {
       if(myGlobals.capturePackets != FLAG_NTOPSTATE_RUN) return(NULL);
@@ -574,16 +544,10 @@ void* dequeueAddress(void* notUsed _UNUSED_) {
       traceEvent(CONST_TRACE_INFO, "DNS-DEBUG: Resolved address %u\n", addr.s_addr);
 #endif
 
-#ifdef CFG_MULTITHREADED
-      accessMutex(&myGlobals.gdbmMutex, "queueAddress");
-#endif
       myGlobals.addressQueuedCurrent--;
       gdbm_delete(myGlobals.addressQueueFile, data_data);
       key_data = data_data;
       data_data = gdbm_nextkey(myGlobals.addressQueueFile, key_data);
-#ifdef CFG_MULTITHREADED
-      releaseMutex(&myGlobals.gdbmMutex);
-#endif
       free(key_data.dptr); /* Free the 'formed' data_data */
     }
   } /* endless loop */
@@ -665,15 +629,7 @@ void fetchAddressFromCache(struct in_addr hostIpAddress, char *buffer) {
 
   if(myGlobals.dnsCacheFile == NULL) return; /* ntop is quitting... */
 
-#ifdef CFG_MULTITHREADED
-  accessMutex(&myGlobals.gdbmMutex, "ipaddr2str");
-#endif
-
   data_data = gdbm_fetch(myGlobals.dnsCacheFile, key_data);
-
-#ifdef CFG_MULTITHREADED
-  releaseMutex(&myGlobals.gdbmMutex);
-#endif
 
   if((data_data.dptr != NULL) &&
      (data_data.dsize == (sizeof(StoredAddress)+1)) ) {

@@ -2153,13 +2153,7 @@ int getSniffedDNSName(char *hostNumIpAddress,
     key.dptr = hostNumIpAddress;
     key.dsize = strlen(key.dptr)+1;
 
-#ifdef CFG_MULTITHREADED
-    accessMutex(&myGlobals.gdbmMutex, "getSniffedDNSName");
-#endif
     data = gdbm_fetch(myGlobals.dnsCacheFile, key);
-#ifdef CFG_MULTITHREADED
-    releaseMutex(&myGlobals.gdbmMutex);
-#endif
 
     if(data.dptr != NULL) {
       xstrncpy(name, data.dptr, maxNameLen);
@@ -2882,17 +2876,7 @@ int fetchPrefsValue(char *key, char *value, int valueLen) {
     return(-1); /* ntop is quitting... */
   }
 
-#ifdef CFG_MULTITHREADED
-  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
-    accessMutex(&myGlobals.gdbmMutex, "fetchPrefValue");
-#endif
-
   data_data = gdbm_fetch(myGlobals.prefsFile, key_data);
-
-#ifdef CFG_MULTITHREADED
-  if(myGlobals.gdbmMutex.isInitialized == 1)
-    releaseMutex(&myGlobals.gdbmMutex);
-#endif
 
   memset(value, 0, valueLen);
 
@@ -2934,20 +2918,11 @@ void storePrefsValue(char *key, char *value) {
     ; /* ntop is quitting... */
   }
 
-#ifdef CFG_MULTITHREADED
-  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
-    accessMutex(&myGlobals.gdbmMutex, "storePrefsValue");
-#endif
-
   if(gdbm_store(myGlobals.prefsFile, key_data, data_data, GDBM_REPLACE) != 0)
     traceEvent(CONST_TRACE_ERROR, "Error while adding %s=%s.", key, value);
   else {
     /* traceEvent(CONST_TRACE_INFO, "Storing %s=%s.", key, value); */
   }
-#ifdef CFG_MULTITHREADED
-  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
-    releaseMutex(&myGlobals.gdbmMutex);
-#endif
 }
 
 /* ******************************** */
@@ -4243,4 +4218,129 @@ void setHostFingerprint(HostTraffic *srcHost) {
   }
 
   releaseAddrResMutex();
+}
+
+/* ************************************************ */
+
+#undef gdbm_firstkey
+#undef gdbm_nextkey
+#undef gdbm_fetch
+#undef gdbm_delete
+#undef gdbm_store
+#undef gdbm_close
+
+int ntop_gdbm_delete(GDBM_FILE g, datum d) {
+  int rc;
+
+#ifdef CFG_MULTITHREADED
+    if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+accessMutex(&myGlobals.gdbmMutex, "ntop_gdbm_delete");
+#endif
+
+  rc = gdbm_delete(g, d);
+  
+#ifdef CFG_MULTITHREADED
+   if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+ releaseMutex(&myGlobals.gdbmMutex);
+#endif
+
+  return(rc);
+}
+
+/* ****************************************** */
+
+datum ntop_gdbm_firstkey(GDBM_FILE g) {
+  datum theData;
+
+#ifdef CFG_MULTITHREADED
+  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+    accessMutex(&myGlobals.gdbmMutex, "ntop_gdbm_firstkey");
+#endif
+
+  theData = gdbm_firstkey(g);
+  
+#ifdef CFG_MULTITHREADED
+  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+    releaseMutex(&myGlobals.gdbmMutex);
+#endif
+
+  return(theData);
+}
+
+/* ****************************************** */
+
+void ntop_gdbm_close(GDBM_FILE g) {
+  datum theData;
+
+#ifdef CFG_MULTITHREADED
+  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+    accessMutex(&myGlobals.gdbmMutex, "ntop_gdbm_close");
+#endif
+
+  gdbm_close(g);
+  
+#ifdef CFG_MULTITHREADED
+  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+    releaseMutex(&myGlobals.gdbmMutex);
+#endif
+}
+
+/* ******************************************* */
+
+datum ntop_gdbm_nextkey(GDBM_FILE g, datum d) {
+  datum theData;
+
+#ifdef CFG_MULTITHREADED
+  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+    accessMutex(&myGlobals.gdbmMutex, "ntop_gdbm_nextkey");
+#endif
+
+  theData = gdbm_nextkey(g, d);
+  
+#ifdef CFG_MULTITHREADED
+  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+    releaseMutex(&myGlobals.gdbmMutex);
+#endif
+
+  return(theData);
+}
+
+/* ******************************************* */
+
+datum ntop_gdbm_fetch(GDBM_FILE g, datum d) {
+  datum theData;
+
+#ifdef CFG_MULTITHREADED
+  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+    accessMutex(&myGlobals.gdbmMutex, "ntop_gdbm_fetch");
+#endif
+
+  theData = gdbm_fetch(g, d);
+  
+#ifdef CFG_MULTITHREADED
+  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+    releaseMutex(&myGlobals.gdbmMutex);
+#endif
+
+  return(theData);
+}
+
+/* ******************************************* */
+
+int ntop_gdbm_store(GDBM_FILE g, datum d, datum v, int r) {
+  int rc;
+
+#ifdef CFG_MULTITHREADED
+  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+    accessMutex(&myGlobals.gdbmMutex, "ntop_gdbm_store");
+#endif
+  
+  rc = gdbm_store(g, d, v, r);
+  
+#ifdef CFG_MULTITHREADED
+  if(myGlobals.gdbmMutex.isInitialized == 1) /* Mutex not yet initialized ? */
+    releaseMutex(&myGlobals.gdbmMutex);
+#endif
+  
+  return(rc);
 }

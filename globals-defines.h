@@ -790,6 +790,11 @@
 #define MAX_PDA_HOST_TABLE                  4096
 
 /*
+ * Limit of the table used to display hosts in the lastSeen plugin.
+ */
+#define MAX_LASTSEEN_TABLE_SIZE             4096
+
+/*
  * Maximum number of entries in the User Lists.
  *  See updateHTTPVirtualHosts(), updateFileList() and updateHostUsers().
  *  Note that these are singly linked lists, so this is the only limit 

@@ -502,9 +502,9 @@ if test ".$ac_mysql" = ".yes"; then
                 _libs=${LIBS}
                 LIBS="${LIBS} -lmysqlclient"
                 AC_TRY_LINK([#include <mysql/mysql.h>], [MYSQL *mysql; mysql_shutdown(mysql);], 
-		[ AC_MSG_RESULT(yes)   have_mysql=yes], [
-
-                LIBS="${_libs} -L/usr/lib/mysql -lmysqlclient"
+		[ AC_MSG_RESULT(yes)
+		  have_mysql=yes],
+		[ LIBS="${_libs} -L/usr/lib/mysql -lmysqlclient"
                 AC_TRY_LINK([#include <mysql/mysql.h>], 
 		[MYSQL *mysql;mysql_shutdown(mysql);], [
                     AC_MSG_RESULT(yes - /usr/lib/mysql)

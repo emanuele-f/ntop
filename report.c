@@ -3739,8 +3739,8 @@ void printDomainStats(char* domainName, int sortedColumn, int revertOrder, int p
 	      statsEntry->domainHost->fullDomainName) < 0)
 	BufferTooShort();
     } else {
-      char tmpBuf[64];
-      int blankId;
+      char tmpBuf[64], *hostLink;
+      int blankId, len;
 
 #ifdef MULTITHREADED
       if(myGlobals.numericFlag == 0) accessMutex(&myGlobals.addressResolutionMutex, "getHostIcon");
@@ -3759,37 +3759,40 @@ void printDomainStats(char* domainName, int sortedColumn, int revertOrder, int p
 	 && (strcmp(&tmpBuf[blankId+1], domainName) == 0))
 	tmpBuf[blankId] = '\0';
 
-      if(snprintf(htmlAnchor, sizeof(htmlAnchor), "<A HREF=/%s.html>%s</A>",
-		  statsEntry->domainHost->hostNumIpAddress, tmpBuf) < 0)
-	BufferTooShort();
+      hostLink = makeHostLink(statsEntry->domainHost, SHORT_FORMAT, 1, 0);
+
+      len = strlen(hostLink); if(len >= sizeof(htmlAnchor)) len = sizeof(htmlAnchor)-1;
+      strncpy(htmlAnchor, hostLink, len);
+      htmlAnchor[len] = '\0';
     }
 
-    if(snprintf(buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT>%s</TH><TD "TD_BG" ALIGN=CENTER>%s</TD>"
-	    "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%.1f%%</TD>"
-	    "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%.1f%%</TD>"
-	    "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD>"
-	    "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD>"
-	    "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD>"
-	    "<TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>\n",
-	    getRowColor(), htmlAnchor,
-	    getHostCountryIconURL(statsEntry->domainHost),
-	    formatBytes(statsEntry->bytesSent, 1),
-	    (100*((float)statsEntry->bytesSent/(float)totBytesSent)),
-	    formatBytes(statsEntry->bytesRcvd, 1),
-	    (100*((float)statsEntry->bytesRcvd/(float)totBytesRcvd)),
-	    formatBytes(statsEntry->tcpSent, 1),
-	    formatBytes(statsEntry->tcpRcvd, 1),
-	    formatBytes(statsEntry->udpSent, 1),
-	    formatBytes(statsEntry->udpRcvd, 1),
-	    formatBytes(statsEntry->icmpSent, 1),
-	    formatBytes(statsEntry->icmpRcvd, 1),
-	    formatBytes(statsEntry->ospfSent, 1),
-	    formatBytes(statsEntry->ospfRcvd, 1),
-	    formatBytes(statsEntry->igmpSent, 1),
-	    formatBytes(statsEntry->igmpRcvd, 1)
-	    ) < 0) BufferTooShort();
-    sendString(buf);
 
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT>%s</TH><TD "TD_BG" ALIGN=CENTER>%s</TD>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%.1f%%</TD>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%.1f%%</TD>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>\n",
+		getRowColor(), htmlAnchor,
+		getHostCountryIconURL(statsEntry->domainHost),
+		formatBytes(statsEntry->bytesSent, 1),
+		(100*((float)statsEntry->bytesSent/(float)totBytesSent)),
+		formatBytes(statsEntry->bytesRcvd, 1),
+		(100*((float)statsEntry->bytesRcvd/(float)totBytesRcvd)),
+		formatBytes(statsEntry->tcpSent, 1),
+		formatBytes(statsEntry->tcpRcvd, 1),
+		formatBytes(statsEntry->udpSent, 1),
+		formatBytes(statsEntry->udpRcvd, 1),
+		formatBytes(statsEntry->icmpSent, 1),
+		formatBytes(statsEntry->icmpRcvd, 1),
+		formatBytes(statsEntry->ospfSent, 1),
+		formatBytes(statsEntry->ospfRcvd, 1),
+		formatBytes(statsEntry->igmpSent, 1),
+		formatBytes(statsEntry->igmpRcvd, 1)
+		) < 0) BufferTooShort();
+    sendString(buf);
+    
     /* Avoid huge tables */
     if(printedEntries++ > myGlobals.maxNumLines)
       break;

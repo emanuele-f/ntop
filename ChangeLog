@@ -153,7 +153,14 @@
           make sntop
         - Vendor lookup table moved from static .h to file, with mini
           file provided and ability to download full file from IEEE.
-
+        - p3p... added parameters to set p3p header values cp= and policyref=
+          Also added ability to return default p3p file upon request from
+          browser. 
+               NOTE:  there is no sample file provided.  This is not an 
+                      oversight.  After careful consideration, we are not
+                      providing one.  The reason is that a .p3p file is 
+                      intended to be a legal contract between your site
+                      and your users.
 
         - Limited - VERY LIMITED - i18n support
         - Bare bones for a new xml dump facility to dump all internal data.

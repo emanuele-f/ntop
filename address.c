@@ -552,7 +552,7 @@ void* dequeueAddress(void* notUsed _UNUSED_) {
 
       memcpy(&addr.s_addr, data_data.dptr, 4);
 
-      HEARTBEAT(1, "dequeueAddress()", NULL);
+      HEARTBEAT(2, "dequeueAddress()", NULL);
 
 #ifdef DNS_DEBUG
       traceEvent(CONST_TRACE_INFO, "DNS_DEBUG: Dequeued address... [%u][key=%s] (#addr=%d)\n",

@@ -145,7 +145,7 @@
 /* Define PARM_SHOW_NTOP_HEARTBEAT to see minimal status messages every cycle
  * from various timed processes
  */
-/* #define PARM_SHOW_NTOP_HEARTBEAT */
+/* #define PARM_SHOW_NTOP_HEARTBEAT 1 */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  *  Timeouts and intervals - in seconds (x*60 = x minutes)

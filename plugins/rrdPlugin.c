@@ -1212,8 +1212,8 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 
     HEARTBEAT(0, "rrdMainLoop(), sleep(%d)...", sleep_tm);
     sleep(sleep_tm);
-    if(myGlobals.capturePackets != FLAG_NTOPSTATE_RUN) return(NULL);
     HEARTBEAT(0, "rrdMainLoop(), sleep(%d)...woke", sleep_tm);
+    if(myGlobals.capturePackets != FLAG_NTOPSTATE_RUN) return(NULL);
 
     numRuns++;
     rrdTime =  time(NULL);

@@ -4101,7 +4101,7 @@ void _HEARTBEAT(int beatLevel, char* file, int line, char * format, ...) {
 
   myGlobals.heartbeatCounter++;
 
-  if((format != NULL) &&(PARM_SHOW_NTOP_HEARTBEAT >= beatLevel) ) {
+  if((format != NULL) && (PARM_SHOW_NTOP_HEARTBEAT >= beatLevel) ) {
     memset(buf, 0, LEN_GENERAL_WORK_BUFFER);
     va_start(va_ap, format);
 #if defined(WIN32)

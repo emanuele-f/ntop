@@ -1540,9 +1540,9 @@ void queuePacket(u_char * _deviceId,
 #ifdef HAVE_SCHED_H
     sched_yield(); /* Allow other threads (dequeue) to run */
 #endif
-    HEARTBEAT(0, "queuePacket(), sleep(1)...", NULL);
+    HEARTBEAT(0, "queuePacket() drop, sleep(1)...", NULL);
     sleep(1);
-    HEARTBEAT(0, "queuePacket(), sleep(1)...woke", NULL);
+    HEARTBEAT(0, "queuePacket() drop, sleep(1)...woke", NULL);
   } else {
 #ifdef DEBUG
     traceEvent(CONST_TRACE_INFO, "About to queue packet... \n");

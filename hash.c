@@ -546,14 +546,14 @@ void purgeIdleHosts(int actDevice) {
 #endif
 
 #ifdef CFG_MULTITHREADED
-    HEARTBEAT(1, "purgeIdleHosts() calling freeHostInfo(), mutex: [%s %s:%d]",   
+    HEARTBEAT(3, "purgeIdleHosts() calling freeHostInfo(), mutex: [%s %s:%d]",   
                  myGlobals.tcpSessionsMutex.isLocked ? "Locked" : "Unlocked",
                  myGlobals.tcpSessionsMutex.lockFile,
                  myGlobals.tcpSessionsMutex.lockLine);
 #endif
     freeHostInfo(actDevice, theFlaggedHosts[idx], actDevice);
 #ifdef CFG_MULTITHREADED
-    HEARTBEAT(1, "purgeIdleHosts() returning freeHostInfo(), mutex: [%s %s:%d]",   
+    HEARTBEAT(3, "purgeIdleHosts() returning freeHostInfo(), mutex: [%s %s:%d]",   
                  myGlobals.tcpSessionsMutex.isLocked ? "Locked" : "Unlocked",
                  myGlobals.tcpSessionsMutex.lockFile,
                  myGlobals.tcpSessionsMutex.lockLine);

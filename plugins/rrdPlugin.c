@@ -1035,27 +1035,27 @@ static void handleRRDHTTPrequest(char* url) {
   if(snprintf(buf, sizeof(buf), "%d", (int)dumpInterval) < 0)
     BufferTooShort();
   sendString(buf);
-  sendString("> seconds<br>It specifies how often data is stored permanently.</TD></tr>\n");
+  sendString("> seconds<br>Specifies how often data is stored permanently.</TD></tr>\n");
 
   sendString("<TR><TH ALIGN=LEFT>Dump Hours</TH><TD><FORM ACTION=/plugins/rrdPlugin METHOD=GET>"
 	     "<INPUT NAME=hours SIZE=5 VALUE=");
   if(snprintf(buf, sizeof(buf), "%d", (int)dumpHours) < 0)
     BufferTooShort();
   sendString(buf);
-  sendString(">Specifies how many hours of 'interval' data is stored permanently.</TD></tr>\n");
+  sendString("><br>Specifies how many hours of 'interval' data is stored permanently.</TD></tr>\n");
 
   sendString("<TR><TH ALIGN=LEFT>Dump Days</TH><TD><FORM ACTION=/plugins/rrdPlugin METHOD=GET>"
 	     "<INPUT NAME=days SIZE=5 VALUE=");
   if(snprintf(buf, sizeof(buf), "%d", (int)dumpDays) < 0)
     BufferTooShort();
   sendString(buf);
-  sendString(">Specifies how many days of hourly data is stored permanently.</TD></tr>\n");
+  sendString("><br>Specifies how many days of hourly data is stored permanently.</TD></tr>\n");
   sendString("<TR><TH ALIGN=LEFT>Dump Months</TH><TD><FORM ACTION=/plugins/rrdPlugin METHOD=GET>"
 	     "<INPUT NAME=months SIZE=5 VALUE=");
   if(snprintf(buf, sizeof(buf), "%d", (int)dumpMonths) < 0)
     BufferTooShort();
   sendString(buf);
-  sendString(">Specifies how many months of daily data is stored permanently.</TD></tr>\n");
+  sendString("><br>Specifies how many months of daily data is stored permanently.</TD></tr>\n");
 
   sendString("<TR><TD ALIGN=CENTER COLSPAN=2><B>WARNING:</B>&nbsp;Changes to the above values will ONLY affect NEW rrds</TD></TR>");
 

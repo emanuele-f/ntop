@@ -224,11 +224,11 @@ void freeHostInfo(int theDevice, HostTraffic *host, int actualDeviceId) {
   if(host->routedTraffic != NULL) free(host->routedTraffic);
 
   if(host->portsUsage != NULL) {
-    for(i=0; i<TOP_ASSIGNED_IP_PORTS; i++)
+    for(i=0; i<TOP_ASSIGNED_IP_PORTS; i++) {
       if(host->portsUsage[i] != NULL) {
 	free(host->portsUsage[i]);
-	host->portsUsage[i] = NULL;
       }
+    }
 
     free(host->portsUsage);
   }

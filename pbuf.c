@@ -553,14 +553,7 @@ static void processIpPkt(const u_char *bp,
 
   if((ether_src == NULL) && (ether_dst == NULL)) {
     /* Ethernet-less protocols (e.g. PPP/RAW IP) */
-
-    memcpy(etherAddrSrc, &(ip.ip_src.s_addr), sizeof(ip.ip_src.s_addr));
-    etherAddrSrc[ETHERNET_ADDRESS_LEN] = '\0';
-    ether_src = etherAddrSrc;
-
-    memcpy(etherAddrDst, &(ip.ip_dst.s_addr), sizeof(ip.ip_dst.s_addr));
-    etherAddrDst[ETHERNET_ADDRESS_LEN] = '\0';
-    ether_dst = etherAddrDst;
+    forceUsingIPaddress = 1;
   }
 
   NTOHL(ip.ip_dst.s_addr); NTOHL(ip.ip_src.s_addr);

@@ -78,6 +78,9 @@ echo "Configuring ${PACKAGE_NAME} according to your request(s):"
 echo "   ./configure ${CONFIGURE_PARAMETERS}"
 echo
 
+dnl> This has to be here due to some odd dependency...
+AC_CANONICAL_TARGET
+
 echo "*******************************************************************"
 echo "*                                                                 *"
 echo "* NOTICE:  I know you're used to ignoring output from ./configure *"
@@ -250,7 +253,15 @@ fi
 if test "x${ac_cv_prog_AUTOCONF}" != "x"; then
   autoconf --version | head -n 1 | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print "     " $3 " " $4 }' >>/tmp/autotoolversions
 fi
-libtool --version | head -n 1  | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print "     " $3 " " $4 }' >>/tmp/autotoolversions
+
+case "${target}:${CC}" in
+    *-*-darwin*:* )
+    glibtool --version | head -n 1  | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print "     " $3 " " $4 }' >>/tmp/autotoolversions
+    ;;
+    * )
+    libtool --version | head -n 1  | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print "     " $3 " " $4 }' >>/tmp/autotoolversions
+    ;;
+esac
 
 touch autotoolversions
 diff autotoolversions /tmp/autotoolversions >/dev/null 2>/dev/null 
@@ -388,9 +399,6 @@ AC_CONFIG_SRCDIR([ntop.c])
 
 dnl> force configure to use current directory
 AC_CONFIG_AUX_DIR(.)
-
-dnl> This has to be here due to some odd dependency...
-AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE()
 AC_MSG_CHECKING([for aclocal.m4])

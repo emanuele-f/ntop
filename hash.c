@@ -150,7 +150,7 @@ static void freeHostSessions(u_int hostIdx, int theDevice) {
 	  releaseMutex(&myGlobals.tcpSessionsMutex);
 	  mutexLocked = 0;
 	}
-#ifdef HAVE_SCHED_H
+#ifdef MAKE_WITH_SCHED_YIELD
 	sched_yield(); /* Allow other threads to run */
 #endif
       }
@@ -408,7 +408,7 @@ void freeHostInstances(int actualDeviceId) {
 		  myGlobals.tcpSessionsMutex.lockLine);
 #endif
 	myGlobals.device[actualDeviceId].hash_hostTraffic[idx] = NULL;
-#ifdef HAVE_SCHED_H
+#ifdef MAKE_WITH_SCHED_YIELD
 	sched_yield(); /* Allow other threads to run */
 #endif
       }
@@ -559,7 +559,7 @@ void purgeIdleHosts(int actDevice) {
                  myGlobals.tcpSessionsMutex.lockLine);
 #endif
     numFreedBuckets++;
-#ifdef HAVE_SCHED_H
+#ifdef MAKE_WITH_SCHED_YIELD
     sched_yield(); /* Allow other threads to run */
 #endif
   }

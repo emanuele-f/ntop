@@ -2122,6 +2122,14 @@ void printNtopConfigHInfo(int textPrintFlag) {
 #endif
                          );
 
+  printFeatureConfigInfo(textPrintFlag, "HAVE_SCHED_YIELD",
+#ifdef HAVE_SCHED_YIELD
+                         "present"
+#else
+                         "absent"
+#endif
+                         );
+
   printFeatureConfigInfo(textPrintFlag, "HAVE_SECURITY_PAM_APPL_H",
 #ifdef HAVE_SECURITY_PAM_APPL_H
                          "present"
@@ -2620,97 +2628,107 @@ void printNtopConfigHInfo(int textPrintFlag) {
 
   printFeatureConfigInfo(textPrintFlag, "LSTAT_FOLLOWS_SLASHED_SYMLINK",
 #ifdef LSTAT_FOLLOWS_SLASHED_SYMLINK
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
   printFeatureConfigInfo(textPrintFlag, "MAKE_MICRO_NTOP",
 #ifdef MAKE_MICRO_NTOP
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
   printFeatureConfigInfo(textPrintFlag, "MAKE_WITH_GDCHART",
 #ifdef MAKE_WITH_GDCHART
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
   printFeatureConfigInfo(textPrintFlag, "MAKE_WITH_I18N",
 #ifdef MAKE_WITH_I18N
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
   printFeatureConfigInfo(textPrintFlag, "MAKE_WITH_IGNORE_SIGPIPE",
 #ifdef MAKE_WITH_IGNORE_SIGPIPE
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
   printFeatureConfigInfo(textPrintFlag, "MAKE_WITH_LARGERRDPOP",
 #ifdef MAKE_WITH_LARGERRDPOP
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
+  printFeatureConfigInfo(textPrintFlag, "MAKE_WITH_SCHED_YIELD",
+#ifdef MAKE_WITH_SCHED_YIELD
+			 "yes"
+#else
+			 "no"
+#endif
+			 );
+
   printFeatureConfigInfo(textPrintFlag, "MAKE_WITH_SSLV3_SUPPORT",
 #ifdef MAKE_WITH_SSLV3_SUPPORT
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
   printFeatureConfigInfo(textPrintFlag, "MAKE_WITH_SSLWATCHDOG_COMPILETIME",
 #ifdef MAKE_WITH_SSLWATCHDOG_COMPILETIME
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
   printFeatureConfigInfo(textPrintFlag, "MAKE_WITH_XMLDUMP",
 #ifdef MAKE_WITH_XMLDUMP
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
   printFeatureConfigInfo(textPrintFlag, "MAKE_WITH_ZLIB",
 #ifdef MAKE_WITH_ZLIB
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
   printFeatureConfigInfo(textPrintFlag, "SETVBUF_REVERSED",
 #ifdef SETVBUF_REVERSED
-                         "present"
+                         "yes"
 #else
-                         "absent"
+                         "no"
 #endif
                          );
 
   printFeatureConfigInfo(textPrintFlag, "STACK_DIRECTION",
-#ifdef STACK_DIRECTION
-                         "present"
+#if STACK_DIRECTION > 0
+                         "grows toward higher addresses"
+#elif STACK_DIRECTION < 0
+                         "grows toward lower addresses"
 #else
-                         "absent"
+                         "direction of growth unknown"
 #endif
                          );
 
@@ -2724,9 +2742,9 @@ void printNtopConfigHInfo(int textPrintFlag) {
 
   printFeatureConfigInfo(textPrintFlag, "TIME_WITH_SYS_TIME",
 #ifdef TIME_WITH_SYS_TIME
-                         "present"
+                         "may include both"
 #else
-                         "absent"
+                         "do not include both"
 #endif
                          );
 

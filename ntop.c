@@ -669,7 +669,7 @@ void* scanIdleLoop(void* notUsed _UNUSED_) {
 #if !defined(__FreeBSD__)
 	purgeIpPorts(i);
 #endif
-#ifdef HAVE_SCHED_H
+#ifdef MAKE_WITH_SCHED_YIELD
 	sched_yield(); /* Allow other threads to run */
 #endif
       }

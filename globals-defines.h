@@ -296,6 +296,15 @@
 #endif
 
 /*
+ * MAKE_WITH_SCHED_YIELD is shorthand
+ */
+#if ( defined(HAVE_SCHED_H) || defined(HAVE_SYS_SCHED_H) ) && defined(HAVE_SCHED_YIELD)
+ #define MAKE_WITH_SCHED_YIELD
+#else
+ #undef MAKE_WITH_SCHED_YIELD
+#endif
+
+/*
  * Do we have the stuff we need for gdchart?
  *    ./configure sets MAKE_WITH_GDCHART - that's the reliable one.
  *    But it's possible we have some of the others set (say we found libpng).

@@ -1537,7 +1537,7 @@ void queuePacket(u_char * _deviceId,
 
     incrementTrafficCounter(&myGlobals.device[getActualInterface(deviceId)].droppedPkts, 1);
 
-#ifdef HAVE_SCHED_H
+#ifdef MAKE_WITH_SCHED_YIELD
     sched_yield(); /* Allow other threads (dequeue) to run */
 #endif
     HEARTBEAT(0, "queuePacket() drop, sleep(1)...", NULL);
@@ -1576,7 +1576,7 @@ void queuePacket(u_char * _deviceId,
 #else
   signalCondvar(&myGlobals.queueCondvar);
 #endif
-#ifdef HAVE_SCHED_H
+#ifdef MAKE_WITH_SCHED_YIELD
   sched_yield(); /* Allow other threads (dequeue) to run */
 #endif
 }

@@ -44,7 +44,7 @@ dnl>       into the stamp.
 dnl>
 AC_INIT([ntop],[2.1.90])
 AC_PREREQ([2.50])
-SCRIPTVER="v1.106-2003-03-29"
+SCRIPTVER="v1.107-2003-03-29"
 
 dnl>
 dnl> generate the config header
@@ -756,11 +756,14 @@ case "${target}:${CC}" in
       ;;
 
     *-*-netbsd*1.5*:gcc* )
-        VERIFIED1="2.1.51:2002-10-23:Burton Strauss <burton@ntopsupport.com:1.5.3 w/ updated auto* tools"
+        VERIFIED1="2.1.90:2003-03-29:Burton Strauss <burton@ntopsupport.com:1.6"
+        VERIFIED2="2.1.51:2002-10-23:Burton Strauss <burton@ntopsupport.com:1.5.3 w/ updated auto* tools"
         NOTE1="Single Threaded only."
         DEFINEOS="NETBSD"
         if test ".${ac_disable_multithread}" = ".yes"; then
             STATUS="SUPPORTED"
+            NOTE2="NetBSD 1.6 requires the UPDATED libpcap in the packages"
+            NOTE3="  If you see a missing pcap_open_dead, you forgot to update!"
         else
             STATUS="WILLFAIL"
             NOTE2="With ANY of the threads packages, you are on your own!"
@@ -844,6 +847,9 @@ case "${STATUS}" in
         fi
         if test ".${NOTE2}" != "."; then
             echo "*    ${NOTE2}"
+        fi
+        if test ".${NOTE3}" != "."; then
+            echo "*    ${NOTE3}"
         fi
         ;;
 
@@ -1438,6 +1444,7 @@ AC_CHECK_FUNCS([localtime_r])
 AC_CHECK_FUNCS([memchr memset])
 AC_CHECK_FUNCS([putenv])
 AC_CHECK_FUNCS([re_comp regcomp])
+AC_CHECK_FUNCS([sched_yield])
 AC_CHECK_FUNCS([select socket])
 AC_CHECK_FUNCS([snprintf])
 AC_CHECK_FUNCS([sqrt])

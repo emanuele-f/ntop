@@ -933,6 +933,8 @@ static void writePcapPacket(SFSample *sample) {
   myGlobals.numSamplesReceived++;
   myGlobals.lastSample = sample->samplePool;
 
+  NTOHL(sample->sourceIP.s_addr);
+
   for(i=0; i<MAX_NUM_PROBES; i++) {
     if(probeList[i].probeAddr.s_addr == 0) {
       probeList[i].probeAddr.s_addr = sample->sourceIP.s_addr;
@@ -1611,6 +1613,7 @@ static void handlesFlowHTTPrequest(char* url) {
 	     "<b>NOTE</b>:<ol>"
 	     "<li>Use 0 as port, and 0.0.0.0 as IP address to disable export/collection."
 	     "<li>sFlow packets are associated with a virtual device and not mixed to captured packets."
+	     "<li>sFlow activation may require ntop restart"
 	     "<li>A virtual sFlow device is activated only when incoming flow capture is enabled."
 	     "<li>You can switch devices using this <A HREF=/switch.html>link</A>."
 	     "</ol></td></tr>\n");

@@ -135,6 +135,8 @@ static void* netflowMainLoop(void* notUsed _UNUSED_) {
 
 	myGlobals.numNetFlowsPktsRcvd++;
 
+	NTOHL(fromHost.sin_addr.s_addr);
+
 	for(i=0; i<MAX_NUM_PROBES; i++) {
 	  if(probeList[i].probeAddr.s_addr == 0) {
 	    probeList[i].probeAddr.s_addr = fromHost.sin_addr.s_addr;
@@ -436,6 +438,7 @@ static void handleNetflowHTTPrequest(char* url) {
 	     "<b>NOTE</b>:<ol>"
 	     "<li>Use 0 as port, and 0.0.0.0 as IP address to disable export/collection"
 	     "<li>NetFlow packets are associated with a virtual device and not mixed to captured packets."
+	     "<li>NetFlow activation may require ntop restart"
 	     "<li>A virtual NetFlow device is activated only when incoming flow capture is enabled."
 	     "<li>You can switch devices using this <A HREF=/switch.html>link</A>."
 	     "</ol></td></tr>\n");

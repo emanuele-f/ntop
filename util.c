@@ -661,6 +661,31 @@ int32_t gmt2local(time_t t) {
 
 /* ********************************* */
 
+#ifdef MAKE_WITH_LARGERRDPOP
+char *dotToSlash(char *name) {
+    /*
+     *  Convert a dotted quad ip address name a.b.c.d to a/b/c/d or a\b\c\d
+     */
+    char* localBuffer;
+    int i, len;
+
+    localBuffer = strdup(name);
+
+    for (i=0; i<strlen(localBuffer); i++) {
+        if (localBuffer[i] == '.')
+ #ifdef WIN32
+            localBuffer[i]='\\';
+ #else
+            localBuffer[i]='/';
+ #endif
+    }
+    localBuffer[i]='\0';
+    return localBuffer;
+}
+#endif
+
+/* ********************************* */
+
 /* Example: "flow1='host jake',flow2='dst host born2run'" */
 void handleFlowsSpecs() {
   FILE *fd;

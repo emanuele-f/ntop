@@ -3400,14 +3400,24 @@ void printHostDetailedInfo(HostTraffic *el, int actualDeviceId) {
     /* Do NOT add a '/' at the end of the path because Win32 will complain about it */
     snprintf(buf, sizeof(buf), "%s/interfaces/%s/hosts/%s", myGlobals.rrdPath, 
 	     myGlobals.device[myGlobals.actualReportDeviceId].humanFriendlyName,
-	     el->hostNumIpAddress);
+#ifdef MAKE_WITH_LARGERRDPOP
+             dotToSlash(el->hostNumIpAddress)
+#else
+             el->hostNumIpAddress
+#endif
+            );
 
     if(stat(buf, &statbuf) == 0) {
       if(snprintf(buf, sizeof(buf), "<TR %s><TH "TH_BG" ALIGN=LEFT>%s</TH><TD "TD_BG" ALIGN=RIGHT>"
                   "[ <A HREF=\"/plugins/rrdPlugin?action=list&key=interfaces/%s/hosts/%s&title=host %s\">"
                    "<IMG BORDER=0 SRC=/graph.gif TITLE=\"link to rrd graphs\"></A> ]</TD></TR>\n",
 		  getRowColor(), "RRD Stats", 
-		  myGlobals.device[myGlobals.actualReportDeviceId].humanFriendlyName, el->hostNumIpAddress,
+                  myGlobals.device[myGlobals.actualReportDeviceId].humanFriendlyName,
+#ifdef MAKE_WITH_LARGERRDPOP
+                  dotToSlash(el->hostNumIpAddress),
+#else
+                  el->hostNumIpAddress,
+#endif
 		  el->hostSymIpAddress[0] != '\0' ? el->hostSymIpAddress : el->hostNumIpAddress) < 0)
 	BufferTooShort();
       sendString(buf);

@@ -67,7 +67,6 @@ extern int optopt;
 void initNtopGlobals(int argc, char * argv[]);
 
 /* address.c */
-extern void updateHostNameInfo(unsigned long numeric, char* symbolic, int actualDeviceId);
 extern int printable(int ch);
 extern void cleanupAddressQueue(void);
 extern void* dequeueAddress(void* notUsed);

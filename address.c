@@ -34,11 +34,12 @@ static int _ns_name_uncompress(const u_char *msg,
 static int _ns_name_unpack(const u_char *msg,
 			  const u_char *eom, const u_char *src,
 			  u_char *dst, size_t dstsiz);
+static void updateDeviceHostNameInfo(unsigned long numeric, char* symbolic, int actualDeviceId);
+static void updateHostNameInfo(unsigned long numeric, char* symbolic);
 
 /* **************************************** */
 
-void updateHostNameInfo(unsigned long numeric, 
-			char* symbolic, int actualDeviceId) {
+static void updateDeviceHostNameInfo(unsigned long numeric, char* symbolic, int actualDeviceId) {
   char *hostName;
   struct in_addr addr;
   char buf[32];
@@ -65,6 +66,16 @@ void updateHostNameInfo(unsigned long numeric,
   }
   releaseAddrResMutex();
 }
+
+/* **************************************** */
+
+static void updateHostNameInfo(unsigned long numeric, char* symbolic) {
+  int i;
+  
+  for(i=0; i<myGlobals.numDevices; i++)
+    updateDeviceHostNameInfo(numeric, symbolic, i);
+}
+
 
 /* ************************************ */
 
@@ -138,7 +149,7 @@ static void resolveAddress(struct in_addr *hostAddr,
     } else
       strncpy(symAddr, retrievedAddress->symAddress, MAX_LEN_SYM_HOST_NAME-1);
 
-    updateHostNameInfo(addr, retrievedAddress->symAddress, actualDeviceId);
+    updateHostNameInfo(addr, retrievedAddress->symAddress);
     myGlobals.numResolvedOnCacheAddresses++;
     free(data_data.dptr);
 #ifdef DNS_DEBUG
@@ -386,7 +397,7 @@ static void resolveAddress(struct in_addr *hostAddr,
   data_data.dptr = (void*)&storedAddress;
   data_data.dsize = sizeof(storedAddress)+1;
 
-  updateHostNameInfo(addr, symAddr, actualDeviceId);
+  updateHostNameInfo(addr, symAddr);
 
   if(myGlobals.gdbm_file == NULL) {
 #ifdef DNS_DEBUG
@@ -684,7 +695,7 @@ void ipaddr2str(struct in_addr hostIpAddress, int actualDeviceId) {
   fetchAddressFromCache(hostIpAddress, buf);
 
   if(buf[0] != '\0') {
-    updateHostNameInfo(hostIpAddress.s_addr, buf, actualDeviceId);
+    updateHostNameInfo(hostIpAddress.s_addr, buf);
   } else {
 #if defined(CFG_MULTITHREADED) && defined(MAKE_ASYNC_ADDRESS_RESOLUTION)
     queueAddress(hostIpAddress);

@@ -3032,9 +3032,11 @@ void printNtopConfigInfo(int textPrintFlag) {
       {
 	int rc;
 
+#ifdef SSLWATCHDOG_DEBUG
 	traceEvent(TRACE_INFO, "SSLWDDEBUG: ****S*S*L*W*A*T*C*H*D*O*G*********STARTING\n");
 	traceEvent(TRACE_INFO, "SSLWDDEBUG: P Common     Parent         Child\n");
 	traceEvent(TRACE_INFO, "SSLWDDEBUG: - ---------- -------------- --------------\n");
+#endif
 
 	if ((rc = sslwatchdogGetLock(SSLWATCHDOG_BOTH)) != 0) {
           /* Bad thing - can't lock the mutex */
@@ -3457,6 +3459,7 @@ void printNtopConfigInfo(int textPrintFlag) {
     static void handleSingleWebConnection(fd_set *fdmask) {
       struct sockaddr_in from;
       int from_len = sizeof(from);
+      int rc;
 
       errno = 0;
 
@@ -3490,7 +3493,6 @@ void printNtopConfigInfo(int textPrintFlag) {
 	    if (myGlobals.useSSLwatchdog == 1)
 #endif /* PARM_SSLWATCHDOG */
 	      {
-		int rc;
 
 #if defined(PARM_SSLWATCHDOG) || defined(USE_SSLWATCHDOG)
 		/* The watchdog ... */
@@ -3532,25 +3534,29 @@ void printNtopConfigInfo(int textPrintFlag) {
 					 0-SSLWATCHDOG_ENTER_LOCKED,
 					 0-SSLWATCHDOG_RETURN_LOCKED);
 #endif /* PARM_SSLWATCHDOG || USE_SSLWATCHDOG */
+              }
 
-		if(accept_ssl_connection(myGlobals.newSock) == -1) {
-                  traceEvent(TRACE_WARNING, "Unable to accept SSL connection\n");
-                  closeNwSocket(&myGlobals.newSock);
-                  return;
-		} else {
-                  myGlobals.newSock = -myGlobals.newSock;
+	    if(accept_ssl_connection(myGlobals.newSock) == -1) {
+                traceEvent(TRACE_WARNING, "Unable to accept SSL connection\n");
+                closeNwSocket(&myGlobals.newSock);
+                return;
+	    } else {
+                myGlobals.newSock = -myGlobals.newSock;
+            }
+
 #if defined(PARM_SSLWATCHDOG) || defined(USE_SSLWATCHDOG)
-                  rc = sslwatchdogSetState(SSLWATCHDOG_STATE_HTTPCOMPLETE,
-                                           SSLWATCHDOG_PARENT,
-                                           0-SSLWATCHDOG_ENTER_LOCKED,
-                                           0-SSLWATCHDOG_RETURN_LOCKED);
-                  /* Wake up child */ 
-                  rc = sslwatchdogSignal(SSLWATCHDOG_PARENT);
-#endif /* PARM_SSLWATCHDOG || USE_SSLWATCHDOG */
-		}
+#ifdef PARM_SSLWATCHDOG
+	    if (myGlobals.useSSLwatchdog == 1)
+#endif /* PARM_SSLWATCHDOG */
+	      {
+                rc = sslwatchdogSetState(SSLWATCHDOG_STATE_HTTPCOMPLETE,
+                                         SSLWATCHDOG_PARENT,
+                                         0-SSLWATCHDOG_ENTER_LOCKED,
+                                         0-SSLWATCHDOG_RETURN_LOCKED);
+                /* Wake up child */ 
+                rc = sslwatchdogSignal(SSLWATCHDOG_PARENT);
 	      }
-	  } else {
-	    sslwatchdogDebug("nonSSLreq", SSLWATCHDOG_PARENT, "");
+#endif /* PARM_SSLWATCHDOG || USE_SSLWATCHDOG */
 	  }
 #endif /* HAVE_OPENSSL */
 

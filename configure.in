@@ -1213,6 +1213,22 @@ dnl>     openssl development tree under the same ntop's root source directory or
           fi
       fi
       if test ".$ac_cv_has_openssl" = ".no"; then
+          ntop_testopenssl("../openssl-0.9.6f", "../openssl-0.9.6f/ssl")
+          if test ".$ac_cv_has_openssl" = ".yes"; then
+              AC_MSG_WARN([ ntop has not been tested with openssl-0.9.6f])
+              AC_MSG_RESULT([          this didn't exist])
+              AC_MSG_RESULT([          (but we'll give it a try anyway])
+          fi
+      fi
+      if test ".$ac_cv_has_openssl" = ".no"; then
+          ntop_testopenssl("../openssl-0.9.6e", "../openssl-0.9.6e/ssl")
+          if test ".$ac_cv_has_openssl" = ".yes"; then
+              AC_MSG_WARN([ ntop has not been tested with openssl-0.9.6e])
+              AC_MSG_RESULT([          this was released after 2.1's release date])
+              AC_MSG_RESULT([          (but we'll give it a try anyway])
+          fi
+      fi
+      if test ".$ac_cv_has_openssl" = ".no"; then
           ntop_testopenssl("../openssl-0.9.6d", "../openssl-0.9.6d/ssl")
       fi
       if test ".$ac_cv_has_openssl" = ".no"; then

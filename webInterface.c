@@ -3518,13 +3518,16 @@ void printNtopConfigInfo(int textPrintFlag) {
       totalHostsMonitored += myGlobals.device[i].hostsno;
 
     if (totalHostsMonitored > 0) {
-        if(snprintf(buf, sizeof(buf), "%d", totalHostsMonitored) < 0)
+        if(snprintf(buf, sizeof(buf), "%d = (%d + %d)", 
+            totalHostsMonitored + myGlobals.hostsCacheLen,
+            totalHostsMonitored,
+            myGlobals.hostsCacheLen) < 0)
           BufferTooShort();
-        printFeatureConfigInfo(textPrintFlag, "Hosts stored", buf);
+        printFeatureConfigInfo(textPrintFlag, "Hosts stored (active+cache)", buf);
 
         if(snprintf(buf, sizeof(buf), "%.1fKB", 
                     ((float)(memStats.arena + memStats.hblkhd - myGlobals.baseMemoryUsage) /
-                     (float)(totalHostsMonitored) /
+                     (float)(totalHostsMonitored + myGlobals.hostsCacheLen) /
                      1024.0 + 0.05)) < 0)
           BufferTooShort();
         printFeatureConfigInfo(textPrintFlag, "(very) Approximate memory per host", buf);

@@ -256,6 +256,7 @@ void initIPCountryTable(void)
   Head->b[1]=NULL;  
   
   addNode(QUAD2IP(10,0,0,0), 256*256*256, "LOC");
+  addNode(QUAD2IP(127,0,0,0), 256*256*256, "LOC");
   addNode(QUAD2IP(172,16,0,0), 16*256*256, "LOC");
   addNode(QUAD2IP(192,168,0,0), 256*256, "LOC");
 
@@ -281,8 +282,6 @@ void initIPCountryTable(void)
     strtoupper(cc);
     if (strcmp(cc, "GB")==0)
       cc="UK";
-    else if (strcmp(cc, "EU")==0)
-      continue;
 
     addNode(xaton(ip), atoi(range), cc);
   }

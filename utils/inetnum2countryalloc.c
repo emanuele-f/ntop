@@ -26,7 +26,7 @@ $ gcc -o inetnum2countryalloc inetnum2countryalloc.c
 
  */
 
-#define VERSION "1.0.1"
+#define VERSION "1.0.2"
 
 #include <stdio.h>
 #include <string.h>
@@ -61,13 +61,16 @@ void convert2Table(void)
 
     iCount++;
 
-    if (2==sscanf(buff, "inetnum:%*[ ] %31[0-9.] - %31[0-9.]", ip1s, ip2s)) {
+    if ((2==sscanf(buff, "inetnum:%*[ ] %31[0-9.] - %31[0-9.]", ip1s, ip2s)) ||
+        (2==sscanf(buff, "*in: %31[0-9.] - %31[0-9.]", ip1s, ip2s))) {
       ip1=xaton(ip1s);
       ip2=xaton(ip2s);
       if (ip2>ip1)
         flags=FLAG_HAVE_INETNUM;
     }
     else if (1==sscanf(buff, "country: %3s", country))
+      flags|=FLAG_HAVE_COUNTRY;
+    else if (1==sscanf(buff, "*cy: %3s", country))
       flags|=FLAG_HAVE_COUNTRY;
     else if (strstr(buff, "not allocated to APNIC"))
       flags=0;
@@ -98,8 +101,8 @@ int main(int argc, char *argv[])
 
   if (usage) {
     printf("ntop (http://www.ntop.org) ip2cc inetnum2countryalloc, version %s\n\n", VERSION);
-    printf("Function: Converts alternate RIPE address file, ripe.db.inetnum.gz to standard file for prefixtablegen\n\n");
-    printf("Usage: zcat ripealt.data.gz | ./inetnum2countryalloc [-help] [-quiet] > ripealt.data\n\n");
+    printf("Function: Converts alternate address file, e.g. ripe.db.inetnum.gz to standard file for prefixtablegen\n\n");
+    printf("Usage: zcat xxxxalt.data.gz | ./inetnum2countryalloc [-help] [-quiet] > 0_xxxxalt.data\n\n");
     exit(0);
   }
 

@@ -177,26 +177,42 @@ void doubleSlash(char *str) {
 #endif
 
 void mkdir_p(char *path) {
-  int i;
+  int i, rc;
+
+  if (path == NULL) {
+      traceEvent(CONST_TRACE_NOISY, "RRD: mkdir(null) skipped");
+      return;
+  }
 
 #ifdef WIN32
   revertSlash(path, 0);
 #endif
 
-  for(i=0; path[i] != '\0'; i++)
+  /* Start at 1 to skip the root */
+  for(i=1; path[i] != '\0'; i++)
     if(path[i] == CONST_PATH_SEP) {
       path[i] = '\0';
-      _mkdir(path);
 #if RRD_DEBUG >= 3
-      /* traceEvent(CONST_TRACE_INFO, "RRD_DEBUG: mkdir(%s)", path); */
+      traceEvent(CONST_TRACE_INFO, "RRD_DEBUG: calling mkdir(%s)", path);
 #endif
+      rc = _mkdir(path);
+      if ((rc != 0) && (errno != EEXIST) ) 
+          traceEvent(CONST_TRACE_WARNING, "RRD: %s, error %d %s",
+                     path,
+                     errno,
+                     strerror(errno));
       path[i] = CONST_PATH_SEP;
     }
 
-  _mkdir(path);
 #if RRD_DEBUG >= 2
-  /* traceEvent(CONST_TRACE_INFO, "RRD_DEBUG: mkdir(%s)", path); */
+  traceEvent(CONST_TRACE_INFO, "RRD_DEBUG: calling mkdir(%s)", path);
 #endif
+  _mkdir(path);
+  if ((rc != 0) && (errno != EEXIST) )
+      traceEvent(CONST_TRACE_WARNING, "RRD: %s, error %d %s",
+                 path,
+                 errno,
+                 strerror(errno));
 }
 
 /* ******************************************* */

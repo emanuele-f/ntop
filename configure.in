@@ -98,6 +98,36 @@ echo
 dnl> early since we need it for --enable-showoses and autotool version check.
 AC_PROG_AWK
 
+echo "  Checking for autoheader ..."
+AC_PATH_PROG(AUTOHEADER, autoheader)
+
+if test "x${ac_cv_prog_AUTOHEADER}" = "x"; then
+ mv Makefile.in Makefile.in.tmp
+ cat Makefile.in.tmp | sed -e "s|@AUTOHEADER@|${SHELL} `pwd`/missing --run echo|" > Makefile.in
+ rm -f Makefile.in.tmp
+ mv plugins/Makefile.in plugins/Makefile.in.tmp
+ cat plugins/Makefile.in.tmp | sed -e "s|@AUTOHEADER@|${SHELL} `pwd`/missing --run echo|" > plugins/Makefile.in
+ rm -f plugins/Makefile.in.tmp
+ mv intop/Makefile.in intop/Makefile.in.tmp
+ cat intop/Makefile.in.tmp | sed -e "s|@AUTOHEADER@|${SHELL} `pwd`/missing --run echo|" > intop/Makefile.in
+ rm -f intop/Makefile.in.tmp
+fi
+
+echo "  Checking for aclocal ..."
+AC_PATH_PROG(ACLOCAL, aclocal)
+
+if test "x${ac_cv_prog_ACLOCAL}" = "x"; then
+ mv Makefile.in Makefile.in.tmp
+ cat Makefile.in.tmp | sed -e "s|@ACLOCAL@|${SHELL} `pwd`/missing --run echo|" > Makefile.in
+ rm -f Makefile.in.tmp
+ mv plugins/Makefile.in plugins/Makefile.in.tmp
+ cat plugins/Makefile.in.tmp | sed -e "s|@ACLOCAL@|${SHELL} `pwd`/missing --run echo|" > plugins/Makefile.in
+ rm -f plugins/Makefile.in.tmp
+ mv intop/Makefile.in intop/Makefile.in.tmp
+ cat intop/Makefile.in.tmp | sed -e "s|@ACLOCAL@|${SHELL} `pwd`/missing --run echo|" > intop/Makefile.in
+ rm -f intop/Makefile.in.tmp
+fi
+
 echo "  Checking for automake ..."
 AC_PATH_PROG(AUTOMAKE, automake)
 
@@ -150,7 +180,7 @@ else
  cat plugins/Makefile.in.tmp | sed -e "s|@AUTOMAKE@|${SHELL} `pwd`/missing --run echo|" > plugins/Makefile.in
  rm -f plugins/Makefile.in.tmp
  mv intop/Makefile.in intop/Makefile.in.tmp
- cat intop/Makefile.in.tmp | sed -e "s|@AUTOCONF@|${SHELL} `pwd`/missing --run echo|" > intop/Makefile.in
+ cat intop/Makefile.in.tmp | sed -e "s|@AUTOMAKE@|${SHELL} `pwd`/missing --run echo|" > intop/Makefile.in
  rm -f intop/Makefile.in.tmp
 fi
 

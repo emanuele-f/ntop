@@ -23,6 +23,11 @@
 
 #include "ntop.h"
 
+/* PPPoE - Courtesy of Andreas Pfaller Feb2003 */
+#ifdef LINUX
+ #include <linux/if_pppox.h>
+#endif
+
 static const struct pcap_pkthdr *h_save;
 static const u_char *p_save;
 static u_char ethBroadcast[] = { 255, 255, 255, 255, 255, 255 };
@@ -2424,6 +2429,18 @@ void processPacket(u_char *_deviceId,
 	  processIpPkt(p, h, length, ether_src, ether_dst, actualDeviceId, vlanId);
 	else
 	  processIpPkt(p+hlen, h, length, ether_src, ether_dst, actualDeviceId, vlanId);
+      } else if (eth_type == 0x8864) /* PPPOE */ {
+        /* PPPoE - Courtesy of Andreas Pfaller Feb2003
+         *   This strips the PPPoE encapsulation for traffic transiting the network.
+         */
+        struct pppoe_hdr *pppoe_hdr=(struct pppoe_hdr *) (p+hlen);
+        int protocol=ntohs(*((int *) (p+hlen+6)));
+
+        if (pppoe_hdr->ver==1 && pppoe_hdr->type==1 && pppoe_hdr->code==0 &&
+            protocol==0x0021) {
+          hlen+=8; /* length of pppoe header */
+	  processIpPkt(p+hlen, h, length, NULL, NULL, actualDeviceId, vlanId);
+        }
       } else  /* Non IP */ if(!myGlobals.dontTrustMACaddr) {
 	/* MAC addresses are meaningful here */
 	struct ether_arp arpHdr;

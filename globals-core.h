@@ -444,9 +444,6 @@ extern u_int numActiveSenders(u_int deviceId);
 extern u_int32_t xaton(char *s);
 extern void addNodeInternal(u_int32_t ip, int prefix, char *country);
 extern char *ip2CountryCode(u_int32_t ip);
-#ifdef CFG_MULTITHREADED
-extern void printMutexStatus(int textPrintFlag, PthreadMutex *mutexId, char *mutexName);
-#endif
 
 #ifdef MAKE_WITH_I18N
 char *i18n_xvert_locale2common(const char *input);

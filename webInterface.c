@@ -2864,6 +2864,17 @@ void printNtopConfigInfo(int textPrintFlag) {
 
   if (textPrintFlag != TRUE) {
     printHTMLheader("Current ntop Configuration", 0);
+    sendString("<CENTER><TABLE BORDER=\"0\">"
+                "<TR>"
+                 "<TD COLSPAN=5 align=\"center\">The color of the host link on many pages indicates how recently the host was FIRST seen</TD>"
+                "</TR>"
+                "<TR>"
+                  "<TD>&nbsp;&nbsp;<A href=# class=\"age0min\">0 to 5 minutes</A>&nbsp;&nbsp;</TD>"
+                  "<TD>&nbsp;&nbsp;<A href=# class=\"age5min\">5 to 15 minutes</A>&nbsp;&nbsp;</TD>"
+                  "<TD>&nbsp;&nbsp;<A href=# class=\"age15min\">15 to 30 minutes</A>&nbsp;&nbsp;</TD>"
+                  "<TD>&nbsp;&nbsp;<A href=# class=\"age30min\">30 to 60 minutes</A>&nbsp;&nbsp;</TD>"
+                  "<TD>&nbsp;&nbsp;<A href=# class=\"age60min\">60+ minutes</A>&nbsp;&nbsp;</TD>"
+                "</TR></TABLE></CENTER>\n");
   }
   sendString(texthtml("\n", 
                       "<CENTER>\n<P><HR><P>"TABLE_ON"<TABLE BORDER=1>\n"

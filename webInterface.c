@@ -3295,6 +3295,7 @@ void printNtopConfigInfo(int textPrintFlag) {
     int topSock = myGlobals.sock;
 
 #ifndef WIN32
+#ifdef MULTITHREADED
     /*
      *  The great ntop "mysterious web server death" fix... and other tales of
      *  sorcery.
@@ -3387,6 +3388,7 @@ void printNtopConfigInfo(int textPrintFlag) {
 #endif
 	}
       }
+#endif /* MULTITHREADED */
 #endif /* WIN32 */
 
       FD_ZERO(&mask);

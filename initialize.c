@@ -704,7 +704,9 @@ void initThreads(void) {
   }
 #endif /* USE_SSLWATCHDOG || PARM_SSLWATCHDOG */
 
+#ifdef MULTITHREADED
   myGlobals.hostsHashMutexInitialized = 1;
+#endif /* MULTITHREADED */
 }
 
 

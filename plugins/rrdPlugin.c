@@ -702,7 +702,7 @@ static void updateRRD(char *hostPath, char *key, Counter value, int isCounter) {
 
     numRRDerrors++;
     rrdError = rrd_get_error();
-    if (strcmp(rrdError, "error: illegal attempt to update using time") != NULL) {
+    if (!strcmp(rrdError, "error: illegal attempt to update using time")) {
         char errTimeBuf1[32], errTimeBuf2[32], errTimeBuf3[32];
         time_t rrdLast;
         strftime(errTimeBuf1, sizeof(errTimeBuf1), "%Y-%m-%d %H:%M:%S", localtime_r(&myGlobals.actTime, &workT));
@@ -870,7 +870,10 @@ static void commonRRDinit(void) {
 	snprintf(myGlobals.rrdPath, len, "%s%s", myGlobals.dbPath, thePath);
     storePrefsValue("rrd.rrdPath", myGlobals.rrdPath);
   } else {
-    myGlobals.rrdPath  = strdup(value);
+    int vlen = strlen(value)+1;
+
+    myGlobals.rrdPath  = (char*)malloc(vlen);
+    unescape(myGlobals.rrdPath, vlen, value);
   }
 
 #ifdef RRD_DEBUG
@@ -998,8 +1001,11 @@ static void handleRRDHTTPrequest(char* url) {
 	} else if(strcmp(key, "hostsFilter") == 0) {
 	  _hostsFilter = strdup(value);
 	} else if(strcmp(key, "rrdPath") == 0) {
+	  int vlen = strlen(value)+1;
+	  
 	  if(myGlobals.rrdPath != NULL) free(myGlobals.rrdPath);
-	  myGlobals.rrdPath = strdup(value);
+	  myGlobals.rrdPath  = (char*)malloc(vlen);
+	  unescape(myGlobals.rrdPath, vlen, value);
 	  storePrefsValue("rrd.rrdPath", myGlobals.rrdPath);
 	} else if(strcmp(key, "dumpFlows") == 0) {
 	  _dumpFlows = 1;

@@ -195,8 +195,8 @@ void showPluginsList(char* pluginName) {
 	} else {
 	  if(flows->pluginStatus.pluginPtr->startFunc != NULL)
 	    flows->pluginStatus.pluginPtr->startFunc();
-            if (flows->pluginStatus.pluginPtr->pluginStatusMessage != NULL)
-              newPluginStatus = 0 /* Disabled */;
+	  if (flows->pluginStatus.pluginPtr->pluginStatusMessage != NULL)
+	    newPluginStatus = 0 /* Disabled */;
 	}
 
 	flows->pluginStatus.activePlugin = newPluginStatus;

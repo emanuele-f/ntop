@@ -1020,6 +1020,7 @@ struct enamemem {
 /* **************** Plugin **************** */
 
 typedef void(*VoidFunc)(void);
+typedef int(*IntFunc)(void);
 typedef void(*PluginFunc)(u_char *_deviceId, const struct pcap_pkthdr *h, const u_char *p);
 typedef void(*PluginHTTPFunc)(char* url);
 #ifdef SESSION_PLUGIN
@@ -1035,7 +1036,8 @@ typedef struct pluginInfo {
   char *pluginURLname;      /* Set it to NULL if the plugin doesn't speak HTTP */
   char activeByDefault;     /* Set it to 1 if this plugin is active by default */
   char inactiveSetup;       /* Set it to 1 if this plugin can be called inactive for setup */
-  VoidFunc startFunc, termFunc;
+  IntFunc startFunc;
+  VoidFunc termFunc;
   PluginFunc pluginFunc;    /* Initialize here all the plugin structs... */
   PluginHTTPFunc httpFunct; /* Set it to NULL if the plugin doesn't speak HTTP */
 #ifdef SESSION_PLUGIN
@@ -1043,6 +1045,7 @@ typedef struct pluginInfo {
 #endif
   char* bpfFilter;          /* BPF filter for selecting packets that
        		               will be routed to the plugin  */
+  char *pluginStatusMessage;
 } PluginInfo;
 
 typedef struct pluginStatus {

@@ -33,6 +33,8 @@
                --reuse-rrd-graphics etc.
        2.1.1   Fixed hosts / interface bug (Luca)
        2.1.2   Added status message
+       2.2     Version roll (preparatory) for ntop 2.2
+       2.2a    Multiple RRAs
 
    Remember, there are TWO paths into this - one is through the main loop,
    if the plugin is active, the other is through the http function if the 
@@ -57,6 +59,7 @@ int optind, opterr;
 #endif
 
 static unsigned short initialized = 0, active = 0, dumpInterval, dumpDetail;
+static unsigned short dumpDays, dumpHours, dumpMonths;
 static char *hostsFilter;
 static Counter numTotalRRDs = 0;
 static unsigned long numRuns = 0, numRRDerrors = 0;
@@ -66,7 +69,7 @@ static time_t start_tm, end_tm, rrdTime;
 pthread_t rrdThread;
 #endif
 
-static u_short dumpFlows, dumpHosts, dumpInterfaces, dumpMatrix;
+static u_short dumpFlows, dumpHosts, dumpInterfaces, dumpMatrix, shownCreate=0;
 
 static Counter rrdGraphicRequests=0, rrdGraphicReuse=0;
 
@@ -525,8 +528,9 @@ static void updateRRD(char *hostPath, char *key, Counter value, int isCounter) {
 #endif
 
   if(stat(path, &statbuf) != 0) {
-    char startStr[32], counterStr[64];
+    char startStr[32], stepStr[32], counterStr[64], intervalStr[32], minStr[32], maxStr[32], daysStr[32], monthsStr[32];
     int step = dumpInterval;
+    int value1, value2;
     unsigned long topValue;
 
     topValue = 100000000 /* 100 Mbps */;
@@ -544,17 +548,62 @@ static void updateRRD(char *hostPath, char *key, Counter value, int isCounter) {
 	     rrdTime-1 /* -1 avoids subsequent rrd_update call problems */);
     argv[argc++] = startStr;
 
+    argv[argc++] = "--step";
+    snprintf(stepStr, sizeof(stepStr), "%u", dumpInterval);
+    argv[argc++] = stepStr;
+
     if(isCounter) {
       snprintf(counterStr, sizeof(counterStr), "DS:counter:COUNTER:%d:0:%u", step, topValue);
     } else {
       /* Unlimited */
       snprintf(counterStr, sizeof(counterStr), "DS:counter:GAUGE:%d:0:U", step);
     }
-
     argv[argc++] = counterStr;
-    argv[argc++] = "RRA:AVERAGE:0.5:1:1200";
-    argv[argc++] = "RRA:MIN:0.5:12:2400";
-    argv[argc++] = "RRA:MAX:0.5:12:2400";
+
+    /* dumpInterval is in seconds.  There are 60m*60s = 3600s in an hour.
+     * value1 is the # of dumpIntervals per hour
+     */
+    value1 = (60*60 + dumpInterval - 1) / dumpInterval;
+    /* value2 is the # of value1 (hours) for dumpHours hours */
+    value2 = value1 * dumpHours;
+    snprintf(intervalStr, sizeof(intervalStr), "RRA:AVERAGE:0.5:1:%d", value2);
+    argv[argc++] = intervalStr;
+
+    /* Store the MIN/MAX 5m value for a # of hours */
+    snprintf(minStr, sizeof(minStr), "RRA:MIN:0.5:1:%d", dumpHours > 0 ? dumpHours : DEFAULT_RRD_HOURS);
+    argv[argc++] = minStr;
+    snprintf(maxStr, sizeof(maxStr), "RRA:MAX:0.5:1:%d", dumpHours > 0 ? dumpHours : DEFAULT_RRD_HOURS);
+    argv[argc++] = maxStr;
+
+    if (dumpDays > 0) {
+        snprintf(daysStr, sizeof(daysStr), "RRA:AVERAGE:0.5:%d:%d", value1, dumpDays * 24);
+        argv[argc++] = daysStr;
+    }
+
+    /* Compute the rollup - how many dumpInterval seconds interval are in a day */
+    value1 = (24*60*60 + dumpInterval - 1) / dumpInterval;
+    if (dumpMonths > 0) {
+        snprintf(monthsStr, sizeof(monthsStr), "RRA:AVERAGE:0.5:%d:%d", value1, dumpMonths * 30);
+        argv[argc++] = monthsStr;
+    }
+
+    if (shownCreate == 0) {
+        char buf[LEN_GENERAL_WORK_BUFFER];
+        int i;
+
+        shownCreate=1;
+
+        memset(buf, 0, sizeof(buf));
+
+        snprintf(buf, sizeof(buf), "%s", argv[4]);
+
+        for (i=5; i<argc; i++) {
+            strcat(buf, " ");
+            strcat(buf, argv[i]);
+        }
+
+        traceEvent(CONST_TRACE_INFO, "RRD: rrdtool create --start now-1 file %s", buf);
+    }
 
     optind=0; /* reset gnu getopt */
     opterr=0; /* no error messages */
@@ -698,6 +747,8 @@ void unescape_url(char *url) {
 static void commonRRDinit(void) {
   char value[64];
 
+  shownCreate=0;
+
   if(fetchPrefsValue("rrd.dataDumpInterval", value, sizeof(value)) == -1) {
     sprintf(value, "%d", DEFAULT_RRD_INTERVAL);
     storePrefsValue("rrd.dataDumpInterval", value);
@@ -706,6 +757,29 @@ static void commonRRDinit(void) {
     dumpInterval = atoi(value);
   }
 
+  if(fetchPrefsValue("rrd.dataDumpHours", value, sizeof(value)) == -1) {
+    sprintf(value, "%d", DEFAULT_RRD_HOURS);
+    storePrefsValue("rrd.dataDumpHours", value);
+    dumpHours = DEFAULT_RRD_HOURS;
+  } else {
+    dumpHours = atoi(value);
+  }
+
+  if(fetchPrefsValue("rrd.dataDumpDays", value, sizeof(value)) == -1) {
+    sprintf(value, "%d", DEFAULT_RRD_DAYS);
+    storePrefsValue("rrd.dataDumpDays", value);
+    dumpDays = DEFAULT_RRD_DAYS;
+  } else {
+    dumpDays = atoi(value);
+  }
+
+  if(fetchPrefsValue("rrd.dataDumpMonths", value, sizeof(value)) == -1) {
+    sprintf(value, "%d", DEFAULT_RRD_MONTHS);
+    storePrefsValue("rrd.dataDumpMonths", value);
+    dumpMonths = DEFAULT_RRD_MONTHS;
+  } else {
+    dumpMonths = atoi(value);
+  }
 
   if(fetchPrefsValue("rrd.dumpFlows", value, sizeof(value)) == -1) {
     storePrefsValue("rrd.dumpFlows", "0");
@@ -764,6 +838,9 @@ static void commonRRDinit(void) {
 #ifdef RRD_DEBUG
   traceEvent(CONST_TRACE_INFO, "RRD_DEBUG: Parameters:\n");
   traceEvent(CONST_TRACE_INFO, "RRD_DEBUG:     dumpInterval %d seconds\n", dumpInterval);
+  traceEvent(CONST_TRACE_INFO, "RRD_DEBUG:     dumpHours %d hours by %d seconds\n", dumpHours, dumpInterval);
+  traceEvent(CONST_TRACE_INFO, "RRD_DEBUG:     dumpDays %d days by hour\n", dumpDays);
+  traceEvent(CONST_TRACE_INFO, "RRD_DEBUG:     dumpMonths %d months by day\n", dumpMonths);
   traceEvent(CONST_TRACE_INFO, "RRD_DEBUG:     dumpHosts %s\n", dumpHosts == 0 ? "no" : "yes");
   traceEvent(CONST_TRACE_INFO, "RRD_DEBUG:     dumpInterfaces %s\n", dumpInterfaces == 0 ? "no" : "yes");
   traceEvent(CONST_TRACE_INFO, "RRD_DEBUG:     dumpMatrix %s\n", dumpMatrix == 0 ? "no" : "yes");
@@ -783,7 +860,7 @@ static void handleRRDHTTPrequest(char* url) {
   char buf[1024], *strtokState, *mainState, *urlPiece,
     rrdKey[64], rrdName[64], rrdTitle[64], startTime[32], endTime[32], rrdPrefix[32];
   u_char action = FLAG_RRD_ACTION_NONE;
-  int _dumpFlows, _dumpHosts, _dumpInterfaces, _dumpMatrix, _dumpDetail, _dumpInterval;
+  int _dumpFlows, _dumpHosts, _dumpInterfaces, _dumpMatrix, _dumpDetail, _dumpInterval, _dumpHours, _dumpDays, _dumpMonths;
   char * _hostsFilter;
 
   if (initialized == 0)
@@ -795,7 +872,10 @@ static void handleRRDHTTPrequest(char* url) {
   _dumpInterfaces=0;
   _dumpMatrix=0;
   _dumpDetail=CONST_RRD_DETIL_DEFAULT;
-  _dumpInterval=300;
+  _dumpInterval=DEFAULT_RRD_INTERVAL;
+  _dumpHours=DEFAULT_RRD_HOURS;
+  _dumpDays=DEFAULT_RRD_DAYS;
+  _dumpMonths=DEFAULT_RRD_MONTHS;
   _hostsFilter = NULL;
 
   if((url != NULL) && (url[0] != '\0')) {
@@ -868,6 +948,15 @@ static void handleRRDHTTPrequest(char* url) {
 	} else if(strcmp(key, "interval") == 0) {
 	  _dumpInterval = atoi(value);
           if (_dumpInterval < 1) _dumpInterval = 1 /* Min 1 second */;
+	} else if(strcmp(key, "days") == 0) {
+	  _dumpDays = atoi(value);
+          if (_dumpDays < 0) _dumpDays = 0 /* Min none */;
+	} else if(strcmp(key, "hours") == 0) {
+	  _dumpHours = atoi(value);
+          if (_dumpHours < 0) _dumpHours = 0 /* Min none */;
+	} else if(strcmp(key, "months") == 0) {
+	  _dumpMonths = atoi(value);
+          if (_dumpMonths < 0) _dumpMonths = 0 /* Min none */;
 	} else if(strcmp(key, "hostsFilter") == 0) {
 	  _hostsFilter = strdup(value);
 	} else if(strcmp(key, "rrdPath") == 0) {
@@ -894,6 +983,9 @@ static void handleRRDHTTPrequest(char* url) {
 
     if(action == FLAG_RRD_ACTION_NONE) {
       dumpInterval = _dumpInterval;
+      dumpHours = _dumpHours;
+      dumpDays = _dumpDays;
+      dumpMonths = _dumpMonths;
       /* traceEvent(CONST_TRACE_INFO, "RRD: dumpFlows=%d", dumpFlows); */
       dumpFlows=_dumpFlows;
       dumpHosts=_dumpHosts;
@@ -901,6 +993,9 @@ static void handleRRDHTTPrequest(char* url) {
       dumpMatrix=_dumpMatrix;
       dumpDetail = _dumpDetail;
       sprintf(buf, "%d", dumpInterval);   storePrefsValue("rrd.dumpInterval", buf);
+      sprintf(buf, "%d", dumpHours);   storePrefsValue("rrd.dumpHours", buf);
+      sprintf(buf, "%d", dumpDays);   storePrefsValue("rrd.dumpDays", buf);
+      sprintf(buf, "%d", dumpMonths);   storePrefsValue("rrd.dumpMonths", buf);
       sprintf(buf, "%d", dumpFlows);      storePrefsValue("rrd.dumpFlows", buf);
       sprintf(buf, "%d", dumpHosts);      storePrefsValue("rrd.dumpHosts", buf);
       sprintf(buf, "%d", dumpInterfaces); storePrefsValue("rrd.dumpInterfaces", buf);
@@ -914,6 +1009,7 @@ static void handleRRDHTTPrequest(char* url) {
           _hostsFilter = NULL;
       }
       storePrefsValue("rrd.hostsFilter", hostsFilter);
+      shownCreate=0;
     }
   }
 
@@ -936,12 +1032,32 @@ static void handleRRDHTTPrequest(char* url) {
   sendString("<TABLE BORDER>\n");
   sendString("<TR><TH ALIGN=LEFT>Dump Interval</TH><TD><FORM ACTION=/plugins/rrdPlugin METHOD=GET>"
 	     "<INPUT NAME=interval SIZE=5 VALUE=");
-
   if(snprintf(buf, sizeof(buf), "%d", (int)dumpInterval) < 0)
     BufferTooShort();
   sendString(buf);
-
   sendString("> seconds<br>It specifies how often data is stored permanently.</TD></tr>\n");
+
+  sendString("<TR><TH ALIGN=LEFT>Dump Hours</TH><TD><FORM ACTION=/plugins/rrdPlugin METHOD=GET>"
+	     "<INPUT NAME=hours SIZE=5 VALUE=");
+  if(snprintf(buf, sizeof(buf), "%d", (int)dumpHours) < 0)
+    BufferTooShort();
+  sendString(buf);
+  sendString(">Specifies how many hours of 'interval' data is stored permanently.</TD></tr>\n");
+
+  sendString("<TR><TH ALIGN=LEFT>Dump Days</TH><TD><FORM ACTION=/plugins/rrdPlugin METHOD=GET>"
+	     "<INPUT NAME=days SIZE=5 VALUE=");
+  if(snprintf(buf, sizeof(buf), "%d", (int)dumpDays) < 0)
+    BufferTooShort();
+  sendString(buf);
+  sendString(">Specifies how many days of hourly data is stored permanently.</TD></tr>\n");
+  sendString("<TR><TH ALIGN=LEFT>Dump Months</TH><TD><FORM ACTION=/plugins/rrdPlugin METHOD=GET>"
+	     "<INPUT NAME=months SIZE=5 VALUE=");
+  if(snprintf(buf, sizeof(buf), "%d", (int)dumpMonths) < 0)
+    BufferTooShort();
+  sendString(buf);
+  sendString(">Specifies how many months of daily data is stored permanently.</TD></tr>\n");
+
+  sendString("<TR><TD ALIGN=CENTER COLSPAN=2><B>WARNING:</B>&nbsp;Changes to the above values will ONLY affect NEW rrds</TD></TR>");
 
   sendString("<TR><TH ALIGN=LEFT>Data to Dump</TH><TD>");
 
@@ -1550,7 +1666,7 @@ static PluginInfo rrdPluginInfo[] = {
     "This plugin is used to setup, activate and deactivate ntop's rrd support.<br>"
     "This plugin also produces the graphs of rrd data, available via a "
     "link from the various 'Info about host xxxxx' reports.",
-    "2.2", /* version */
+    "2.2a", /* version */
     "<A HREF=http://luca.ntop.org/>L.Deri</A>",
     "rrdPlugin", /* http://<host>:<port>/plugins/rrdPlugin */
     1, /* Active by default */ 

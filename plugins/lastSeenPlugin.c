@@ -41,7 +41,7 @@ typedef struct LsHostNote {
   char note[50];
 } LsHostNote;
 
-static void handleLsPacket(u_char *_deviceId _UNUSED_, 
+static void handleLsPacket(u_char *_deviceId, 
 			   const struct pcap_pkthdr *h _UNUSED_,
 			   const u_char *p) {
   struct ip ip;
@@ -57,7 +57,7 @@ static void handleLsPacket(u_char *_deviceId _UNUSED_,
 #ifdef WIN32
     deviceId = 0;
 #else
-    deviceId = (u_int)_deviceId;
+    deviceId = (u_int)(*_deviceId);
 #endif
 
   ep = (struct ether_header *)p;
@@ -102,13 +102,13 @@ static int SortLS(const void *_a, const void *_b) {
   LsHostInfo *b = (LsHostInfo *)_b;
   unsigned long n1, n2;
   if(((a) == NULL) && ((b) != NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (1)\n");
+    traceEvent(CONST_TRACE_WARNING, "SortLS() (1)");
     return(1);
   } else if(((a) != NULL) && ((b) == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (2)\n");
+    traceEvent(CONST_TRACE_WARNING, "SortLS() (2)");
     return(-1);
   } else if(((a) == NULL) && ((b) == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (3)\n");
+    traceEvent(CONST_TRACE_WARNING, "SortLS() (3)");
     return(0);
   }
   n1 = (*a).HostIpAddress.s_addr;
@@ -375,7 +375,7 @@ PluginInfo* lsPluginEntryFctn(void) {
 #endif
   char tmpBuf[200];
 
-  traceEvent(CONST_TRACE_INFO, "LASTSEEN: Welcome to %s. (C) 1999 by Andrea Marangoni", 
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "LASTSEEN: Welcome to %s. (C) 1999 by Andrea Marangoni", 
 	     LsPluginInfo->pluginName);
   
   /* Fix courtesy of Ralf Amandi <Ralf.Amandi@accordata.net> */
@@ -385,7 +385,7 @@ PluginInfo* lsPluginEntryFctn(void) {
 
   if(LsDB == NULL) {
     traceEvent(CONST_TRACE_ERROR, 
-               "LASTSEEN: ERROR: Unable to open LsWatch database -  the plugin will be disabled");
+               "LASTSEEN: Unable to open LsWatch database - the plugin will be disabled");
     setPluginStatus("Disabled - unable to open LsWatch database.");
     disabled = 1;
   } else {

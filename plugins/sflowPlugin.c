@@ -649,10 +649,12 @@ static u_long *readExtendedSwitch(SFSample *sample, u_long *datap, u_char *endPt
 
   sample->extended_data_tag |= SASAMPLE_EXTENDED_DATA_SWITCH;
 
-  if(debug) traceEvent(CONST_TRACE_INFO, "in_vlan %lu\n", sample->in_vlan);
-  if(debug) traceEvent(CONST_TRACE_INFO, "in_priority %lu\n", sample->in_priority);
-  if(debug) traceEvent(CONST_TRACE_INFO, "out_vlan %lu\n", sample->out_vlan);
-  if(debug) traceEvent(CONST_TRACE_INFO, "out_priority %lu\n", sample->out_priority);
+  if(debug) {
+            traceEvent(CONST_TRACE_INFO, "in_vlan %lu\n", sample->in_vlan);
+            traceEvent(CONST_TRACE_INFO, "in_priority %lu\n", sample->in_priority);
+            traceEvent(CONST_TRACE_INFO, "out_vlan %lu\n", sample->out_vlan);
+            traceEvent(CONST_TRACE_INFO, "out_priority %lu\n", sample->out_priority);
+  }
 
   return datap;
 }
@@ -1617,7 +1619,7 @@ static void setSflowInSocket() {
   int sockopt = 1;
 
   if(myGlobals.sflowInSocket > 0) {
-    traceEvent(CONST_TRACE_INFO, "SFLOW: Collector terminated");
+    traceEvent(CONST_TRACE_ALWAYSDISPLAY, "SFLOW: Collector terminated");
     closeNwSocket(&myGlobals.sflowInSocket);
   }
 
@@ -1631,14 +1633,14 @@ static void setSflowInSocket() {
     sockIn.sin_addr.s_addr       = INADDR_ANY;
 
     if(bind(myGlobals.sflowInSocket, (struct sockaddr *)&sockIn, sizeof(sockIn)) < 0) {
-      traceEvent(CONST_TRACE_WARNING, "SFLOW: Collector, port %d already in use",
+      traceEvent(CONST_TRACE_ERROR, "SFLOW: Collector, port %d already in use - import disabled",
 		 myGlobals.sflowInPort);
       closeNwSocket(&myGlobals.sflowInSocket);
       myGlobals.sflowInSocket = 0;
       return;
     }
 
-    traceEvent(CONST_TRACE_INFO, "SFLOW: Collector listening on port %d",
+    traceEvent(CONST_TRACE_ALWAYSDISPLAY, "SFLOW: Collector listening on port %d",
 	       myGlobals.sflowInPort);
   }
 
@@ -1687,7 +1689,7 @@ static void handlesFlowHTTPrequest(char* url) {
 	  storePrefsValue("sflow.ifNetMask", value);
 	  freeSflowMatrixMemory(); setSflowInterfaceMatrix();
 	} else
-	  traceEvent(CONST_TRACE_INFO, "SFLOW: Parse Error (%s)", value);
+	  traceEvent(CONST_TRACE_WARNING, "SFLOW: Parse Error (%s)", value);
      } else if(strcmp(key, "sflowDest") == 0) {
 	myGlobals.sflowDest.sin_addr.s_addr = inet_addr(value);
 	storePrefsValue("sflow.sflowDest", value);
@@ -1903,7 +1905,7 @@ static void initSflowInSocket() {
     sockIn.sin_addr.s_addr       = INADDR_ANY;
 
     if(bind(myGlobals.sflowInSocket, (struct sockaddr *)&sockIn, sizeof(sockIn)) < 0) {
-      traceEvent(CONST_TRACE_WARNING, "SFLOW: ERROR: Collector: port %d already in use",
+      traceEvent(CONST_TRACE_ERROR, "SFLOW: Collector: port %d already in use - collector disabled",
 		 myGlobals.sflowInPort);
       closeNwSocket(&myGlobals.sflowInSocket);
       myGlobals.sflowInSocket = 0;
@@ -1954,7 +1956,7 @@ static void setSflowOutSocket() {
   int sockopt = 1;
 
   if(myGlobals.sflowOutSocket != 0) {
-    if(debug) traceEvent(CONST_TRACE_INFO, "SFLOW_DEBUG: sFlow collector terminated");
+    traceEvent(CONST_TRACE_INFO, "SFLOW_DEBUG: sFlow collector terminated");
     closeNwSocket(&myGlobals.sflowOutSocket);
   }
 
@@ -2202,6 +2204,9 @@ static int initsFlowFunct(void) {
 /* ****************************** */
 
 static void termsFlowFunct(void) {
+
+  traceEvent(CONST_TRACE_INFO, "SFLOW: Thanks for using sFlow");
+
 #ifdef CFG_MULTITHREADED
   killThread(&sFlowThread);
 #endif
@@ -2212,7 +2217,7 @@ static void termsFlowFunct(void) {
   if(myGlobals.sflowDeviceId != -1)
     myGlobals.device[myGlobals.sflowDeviceId].activeDevice = 0;
 
-  traceEvent(CONST_TRACE_INFO, "SFLOW: Thanks for using sFlow. Done");
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "SFLOW: Done");
   fflush(stdout);
 }
 
@@ -2246,7 +2251,7 @@ PluginInfo* sflowPluginEntryFctn(void)
      PluginInfo* PluginEntryFctn(void)
 #endif
 {
-  traceEvent(CONST_TRACE_INFO, "SFLOW: Welcome to %s. (C) 2002 by Luca Deri",
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "SFLOW: Welcome to %s. (C) 2002 by Luca Deri",
 	     sFlowPluginInfo->pluginName);
 
   return(sFlowPluginInfo);

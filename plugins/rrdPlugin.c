@@ -431,14 +431,14 @@ void graphCounter(char *rrdPath, char *rrdName, char *rrdTitle,
 
     if (rc != 0) {
       if (errno != ENOENT)
-	traceEvent(CONST_TRACE_INFO, "RRD: ERROR: stat('%s') failed, %d", fname, errno);
+	traceEvent(CONST_TRACE_ERROR, "RRD: lookup of file '%s' failed, %d", fname, errno);
       reusebuf.st_mtime = 0;
     }
 
     if ( (reusebuf.st_mtime <= start_tm) || (reusebuf.st_mtime >= end_tm) ) {
       /* Recreate - delete existing and make a new one */
       if ( (unlink(fname) != 0) && (errno != ENOENT) ) {
-	traceEvent(CONST_TRACE_ERROR, "RRD: ERROR: unlink('%s') failed, %d...\n", fname, errno);
+	traceEvent(CONST_TRACE_ERROR, "RRD: unlink('%s') failed, %d...\n", fname, errno);
       }
       argv[argc++] = "rrd_graph";
       argv[argc++] = fname;
@@ -562,7 +562,7 @@ static void updateRRD(char *hostPath, char *key, Counter value, int isCounter) {
     rc = rrd_create(argc, argv);
 
     if (rrd_test_error()) {
-      traceEvent(CONST_TRACE_WARNING, "RRD: WARNING: rrd_create(%s) error: %s", 
+      traceEvent(CONST_TRACE_WARNING, "RRD: rrd_create(%s) error: %s", 
 		 path, rrd_get_error());
       rrd_clear_error();
       numRRDerrors++;
@@ -633,7 +633,7 @@ static void updateRRD(char *hostPath, char *key, Counter value, int isCounter) {
     int x;
 
     numRRDerrors++;
-    traceEvent(CONST_TRACE_WARNING, "RRD: WARNING: rrd_update(%s) error: %s", path, rrd_get_error());
+    traceEvent(CONST_TRACE_WARNING, "RRD: rrd_update(%s) error: %s", path, rrd_get_error());
     rrd_clear_error();
 
     traceEvent(CONST_TRACE_INFO, "RRD: call stack (counter created: %d):", createdCounter);
@@ -1052,7 +1052,7 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
   int cycleCount=0;
 
 #ifdef CFG_MULTITHREADED
-  traceEvent(CONST_TRACE_INFO, "THREADMGMT: rrd thread (%ld) started...\n", rrdThread);
+  traceEvent(CONST_TRACE_INFO, "THREADMGMT: rrd thread (%ld) started", rrdThread);
 #else
  #ifdef RRD_DEBUG
   traceEvent(CONST_TRACE_INFO, "RRD_DEBUG: rrdMainLoop()");
@@ -1106,7 +1106,7 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 
     numLocalNets = 0;
     strcpy(rrdPath, hostsFilter); /* It avoids strtok to blanks into hostsFilter */
-    handleAddressLists(rrdPath, networks, &numLocalNets, value, sizeof(value));
+    handleAddressLists(rrdPath, networks, &numLocalNets, value, sizeof(value), TRUE);
 
     /* ****************************************************** */
 
@@ -1397,7 +1397,7 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
      * we kill the thread...
      */
     if (myGlobals.capturePackets == FLAG_NTOPSTATE_STOPCAP) {
-        traceEvent(CONST_TRACE_INFO, "RRD: STOPCAP, ending rrd thread.\n");
+        traceEvent(CONST_TRACE_WARNING, "RRD: STOPCAP, ending rrd thread");
         break;
     }
 
@@ -1433,7 +1433,7 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 #endif
 	      if ((unlink(fname) != 0) && (errno != ENOENT)) {
 		purgeCountErrors++;
-		traceEvent(CONST_TRACE_ERROR, "RRD: ERROR: unlink('%s') failed, %d...\n", fname, errno);
+		traceEvent(CONST_TRACE_ERROR, "RRD: unlink('%s') failed, %d...\n", fname, errno);
 	      } else {
 		purgeCountUnlink++;
 	      }
@@ -1448,12 +1448,12 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 		 purgeCountErrors);
 #endif
     } else {
-      traceEvent(CONST_TRACE_ERROR, "RRD: ERROR: Unable to opendir(%s), errno=%d", rrdPath, errno);
+      traceEvent(CONST_TRACE_ERROR, "RRD: Unable to opendir(%s), errno=%d", rrdPath, errno);
     }
   }
 
 #ifdef CFG_MULTITHREADED
-  traceEvent(CONST_TRACE_INFO, "THREADMGMT: rrd thread (%ld) terminated...\n", rrdThread);
+  traceEvent(CONST_TRACE_WARNING, "THREADMGMT: rrd thread (%ld) terminated", rrdThread);
 #else
  #ifdef RRD_DEBUG
   traceEvent(CONST_TRACE_INFO, "RRD_DEBUG: rrdMainLoop() terminated.");
@@ -1484,7 +1484,7 @@ static int initRRDfunct(void) {
   sprintf(dname, "%s", myGlobals.rrdPath);
   if (_mkdir(dname) == -1) { 
     if (errno != EEXIST) {
-      traceEvent(CONST_TRACE_ERROR, "RRD: ERROR: Disabled - unable to create base directory (err %d, %s)\n", errno, dname);
+      traceEvent(CONST_TRACE_ERROR, "RRD: Disabled - unable to create base directory (err %d, %s)\n", errno, dname);
       setPluginStatus("Disabled - unable to create rrd base directory."); 
       /* Return w/o creating the rrd thread ... disabled */
       return(-1);
@@ -1504,7 +1504,7 @@ static int initRRDfunct(void) {
 	return(-1);
       }
     } else {
-      traceEvent(CONST_TRACE_INFO, "RRD: Note: Created directory (%s)\n", dname);
+      traceEvent(CONST_TRACE_INFO, "RRD: Created directory (%s)\n", dname);
     }
   } 
 
@@ -1526,7 +1526,7 @@ static void termRRDfunct(void) {
 #endif
 
   traceEvent(CONST_TRACE_INFO, "RRD: Thanks for using the rrdPlugin");
-  traceEvent(CONST_TRACE_INFO, "RRD: Done.\n");
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "RRD: Done");
   fflush(stdout);
 }
 
@@ -1573,7 +1573,7 @@ static PluginInfo rrdPluginInfo[] = {
    PluginInfo* PluginEntryFctn(void)
 #endif
    {
-     traceEvent(CONST_TRACE_INFO, "RRD: Welcome to %s. (C) 2002 by Luca Deri.\n",
+     traceEvent(CONST_TRACE_ALWAYSDISPLAY, "RRD: Welcome to %s. (C) 2002 by Luca Deri.\n",
 		rrdPluginInfo->pluginName);
      
      return(rrdPluginInfo);

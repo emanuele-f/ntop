@@ -48,13 +48,13 @@ static int cmpPdaFctn(const void *_a, const void *_b) {
   TrafficCounter a_, b_;
 
   if((a == NULL) && (b != NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (1)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpPdaFctn() (1)");
     return(1);
   } else if((a != NULL) && (b == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (2)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpPdaFctn() (2)");
     return(-1);
   } else if((a == NULL) && (b == NULL)) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING (3)\n");
+    traceEvent(CONST_TRACE_WARNING, "cmpPdaFctn() (3)");
     return(0);
   }
 
@@ -287,7 +287,7 @@ static void handlePDArequest(char* url) {
 
 static void termPdaFunct(void) {
   traceEvent(CONST_TRACE_INFO, "PDA: Thanks for using PDAWatch");
-  traceEvent(CONST_TRACE_INFO, "PDA: Done");
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "PDA: Done");
 }
 
 /* ****************************** */
@@ -316,7 +316,7 @@ PluginInfo* wapPluginEntryFctn(void)
   PluginInfo* PluginEntryFctn(void)
 #endif
 {
-  traceEvent(CONST_TRACE_INFO, "PDA: Welcome to %s. (C) 2001-2002 by L.Deri and W.Brock",  
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "PDA: Welcome to %s. (C) 2001-2002 by L.Deri and W.Brock",  
 	     PDAPluginInfo->pluginName);
   
   return(PDAPluginInfo);

@@ -92,7 +92,7 @@ static void setNetFlowInSocket() {
   int sockopt = 1;
 
   if(myGlobals.netFlowInSocket > 0) {
-    traceEvent(CONST_TRACE_INFO, "NETFLOW: Collector terminated");
+    traceEvent(CONST_TRACE_ALWAYSDISPLAY, "NETFLOW: Collector terminated");
     closeNwSocket(&myGlobals.netFlowInSocket);
   }
 
@@ -106,14 +106,14 @@ static void setNetFlowInSocket() {
     sockIn.sin_addr.s_addr       = INADDR_ANY;
 
     if(bind(myGlobals.netFlowInSocket, (struct sockaddr *)&sockIn, sizeof(sockIn)) < 0) {
-      traceEvent(CONST_TRACE_WARNING, "NETFLOW: WARNING: Collector port %d already in use",
+      traceEvent(CONST_TRACE_ERROR, "NETFLOW: Collector port %d already in use",
 		 myGlobals.netFlowInPort);
       closeNwSocket(&myGlobals.netFlowInSocket);
       myGlobals.netFlowInSocket = 0;
       return;
     }
 
-    traceEvent(CONST_TRACE_WARNING, "NETFLOW: Collector listening on port %d",
+    traceEvent(CONST_TRACE_ALWAYSDISPLAY, "NETFLOW: Collector listening on port %d",
 	       myGlobals.netFlowInPort);
   }
 
@@ -146,9 +146,9 @@ static void setNetFlowOutSocket() {
     else if(value[0] != '\0') {
       myGlobals.netFlowDest.sin_addr.s_addr = inet_addr(value);
       if(myGlobals.netFlowDest.sin_addr.s_addr > 0)
-	traceEvent(CONST_TRACE_INFO, "NETFLOW: Exporting NetFlow's towards %s:%s", value, DEFAULT_NETFLOW_PORT_STR);
+	traceEvent(CONST_TRACE_ALWAYSDISPLAY, "NETFLOW: Exporting NetFlow's towards %s:%s", value, DEFAULT_NETFLOW_PORT_STR);
       else
-	traceEvent(CONST_TRACE_INFO, "NETFLOW: Export disabled at user request");
+	traceEvent(CONST_TRACE_ALWAYSDISPLAY, "NETFLOW: Export disabled at user request");
     }
   }
 }
@@ -254,7 +254,7 @@ static void dissectFlow(char *buffer, int bufferLen) {
       actualDeviceId = myGlobals.netFlowDeviceId;
 
       if((actualDeviceId == -1) || (actualDeviceId >= myGlobals.numDevices)) {
-	traceEvent(CONST_TRACE_ERROR, "NETFLOW: ERROR: deviceId (%d) is out of range", actualDeviceId);
+	traceEvent(CONST_TRACE_ERROR, "NETFLOW: deviceId (%d) is out of range - ignored", actualDeviceId);
 	break;
       }
 
@@ -430,25 +430,21 @@ static void dissectFlow(char *buffer, int bufferLen) {
 
 /* ****************************** */
 
+#ifdef CFG_MULTITHREADED
+
 static void* netflowMainLoop(void* notUsed _UNUSED_) {
   fd_set netflowMask;
   int rc, len;
   u_char buffer[2048];
   struct sockaddr_in fromHost;
 
+  if(!(myGlobals.netFlowInSocket > 0)) return(NULL);
+
   if(myGlobals.netFlowDeviceId != -1)
     myGlobals.device[myGlobals.netFlowDeviceId].activeDevice = 1;
 
-#ifdef CFG_MULTITHREADED
   threadActive = 1;
-#endif
-
-  if(!(myGlobals.netFlowInSocket > 0)) return(NULL);
-  traceEvent(CONST_TRACE_INFO, "NETFLOW: Welcome to NetFlow");
-  traceEvent(CONST_TRACE_INFO, "NETFLOW: Listening on UDP port %d", myGlobals.netFlowInPort);
-#ifdef CFG_MULTITHREADED
- traceEvent(CONST_TRACE_INFO, "THREADMGMT: netFlow thread (%ld) started", netFlowThread);
-#endif
+  traceEvent(CONST_TRACE_INFO, "THREADMGMT: netFlow thread (%ld) started", netFlowThread);
 
   for(;myGlobals.capturePackets == FLAG_NTOPSTATE_RUN;) {
     FD_ZERO(&netflowMask);
@@ -485,7 +481,7 @@ static void* netflowMainLoop(void* notUsed _UNUSED_) {
 	dissectFlow(buffer, rc);
       }
     } else {
-      traceEvent(CONST_TRACE_INFO, "NETFLOW: select() failed (%d, %s), terminating",
+      traceEvent(CONST_TRACE_FATALERROR, "NETFLOW: select() failed (%d, %s), terminating netFlow",
                  errno,
                  (errno == EBADF ? "EBADF" :
                     errno == EINTR ? "EINTR" :
@@ -495,16 +491,16 @@ static void* netflowMainLoop(void* notUsed _UNUSED_) {
     }
   }
 
-#ifdef CFG_MULTITHREADED
   threadActive = 0;
-  traceEvent(CONST_TRACE_INFO, "THREADMGMT: netFlow thread (%ld) terminated", netFlowThread);
-#endif
+  traceEvent(CONST_TRACE_WARNING, "THREADMGMT: netFlow thread (%ld) terminated", netFlowThread);
 
   if(myGlobals.netFlowDeviceId != -1)
     myGlobals.device[myGlobals.netFlowDeviceId].activeDevice = 0;
 
   return(NULL);
 }
+
+#endif
 
 /* ****************************** */
 
@@ -617,7 +613,7 @@ static void handleNetflowHTTPrequest(char* url) {
 	  storePrefsValue("netFlow.ifNetMask", value);
 	  freeNetFlowMatrixMemory(); setNetFlowInterfaceMatrix();
 	} else
-	  traceEvent(CONST_TRACE_INFO, "NETFLOW: Parse Error (%s)", value);
+	  traceEvent(CONST_TRACE_ERROR, "NETFLOW: HTTP request NetMask Parse Error (%s)", value);
       } else if(strcmp(device, "collectorIP") == 0) {
 	storePrefsValue("netFlow.netFlowDest", value);
 	myGlobals.netFlowDest.sin_addr.s_addr = inet_addr(value);
@@ -817,7 +813,7 @@ static void termNetflowFunct(void) {
   }
 
   traceEvent(CONST_TRACE_INFO, "NETFLOW: Thanks for using ntop NetFlow");
-  traceEvent(CONST_TRACE_INFO, "NETFLOW: Done");
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "NETFLOW: Done");
   fflush(stdout);
 }
 
@@ -910,7 +906,7 @@ PluginInfo* netflowPluginEntryFctn(void)
      PluginInfo* PluginEntryFctn(void)
 #endif
 {
-  traceEvent(CONST_TRACE_INFO, "NETFLOW: Welcome to %s. (C) 2002 by Luca Deri",
+  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "NETFLOW: Welcome to %s. (C) 2002 by Luca Deri",
 	     netflowPluginInfo->pluginName);
 
   return(netflowPluginInfo);

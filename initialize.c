@@ -811,7 +811,8 @@ void initSingleGdbm(GDBM_FILE *database, char *dbName, char *directory, int doUn
   *database = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
 
   if(*database == NULL) {
-      traceEvent(CONST_TRACE_FATALERROR, "....open failed: %s",
+      traceEvent(CONST_TRACE_FATALERROR, "....open of %s failed: %s",
+                 tmpBuf,
 #if defined(WIN32) && defined(__GNUC__)
                  "unknown gdbm errno"
 #else

@@ -1423,7 +1423,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-SCRIPTVER="v1.105-2003-03-29"
+SCRIPTVER="v1.106-2003-03-29"
 
 umask 002
 # Add the stamp file to the list of files AC keeps track of,
@@ -1616,8 +1616,10 @@ if test ".${rc}" = ".1"; then
     echo "*>>> We are going to:"
     echo "*>>>     1. delete the existing generated files"
     echo "*>>>     2. use the auto* tools to recreate them"
-    echo "*                (if you do not have automake, autoconf and libtool"
-    echo "*                 intalled, this will fail)"
+    echo "*                (if you do not have automake and autoconf installed,"
+    echo "*                 this will fail)"
+    echo "*                (if you do not have libtool installed, it will"
+    echo "*                 not give an error message, but will fail later)"
     echo "*>>>     3. tell you to rerun ./configure"
     echo "*"
     echo "*    Please, tell the ntop-dev mailing list if there are problems..."
@@ -1654,6 +1656,9 @@ if test ".${rc}" = ".1"; then
         echo "*"
         echo "*******************************************************************"
         echo
+        if test -f /tmp/autotoolversions; then
+            rm -f /tmp/autotoolversions
+        fi
         exit 1
     fi
     for i in aclocal \
@@ -1675,6 +1680,9 @@ if test ".${rc}" = ".1"; then
             echo "*"
             echo "*******************************************************************"
             echo
+            if test -f /tmp/autotoolversions; then
+                rm -f /tmp/autotoolversions
+            fi
             exit 1
         fi
     done
@@ -1694,6 +1702,9 @@ if test ".${rc}" = ".1"; then
     echo
     exit 1
 else
+    if test -f /tmp/autotoolversions; then
+        rm -f /tmp/autotoolversions
+    fi
     echo "auto* tools are OK, continuing with ./configure"
 fi
 
@@ -6576,7 +6587,7 @@ test "x$enable_libtool_lock" != xno && enable_libtool_lock=yes
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6579 "configure"' > conftest.$ac_ext
+  echo '#line 6590 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7112,7 +7123,7 @@ chmod -w .
 save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -o out/conftest2.$ac_objext"
 compiler_c_o=no
-if { (eval echo configure:7115: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
+if { (eval echo configure:7126: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
   # The compiler can only warn and ignore the option if not recognized
   # So say no if there are warnings
   if test -s out/conftest.err; then
@@ -8905,7 +8916,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8908 "configure"
+#line 8919 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9003,7 +9014,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9006 "configure"
+#line 9017 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -23955,7 +23966,7 @@ echo "${ECHO_T}error" >&6
     echo
     echo "*******************************************************************"
     echo "*"
-    echo "* ERROR: Basic c library routines are missing."
+    echo "* ERROR: Critical c library routine is missing."
     echo "*"
     case "$target" in
       *-hpux* )

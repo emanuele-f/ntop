@@ -1,10 +1,6 @@
 dnl> TODOs
 
 dnl>   should use STDC_HEADERS instead of __STDC__
-dnl>   delete SNMP from webInterface.c
-dnl>   Cleanup HAVE_SYS_SYSLOG_H to match pattern in test program!
-dnl>   Cleanup CFG_NEED_GETDOMAINNAME from webInterface.c
-dnl>   Cleanup HAVE_REGEX to use the value set by AC_CHECK_LIB
 dnl>   Cleanup Autoconf2 (obsolete Autoconf1 macros still in use)
 dnl>   Solaris 8 -- libgcc_s -- need test
 
@@ -46,7 +42,7 @@ dnl>   Edit the version # in the AC_INIT line to roll the version.
 dnl>   Edit NTOP_VERSION_EXTRA to put something extra (e.g. SourceForge rpm version"
 dnl>       into the stamp.
 dnl>
-AC_INIT([ntop],[2.1.58pre])
+AC_INIT([ntop],[2.1.58])
 AC_PREREQ([2.50])
 SCRIPTVER="v1.103-2003-02-11"
 

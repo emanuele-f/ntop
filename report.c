@@ -1365,7 +1365,7 @@ void printHostsInfo(int sortedColumn, int revertOrder, int pageNum) {
 	    }
 
 	    if(el->ipxHostName) {
-	      int i;
+	      int i, numSap=0;
 
 	      if(numAddresses > 0) sendString("/");
 	      if(snprintf(buf, sizeof(buf), "%s&nbsp;%s&nbsp;",
@@ -1375,14 +1375,20 @@ void printHostsInfo(int sortedColumn, int revertOrder, int pageNum) {
 	      sendString(buf);
 
 	      for(i=0; i<el->numIpxNodeTypes; i++) {
-		if(i == 0)
-		  sendString("[");
-		else
-		  sendString("/");
-		sendString(getSAPInfo(el->ipxNodeType[i], 1));
+		char *str = getSAPInfo(el->ipxNodeType[i], 1);
+		
+		if(str[0] != '\0') {
+		  if(numSap == 0)
+		    sendString("[");
+		  else
+		    sendString("/");
+
+		  sendString(str);
+		  numSap++;
+		}
 	      }
 
-	      if(i>0) sendString("]");
+	      if(numSap > 0) sendString("]");
 
 	      numAddresses++;
 	    }

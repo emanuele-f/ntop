@@ -2909,10 +2909,10 @@ else
 #include "confdefs.h"
 
 #       include <sys/types.h>
+#       include <netinet/in.h>,
 #include <netinet/in_systm.h>
 #       include <sys/socket.h>
 #       include <netinet/ip.h>
-#       include <netinet/in.h>
 int main() {
 struct in6_addr tmp;
 ; return 0; }

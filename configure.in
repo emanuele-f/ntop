@@ -468,10 +468,10 @@ AC_CACHE_VAL(ac_cv_in6_addr_has_ea,
     CFLAGS="$CFLAGS $V_INCLS"
     AC_TRY_COMPILE([
 #       include <sys/types.h>
+#       include <netinet/in.h>,
 #include <netinet/in_systm.h>
 #       include <sys/socket.h>
-#       include <netinet/ip.h>
-#       include <netinet/in.h>],
+#       include <netinet/ip.h>],
         [struct in6_addr tmp;],
         ac_cv_in6_addr_has_ea=yes,
         ac_cv_in6_addr_has_ea=no)

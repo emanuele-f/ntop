@@ -444,7 +444,7 @@ void purgeIdleHosts(int actDevice) {
 #ifdef MULTITHREADED
 	  releaseMutex(&myGlobals.hostsHashMutex);
 #endif
-	  if(maxBucket == (len-1)) {
+	  if(maxBucket >= (len-1)) {
 	    hashFull = 1;
 	    continue;
 	  }

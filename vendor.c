@@ -312,14 +312,15 @@ char* getMACInfo(int special, u_char* ethAddress, short encodeString) {
 #endif
 
   data_data = gdbm_fetch(myGlobals.macPrefixFile, key_data);
-
-  if ( (data_data.dptr != NULL) && 
-       ( (special == TRUE)  && ( ((MACInfo*)data_data.dptr)->isSpecial = 's') ) ||
-       ( (special == FALSE) && ( ((MACInfo*)data_data.dptr)->isSpecial != 's') ) ) {
+  
+  if(data_data.dptr != NULL) {
+    if(((special == TRUE)  && (((MACInfo*)data_data.dptr)->isSpecial = 's')) ||
+       ((special == FALSE) && (((MACInfo*)data_data.dptr)->isSpecial != 's'))) {
       strncpy(tmpBuf, ((MACInfo*)data_data.dptr)->vendorName, sizeof(tmpBuf));
       free(data_data.dptr);
       myGlobals.numVendorLookupFound24bit++;
       return(tmpBuf);
+    }
   }
 
   /* Hand coded for LAA/Multicast */

@@ -10,7 +10,7 @@ dnl>   Solaris 8 -- libgcc_s -- need test
 
 dnl> -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 dnl>
-dnl> Copyright (c) 1998 - 2002 Luca Deri <deri@ntop.org>
+dnl> Copyright (c) 1998 - 2003 Luca Deri <deri@ntop.org>
 dnl> Written Oct2002 by Burton M. Strauss III <burton@ntopsupport.com>
 dnl>     (Loosely based on the earlier ntop version)
 dnl>
@@ -71,7 +71,7 @@ GDCHART_DIRECTORY=`(cd ../${GDCHART_DIRECTORY} && pwd)`
 
 echo
 echo "Welcome to $PACKAGE_NAME, Version $PACKAGE_VERSION $NTOP_VERSION_EXTRA"
-echo "  copyright (c) 1998-2002 Luca Deri <deri@ntop.org>"
+echo "  copyright (c) 1998-2003 Luca Deri <deri@ntop.org>"
 echo
 echo          "Configuration script version $SCRIPTVER"
 echo

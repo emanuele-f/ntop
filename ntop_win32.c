@@ -80,7 +80,7 @@ void initWinsock32() {
     exit(-1);
   }
 
-  version = "2.1.59";
+  version = "2.1.90";
   author  = "Luca Deri <deri@ntop.org>";
   buildDate = "2003-03-17";
 

@@ -293,7 +293,7 @@ static void termPdaFunct(void) {
 static PluginInfo PDAPluginInfo[] = {
   { "PDAPlugin",
     "This plugin produces a minimal ntop report, suitable for display on a pda.",
-    "2.0",            /* version */
+    "2.2",            /* version */
     "<A HREF=mailto:walterbrock@netscape.net>W. Brock</A>", 
     "PDAPlugin",      /* http://<host>:<port>/plugins/PDAPlugin */
     0,                /* Active by default */

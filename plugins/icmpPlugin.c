@@ -444,7 +444,7 @@ static PluginInfo icmpPluginInfo[] = {
   { "icmpWatchPlugin",
     "This plugin produces a report about the ICMP packets that ntop has seen. "
        "The report includes each host, byte and per-type counts (send/received).",
-    "2.0", /* version */
+    "2.2", /* version */
     "<A HREF=http://luca.ntop.org/>L.Deri</A>",
     "icmpWatch", /* http://<host>:<port>/plugins/icmpWatch */
     0, /* Active by default */

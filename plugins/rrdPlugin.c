@@ -1550,7 +1550,7 @@ static PluginInfo rrdPluginInfo[] = {
     "This plugin is used to setup, activate and deactivate ntop's rrd support.<br>"
     "This plugin also produces the graphs of rrd data, available via a "
     "link from the various 'Info about host xxxxx' reports.",
-    "2.1.2", /* version */
+    "2.2", /* version */
     "<A HREF=http://luca.ntop.org/>L.Deri</A>",
     "rrdPlugin", /* http://<host>:<port>/plugins/rrdPlugin */
     1, /* Active by default */ 

@@ -353,7 +353,7 @@ static PluginInfo LsPluginInfo[] = {
     "This plugin produces a report about the last time packets were seen from "
       "each specific host.  A note card database is available for recording "
       "additional information.",
-    "2.0", /* version */
+    "2.2", /* version */
     "<A HREF=mailto:marangoni@unimc.it>A.Marangoni</A>", 
     "LastSeen", /* http://<host>:<port>/plugins/Ls */
     0, /* Active by default */

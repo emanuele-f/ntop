@@ -26,6 +26,27 @@
 /* PPPoE - Courtesy of Andreas Pfaller Feb2003 */
 #ifdef LINUX
  #include <linux/if_pppox.h>
+#else
+ /* Extracted and modified from the Linux header for other systems - BMS Mar2003 */
+ struct pppoe_tag {
+         u_int16_t tag_type;
+         u_int16_t tag_len;
+         char tag_data[0];
+ } __attribute ((packed));
+
+ struct pppoe_hdr {
+ #ifdef CFG_LITTLE_ENDIAN
+         u_int8_t ver : 4;
+         u_int8_t type : 4;
+ #else
+         u_int8_t type : 4;
+         u_int8_t ver : 4;
+ #endif
+         u_int8_t code;
+         u_int16_t sid;
+         u_int16_t length;
+         struct pppoe_tag tag[0];
+ } __attribute__ ((packed));
 #endif
 
 static const struct pcap_pkthdr *h_save;

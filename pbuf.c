@@ -31,8 +31,8 @@
  struct pppoe_tag {
          u_int16_t tag_type;
          u_int16_t tag_len;
-         char tag_data[0];
- } __attribute ((packed));
+         char tag_data;
+ };
 
  struct pppoe_hdr {
  #ifdef CFG_LITTLE_ENDIAN
@@ -45,8 +45,8 @@
          u_int8_t code;
          u_int16_t sid;
          u_int16_t length;
-         struct pppoe_tag tag[0];
- } __attribute__ ((packed));
+         struct pppoe_tag tag;
+ };
 #endif
 
 static const struct pcap_pkthdr *h_save;
@@ -1589,8 +1589,14 @@ void cleanupPacketQueue(void) {
 
 /* ************************************ */
 
+#define MAX_PACKET_LEN          8232 /* _mtuSize[DLT_NULL] */
+
+
 void* dequeuePacket(void* notUsed _UNUSED_) {
   PacketInformation pktInfo;
+  unsigned short deviceId;
+  struct pcap_pkthdr h;
+  u_char p[MAX_PACKET_LEN];
 
   traceEvent(CONST_TRACE_INFO, "THREADMGMT: Packet processor thread (%ld) started...\n", myGlobals.dequeueThreadId);
 
@@ -1614,10 +1620,23 @@ void* dequeuePacket(void* notUsed _UNUSED_) {
     traceEvent(CONST_TRACE_INFO, "Got packet...\n");
 #endif
     accessMutex(&myGlobals.packetQueueMutex, "dequeuePacket");
-    memcpy(&pktInfo.h, &myGlobals.packetQueue[myGlobals.packetQueueTail].h,
+    memcpy(&h, &myGlobals.packetQueue[myGlobals.packetQueueTail].h,
 	   sizeof(struct pcap_pkthdr));
-    memcpy(pktInfo.p, myGlobals.packetQueue[myGlobals.packetQueueTail].p, DEFAULT_SNAPLEN);
-    pktInfo.deviceId = myGlobals.packetQueue[myGlobals.packetQueueTail].deviceId;
+    
+    /* This code should be changed ASAP. It is a bad trick that avoids ntop to
+       go beyond packet boundaries (L.Deri 17/03/2003)
+       
+       1. h->len is truncated
+       2. MAX_PACKET_LEN should probably be removed
+       3. all the functions must check that they are not going beyond packet boundaries
+    */
+    memcpy(p, myGlobals.packetQueue[myGlobals.packetQueueTail].p, DEFAULT_SNAPLEN);
+    if(h.len > MAX_PACKET_LEN) {
+      traceEvent(CONST_TRACE_WARNING, "WARNING: packet truncated (%d->%d)", h.len, MAX_PACKET_LEN);
+      h.len = MAX_PACKET_LEN;
+    }
+    
+    deviceId = myGlobals.packetQueue[myGlobals.packetQueueTail].deviceId;
     myGlobals.packetQueueTail = (myGlobals.packetQueueTail+1) % CONST_PACKET_QUEUE_LENGTH;
     myGlobals.packetQueueLen--;
     releaseMutex(&myGlobals.packetQueueMutex);
@@ -1632,7 +1651,7 @@ void* dequeuePacket(void* notUsed _UNUSED_) {
 
     HEARTBEAT(9, "dequeuePacket()...processing...", NULL);
     myGlobals.actTime = time(NULL);
-    processPacket((u_char*)((long)pktInfo.deviceId), &pktInfo.h, pktInfo.p);
+    processPacket((u_char*)((long)deviceId), &h, p);
   }
 
   traceEvent(CONST_TRACE_INFO, "THREADMGMT: Packet Processor thread (%ld) terminated...\n", myGlobals.dequeueThreadId);

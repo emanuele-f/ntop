@@ -137,9 +137,9 @@ static void resolveAddress(struct in_addr *hostAddr,
     StoredAddress *retrievedAddress;
 
     retrievedAddress = (StoredAddress*)data_data.dptr;
+#ifdef DNS_DEBUG
     traceEvent(CONST_TRACE_INFO, "DNS_DEBUG: Fetched data from cache: '%s' [%s]\n",
 	       retrievedAddress->symAddress, keyBuf);
-#ifdef DNS_DEBUG
 #endif
 
     /* Sanity check */

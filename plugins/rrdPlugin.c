@@ -35,6 +35,7 @@
        2.1.2   Added status message
        2.2     Version roll (preparatory) for ntop 2.2
        2.2a    Multiple RRAs
+       2.2b    Large rrd population option
 
    Remember, there are TWO paths into this - one is through the main loop,
    if the plugin is active, the other is through the http function if the 
@@ -1115,7 +1116,31 @@ static void handleRRDHTTPrequest(char* url) {
   sendString("<TR><TH ALIGN=LEFT>RRD Files Path</TH><TD>"
              "<INPUT NAME=rrdPath SIZE=50 VALUE=\"");
   sendString(myGlobals.rrdPath);
-  sendString("\"></TD></tr>\n");
+  sendString("\">");
+#ifdef MAKE_WITH_LARGERRDPOP
+  sendString("<br>NOTE: The 'large rrd population' option is in effect.\n");
+  sendString("This means that the rrd files will be in a subdirectory structure, e.g.\n");
+  if (snprintf(buf, sizeof(buf), 
+ #ifdef WIN32
+                    "%s\\interfaces\\interface-name\\12\\239\\98\\199\\xxxxx.rrd ",
+ #else
+                    "%s/interfaces/interface-name/12/239/98/199/xxxxx.rrd ",
+ #endif
+               myGlobals.rrdPath) < 0)
+    BufferTooShort();
+  sendString(buf);
+  sendString("instead of a single level structure, ");
+  if (snprintf(buf, sizeof(buf), 
+ #ifdef WIN32
+                    "%s\\interfaces\\interface-name\\12.239.98.199\\xxxxx.rrd\n",
+ #else
+                    "%s/interfaces/interface-name/12.239.98.199/xxxxx.rrd\n",
+ #endif
+               myGlobals.rrdPath) < 0)
+    BufferTooShort();
+  sendString(buf);
+#endif
+  sendString("</TD></tr>\n");
 
   sendString("<TR><TH ALIGN=LEFT>RRD Updates</TH><TD>");
   if(snprintf(buf, sizeof(buf), "%lu RRD files updated</TD></TR>\n", (unsigned long)numTotalRRDs) < 0)
@@ -1166,6 +1191,9 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
   struct stat statbuf;
   int purgeCountFiles, purgeCountUnlink, purgeCountErrors;
   int cycleCount=0;
+#ifdef MAKE_WITH_LARGERRDPOP
+  char *adjHostName;
+#endif
 
 #ifdef CFG_MULTITHREADED
   traceEvent(CONST_TRACE_INFO, "THREADMGMT: rrd thread (%ld) started", rrdThread);
@@ -1260,9 +1288,18 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 	      continue;
 	    }
 
+#ifdef MAKE_WITH_LARGERRDPOP
+            adjHostName = dotToSlash(hostKey);
+#endif
+
 	    sprintf(rrdPath, "%s/interfaces/%s/hosts/%s/",
 		    myGlobals.rrdPath, myGlobals.device[devIdx].humanFriendlyName, 
-		    hostKey);
+#ifdef MAKE_WITH_LARGERRDPOP
+                    adjHostName
+#else
+                    hostKey
+#endif
+                   );
 	    mkdir_p(rrdPath);
 
 	    updateTrafficCounter(rrdPath, "pktSent", &el->pktSent);
@@ -1341,8 +1378,15 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 		traceEvent(CONST_TRACE_INFO, "RRD_DEBUG: Updating host %s", hostKey);
 #endif
 
-		sprintf(rrdPath, "%s/interfaces/%s/hosts/%s/IP_", myGlobals.rrdPath,  
-			myGlobals.device[devIdx].humanFriendlyName, hostKey);
+		sprintf(rrdPath, "%s/interfaces/%s/hosts/%s/IP_",
+                        myGlobals.rrdPath,  
+			myGlobals.device[devIdx].humanFriendlyName,
+#ifdef MAKE_WITH_LARGERRDPOP
+                        adjHostName
+#else
+                        hostKey
+#endif
+                       );
 
 		for(j=0; j<myGlobals.numIpProtosToMonitor; j++) {
 		  char key[128];
@@ -1357,6 +1401,11 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 	      }
 	    }
 	  }	
+
+#ifdef MAKE_WITH_LARGERRDPOP
+          if (adjHostName != NULL)
+              free(adjHostName);
+#endif
 
 	  if(mutexLocked && (((i+1) & CONST_MUTEX_FHS_MASK) == 0)) {
 #ifdef CFG_MULTITHREADED
@@ -1468,6 +1517,7 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 
     /* ************************** */
 
+#ifndef MAKE_WITH_LARGERRDPOP
     if(dumpMatrix) {
       int k;
 
@@ -1501,6 +1551,7 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 	    }
 	  }
     }
+#endif
 
 #ifdef RRD_DEBUG
     traceEvent(CONST_TRACE_INFO, "RRD_DEBUG: %lu RRDs updated (%lu total updates)\n",
@@ -1666,7 +1717,7 @@ static PluginInfo rrdPluginInfo[] = {
     "This plugin is used to setup, activate and deactivate ntop's rrd support.<br>"
     "This plugin also produces the graphs of rrd data, available via a "
     "link from the various 'Info about host xxxxx' reports.",
-    "2.2a", /* version */
+    "2.2b", /* version */
     "<A HREF=http://luca.ntop.org/>L.Deri</A>",
     "rrdPlugin", /* http://<host>:<port>/plugins/rrdPlugin */
     1, /* Active by default */ 

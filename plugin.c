@@ -26,9 +26,6 @@ extern PluginInfo* nfsPluginEntryFctn(void);
 extern PluginInfo* sflowPluginEntryFctn(void);
 extern PluginInfo* rrdPluginEntryFctn(void);
 /* rrd never made it into the code base */
-#ifdef MAKE_RMON_SUPPORT
-extern PluginInfo* rmonPluginEntryFctn(void);
-#endif
 extern PluginInfo* netflowPluginEntryFctn(void);
 #endif
 
@@ -214,11 +211,6 @@ static void loadPlugin(char* dirName, char* pluginName) {
     pluginInfo = netflowPluginEntryFctn();
   else if(strcmp(pluginName, "rrdPlugin") == 0)
     pluginInfo = rrdPluginEntryFctn();
-
-#ifdef MAKE_RMON_SUPPORT
-  else if(strcmp(pluginName, "ntopRmon") == 0)
-    pluginInfo = rmonPluginEntryFctn();
-#endif
   else
     pluginInfo = NULL;
 

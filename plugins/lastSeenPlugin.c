@@ -27,8 +27,6 @@ static void addNotes(char *addr, char *PostNotes);
 static void deletelastSeenURL( char *addr );
 static void setPluginStatus(char * status);
 
-#define MY_NETWORK 16
-
 /* ****************************** */
 
 static GDBM_FILE LsDB;
@@ -138,7 +136,7 @@ static void handleLsHTTPrequest(char* url) {
   char tmpTime[25], postData[128];
   char *no_info = "<TH "TH_BG">-NO INFO-</TH>",*tmp, *no_note ="-";
   datum ret_data,key_data, content;
-  LsHostInfo tablehost[MY_NETWORK*256];
+  LsHostInfo tablehost[MAX_LASTSEEN_TABLE_SIZE];
   LsHostNote HostN;
   HostTraffic *HostT;
   struct tm loctime;
@@ -198,7 +196,7 @@ static void handleLsHTTPrequest(char* url) {
 #ifdef CFG_MULTITHREADED
     releaseMutex(&myGlobals.gdbmMutex);
 #endif 
-    if ( key_data.dptr[1]!='_') {
+    if ( (key_data.dptr[1]!='_') && (entry < MAX_LASTSEEN_TABLE_SIZE) ) {
       memcpy(&tablehost[entry],(struct LsHostInfo *)content.dptr,sizeof(struct LsHostInfo)); 	
       entry++;
     }
@@ -219,6 +217,11 @@ static void handleLsHTTPrequest(char* url) {
   num_hosts=entry;
   entry--;
   printSectionTitle("Last Seen Statistics");
+
+  if (entry >= MAX_LASTSEEN_TABLE_SIZE - 1) {
+      sendString("<P><CENTER>NOTE:&nbsp;Table size at/exceeds limit, some data may not be displayed.</CENTER></P>\n");
+  }
+
   sendString("<CENTER><TABLE BORDER>\n");
   sendString("<TR "TR_ON"><TH "TH_BG">Host</TH><TH "TH_BG">Address</TH><TH "TH_BG">LastSeen</TH><TH "TH_BG">Comments</TH><TH "TH_BG">Options</TH></TR>\n");
   while ( entry >= 0 ) {

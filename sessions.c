@@ -100,10 +100,12 @@ static void updateHTTPVirtualHosts(char *virtualHostName,
   if(virtualHostName != NULL) {
     VirtualHostList *list = theRemHost->httpVirtualHosts;
 
+#ifdef DEBUG
     traceEvent(TRACE_INFO, "updateHTTPVirtualHosts: %s for host %s [s=%u,r=%u]",
 	       virtualHostName, theRemHost->hostNumIpAddress,
 	       (unsigned int)bytesSent, (unsigned int)bytesRcvd);
-    
+#endif
+
     while(list != NULL) {
       if(strcmp(list->virtualHostName, virtualHostName) == 0) {
 	list->bytesSent += bytesSent, list->bytesRcvd += bytesRcvd;

@@ -2003,19 +2003,6 @@ void printNtopConfigInfo(int textPrintFlag) {
                            myGlobals.accessLogPath,
                            NTOP_DEFAULT_ACCESS_LOG_PATH);
 
-  if (myGlobals.enableDBsupport == 1) {
-    if (snprintf(buf, sizeof(buf), "%sActive - server at %s:%d",
-		 myGlobals.enableDBsupport == NTOP_DEFAULT_DB_SUPPORT ? REPORT_ITS_DEFAULT : "",
-		 myGlobals.sqlHostName,
-		 myGlobals.sqlPortNumber) < 0)
-      BufferTooShort();
-  } else {
-    if (snprintf(buf, sizeof(buf), "%sInactive",
-		 myGlobals.enableDBsupport == NTOP_DEFAULT_DB_SUPPORT ? REPORT_ITS_DEFAULT : "") < 0)
-      BufferTooShort();
-  }
-  printFeatureConfigInfo(textPrintFlag, "-b | --sql-host", buf);
-
   printParameterConfigInfo(textPrintFlag, "-c | --sticky-hosts",
                            myGlobals.stickyHosts == 1 ? "Yes" : "No",
                            NTOP_DEFAULT_STICKY_HOSTS == 1 ? "Yes" : "No");

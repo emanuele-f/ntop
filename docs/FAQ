@@ -29,6 +29,9 @@ Note that some of this information may be dated or not completely verified for 2
 
 Entries are in no particular sequence.
 
+Post 2.1 release entries will have a author/date stamp, (Updated/Added ddmmmyyyy by x)
+at the end.
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1453,6 +1456,32 @@ A. ntop has special parameters under Win32
 	 ntop /d deletes the ntop service
 
    Remember, ntop /i and ntop /d don't actually run the service - you need to start it.
+
+Q. Where does ntop look for html (and gif) files under Win32?
+A. ntop looks in two places. The first is the current directory and the second is 
+   configurable through a constant in ntop_win32.h, #define DATAFILE_DIR "."
+
+   Note that the current directory, or ".", may not be what you expect.
+
+   When running ntop as a Win32 service, "." is %SystemRoot%\system32, meaning that ntop 
+   looks in %SystemRoot%\system32\html for the .html and .gif files.
+
+   When running ntop from the command line, 
+
+       ntop /c parameters...
+
+   "." is whatever directory is current.  This means that if you run ntop with a full, 
+   explicit path (c:\ntopnew\ntop /c ...) there may be an unexpected difference between 
+   what ntop finds for "." and what you THINK "." is!  This will lead to missing .html 
+   and .gif files.
+
+   If you wish to have ntop look in a specific place for the files, the best choices are:
+
+     1) Create a .bat file to run ntop which does a cd to the expected directory first.
+     2) Edit ntop_win32.c and then recompile.
+
+   Note that the settings for DATAFILE_DIR (and other constants) are reported on the text 
+   version of the configuration page, textinfo.html. (Added 14Jul2002 Burton)
 
 
 Other Platforms - not very well supported...

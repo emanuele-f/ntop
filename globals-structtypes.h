@@ -1836,11 +1836,11 @@ XML*/
   int netFlowInSocket, netFlowDeviceId;
   u_short netFlowInPort;
   u_long numNetFlowsPktsRcvd, numNetFlowsPktsSent, numNetFlowsRcvd, numNetFlowsProcessed;
-  u_long numBadFlowsVersionsRcvd, numBadFlowPkts, numBadFlowBytes, numBadFlowReality;
-  u_long numSrcFlowsEntryFailedBlackList, numSrcFlowsEntryFailedWhiteList,
-         numSrcFlowsEntryAccepted,
-         numDstFlowsEntryFailedBlackList, numDstFlowsEntryFailedWhiteList,
-         numDstFlowsEntryAccepted;
+  u_long numBadNetFlowsVersionsRcvd, numBadFlowPkts, numBadFlowBytes, numBadFlowReality;
+  u_long numSrcNetFlowsEntryFailedBlackList, numSrcNetFlowsEntryFailedWhiteList,
+         numSrcNetFlowsEntryAccepted,
+         numDstNetFlowsEntryFailedBlackList, numDstNetFlowsEntryFailedWhiteList,
+         numDstNetFlowsEntryAccepted;
 
   /* sFlow */
   int sflowOutSocket, sflowInSocket, sflowDeviceId;

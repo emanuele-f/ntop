@@ -497,6 +497,14 @@ extern char **buildargv(const char *argv);
 #ifndef HAVE_FREEARGV
 extern void freeargv(char **argv);
 #endif
+void handleWhiteBlackListAddresses(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS][3],
+                                   u_short *numNets, char* outAddresses,
+                                   int outAddressesLen);
+unsigned short isOKtoSave(u_int32_t addr, 
+			  u_int32_t whiteNetworks[MAX_NUM_NETWORKS][3], 
+			  u_int32_t blackNetworks[MAX_NUM_NETWORKS][3],
+			  u_short numWhiteNets, u_short numBlackNets);
+
 
 /* Formatting for %.2f ... */
 #define xvertDOT00MB(v) (((float)(v)/(float)(1024.0*1024.0))+0.005)

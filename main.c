@@ -1098,18 +1098,44 @@ int main(int argc, char *argv[]) {
       traceEvent(CONST_TRACE_FATALERROR, "Unable to change user ID");
       exit(-1);
     }
+      
   } else {
-    if((geteuid() == 0) || (getegid() == 0)) {
-      if(!userSpecified) {
-	traceEvent(CONST_TRACE_FATALERROR, "For security reasons you cannot run ntop as root - aborting");
-	traceEvent(CONST_TRACE_INFO, "Unless you really, really, know what you're doing");
-	traceEvent(CONST_TRACE_INFO, "Please specify the user name using the -u option!");
-	exit(0);
-      } else {
-	traceEvent(CONST_TRACE_ALWAYSDISPLAY, "For security reasons you should not run ntop as root (-u)!");
+    struct passwd *pw;
+    char *user;
+    
+    /*
+      The user has not specified the uid using the -u flag.
+      We try to locate a user with no privileges
+    */
+    
+    pw = getpwnam(user = "nobody");
+    if(pw == NULL) pw = getpwnam(user = "anonymous");
+    
+    if(pw != NULL) {
+      /* User located */
+      myGlobals.userId = pw->pw_uid;
+      myGlobals.groupId = pw->pw_gid;
+
+      if((myGlobals.userId != 0) || (myGlobals.groupId != 0)) {
+	if((setgid(myGlobals.groupId) != 0) || (setuid(myGlobals.userId) != 0)) {
+	  traceEvent(CONST_TRACE_FATALERROR, "Unable to change user to %s", user);
+	  exit(-1);
+	} else
+	  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "ntop started as user %s", user);
       }
     } else {
-      traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Now running as requested user... continuing with initialization");
+      if((geteuid() == 0) || (getegid() == 0)) {
+	if(!userSpecified) {
+	  traceEvent(CONST_TRACE_FATALERROR, "For security reasons you cannot run ntop as root - aborting");
+	  traceEvent(CONST_TRACE_INFO, "Unless you really, really, know what you're doing");
+	  traceEvent(CONST_TRACE_INFO, "Please specify the user name using the -u option!");
+	  exit(0);
+	} else {
+	  traceEvent(CONST_TRACE_ALWAYSDISPLAY, "For security reasons you should not run ntop as root (-u)!");
+	}
+      } else {
+	traceEvent(CONST_TRACE_ALWAYSDISPLAY, "Now running as requested user... continuing with initialization");
+      }
     }
   }
 #endif

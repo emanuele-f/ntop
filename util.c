@@ -4443,3 +4443,66 @@ int ntop_gdbm_store(GDBM_FILE g, datum d, datum v, int r) {
   
   return(rc);
 }
+
+/* ******************************************* */
+
+void handleWhiteBlackListAddresses(char* addresses,
+                                   u_int32_t theNetworks[MAX_NUM_NETWORKS][3],
+                                   u_short *numNets,
+                                   char* outAddresses,
+                                   int outAddressesLen) {
+
+  *numNets = 0;
+  if((addresses == NULL) ||(strlen(addresses) == 0) ) {
+      /* No list - return with numNets = 0 */
+      outAddresses[0]='\0';
+      return;
+  }
+
+          
+  handleAddressLists(addresses,
+                     theNetworks,
+                     numNets,
+                     outAddresses,
+                     outAddressesLen,
+                     CONST_HANDLEADDRESSLISTS_NETFLOW);
+
+}
+
+/* ****************************** */
+
+/* This function checks if a host is OK to save
+ * i.e. specified in the white list and NOT specified in the blacklist
+ *
+ *   We return 1 or 2 - DO NOT SAVE
+ *                        (1 means failed white list,
+ *                          2 means matched black list)
+ *             0      - SAVE
+ *
+ * We use the routines from util.c ... 
+ *  For them, 1=PseudoLocal, which means it's in the set
+ *  So we have to flip the whitelist code
+ */
+unsigned short isOKtoSave(u_int32_t addr, 
+			  u_int32_t whiteNetworks[MAX_NUM_NETWORKS][3], 
+			  u_int32_t blackNetworks[MAX_NUM_NETWORKS][3],
+			  u_short numWhiteNets, u_short numBlackNets) {
+  int rc;
+  struct in_addr workAddr;
+
+  workAddr.s_addr = addr;
+
+  if(numBlackNets > 0) {
+      rc = __pseudoLocalAddress(&workAddr, blackNetworks, numBlackNets);
+      if(rc == 1)
+          return 2;
+  }
+
+  if(numWhiteNets > 0) {
+      rc = __pseudoLocalAddress(&workAddr, whiteNetworks, numWhiteNets);
+      return(1 - rc);
+  }
+
+  return(0 /* SAVE */);
+}
+

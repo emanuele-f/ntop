@@ -1995,92 +1995,130 @@ void traceEvent(int eventTraceLevel, char* file,
   /* Fix courtesy of "Burton M. Strauss III" <BStrauss@acm.org> */
   if(eventTraceLevel <= myGlobals.traceLevel) {
     char theDate[32];
-    char buf[LEN_GENERAL_WORK_BUFFER], fbuf[LEN_GENERAL_WORK_BUFFER];
-    struct tm t;
+    char buf[LEN_GENERAL_WORK_BUFFER];
     time_t theTime = time(NULL);
+    struct tm t;
+    int beginFileIdx;
+    char *mFile = NULL;
 
-    /* We have two paths - one if we're logging, one if we aren't
-     *   Note that the no-log case is those systems which don't support it (WIN32),
-     *                                those without the headers !defined(MAKE_WITH_SYSLOG)
-     *                                those where it's parametrically off...
+    /* We have three paths - one if we're logging, two if we aren't
+     *   Note that the no-log case is 1. those systems which don't support it (WIN32),
+     *                                2. those without the headers !defined(MAKE_WITH_SYSLOG)
+     *                                   those where it's parametrically off...
      */
 
     memset(buf, 0, LEN_GENERAL_WORK_BUFFER);
-    memset(fbuf, 0, LEN_GENERAL_WORK_BUFFER);
 
-    snprintf(fbuf, LEN_GENERAL_WORK_BUFFER, "%s%s", 
-                   eventTraceLevel == CONST_FATALERROR_TRACE_LEVEL  ? "***FATAL_ERROR*** " :
-                       eventTraceLevel == CONST_ERROR_TRACE_LEVEL   ? "**ERROR** " :
-                       eventTraceLevel == CONST_WARNING_TRACE_LEVEL ? "*WARNING* " : "",
-                   format);
-    if (strlen(fbuf) >= LEN_GENERAL_WORK_BUFFER) 
-        fbuf[LEN_GENERAL_WORK_BUFFER] = '\0';
-
-#if defined(WIN32) || !defined(MAKE_WITH_SYSLOG)
-    strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &t));
     if(myGlobals.traceLevel == CONST_DETAIL_TRACE_LEVEL) {
-      int beginFileIdx;
-
-      for(beginFileIdx=strlen(file)-1; beginFileIdx>1; beginFileIdx--)
-	if(file[beginFileIdx-1] == '\\') break;
-      printf("%s [%s:%d] ", theDate, &file[beginFileIdx], line);
-    } else {
-      printf("%s ", theDate);
-    }
-
-#if defined(WIN32)
-    /* Windows lacks vsnprintf */
-    vsprintf(buf, fbuf, va_ap);
-#else /* WIN32 - vsnprintf */
-    vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, fbuf, va_ap);
-#endif /* WIN32 - vsnprintf */
-
-    printf("%s%s", buf, (format[strlen(format)-1] != '\n') ? "\n" : "");
-    fflush(stdout);
-
-#else /* WIN32 || !MAKE_WITH_SYSLOG */
-
-    vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, fbuf, va_ap);
-
-    if(myGlobals.useSyslog != FLAG_SYSLOG_NONE) {
-
-      openlog("ntop", LOG_PID, myGlobals.useSyslog);
-
-      /* syslog(..) call fix courtesy of Peter Suschlik <peter@zilium.de> */
-#if (0)
-      switch(myGlobals.traceLevel) {
-      case 0:
-	syslog(LOG_ERR, "%s", buf);
-	break;
-      case 1:
-	syslog(LOG_WARNING, "%s", buf);
-	break;
-      case 2:
-	syslog(LOG_NOTICE, "%s", buf);
-	break;
-      default:
-	syslog(LOG_INFO, "%s", buf);
-	break;
-      }
+        mFile = strdup(file);
+        for(beginFileIdx=strlen(mFile)-1; beginFileIdx>0; beginFileIdx--) {
+            if(mFile[beginFileIdx] == '.') mFile[beginFileIdx] = '\0'; /* Strip off .c */
+#if defined(WIN32) 
+            if(mFile[beginFileIdx-1] == '\\') break;  /* Start after \ (Win32)  */
 #else
-      syslog(LOG_ERR, "%s", buf);
+            if(mFile[beginFileIdx-1] == '/') break;   /* Start after / (!Win32) */
 #endif
-      closelog();
+        }
+    }
 
+#if defined(WIN32) 
+    /* Windows lacks vsnprintf */
+    strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &t));
+    printf("%s ", theDate);
+
+    if(myGlobals.traceLevel == CONST_DETAIL_TRACE_LEVEL) {
+        printf("[MSGID%05d-%s] ", line, &mFile[beginFileIdx]);
+    }
+
+    printf("%s", eventTraceLevel == CONST_FATALERROR_TRACE_LEVEL  ? "**FATAL_ERROR** " :
+                     eventTraceLevel == CONST_ERROR_TRACE_LEVEL   ? "**ERROR** " :
+                     eventTraceLevel == CONST_WARNING_TRACE_LEVEL ? "**WARNING** " : "");
+
+    vsprintf(buf, format, va_ap);
+    printf("%s%s", buf, (format[strlen(format)-1] != '\n') ? "\n" : "");
+
+    fflush(stdout);
+#else
+    /* Not Win32...
+     *    If we have syslog, or we're not making with syslog, then it's
+     *    similar to Win32 but uses vsnprintf.
+     *    If we syslog, we don't have to worry about the date/time stamp
+     */
+
+ #ifdef MAKE_WITH_SYSLOG
+    if(myGlobals.useSyslog == FLAG_SYSLOG_NONE) {
+ #endif
+
+        /* no SYSLOG or it's NONE - use vnsprintf */
+        strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &t));
+        printf("%s ", theDate);
+
+        if(myGlobals.traceLevel == CONST_DETAIL_TRACE_LEVEL) {
+            printf("[MSGID%05d-%s] ", line, &mFile[beginFileIdx]);
+        }
+
+        printf("%s", eventTraceLevel == CONST_FATALERROR_TRACE_LEVEL  ? "**FATAL_ERROR** " :
+                         eventTraceLevel == CONST_ERROR_TRACE_LEVEL   ? "**ERROR** " :
+                         eventTraceLevel == CONST_WARNING_TRACE_LEVEL ? "**WARNING** " : "");
+
+        vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, format, va_ap);
+        printf("%s%s", buf, (format[strlen(format)-1] != '\n') ? "\n" : "");
+
+        fflush(stdout);
+
+ #ifdef MAKE_WITH_SYSLOG
     } else {
 
-      strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &t));
-      if(myGlobals.traceLevel == CONST_DETAIL_TRACE_LEVEL) {
-	printf("%s [%s:%d] ", theDate, file, line);
-      } else {
-	printf("%s ", theDate);
-      }
+        char dbuf[LEN_MEDIUM_WORK_BUFFER];
+        char fbuf[LEN_GENERAL_WORK_BUFFER];
 
-      printf("%s%s", buf, (fbuf[strlen(fbuf)-1] != '\n') ? "\n" : "");
-      fflush(stdout);
+        memset(dbuf, 0, LEN_MEDIUM_WORK_BUFFER);
+        memset(fbuf, 0, LEN_GENERAL_WORK_BUFFER);
 
+        if (myGlobals.traceLevel == CONST_DETAIL_TRACE_LEVEL) {
+            snprintf(dbuf, LEN_MEDIUM_WORK_BUFFER, "[MSGID%05d-%s] ", line, &mFile[beginFileIdx]);
+            if (strlen(dbuf) >= LEN_MEDIUM_WORK_BUFFER) 
+                dbuf[LEN_MEDIUM_WORK_BUFFER] = '\0';
+        }
+
+        snprintf(fbuf, LEN_GENERAL_WORK_BUFFER, "%s%s%s",
+                      dbuf,
+                      eventTraceLevel == CONST_FATALERROR_TRACE_LEVEL  ? "**FATAL_ERROR** " :
+                          eventTraceLevel == CONST_ERROR_TRACE_LEVEL   ? "**ERROR** " :
+                          eventTraceLevel == CONST_WARNING_TRACE_LEVEL ? "**WARNING** " : "",
+                      format);
+        vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, fbuf, va_ap);
+
+        /* SYSLOG and set */
+        openlog("ntop", LOG_PID, myGlobals.useSyslog);
+
+        /* syslog(..) call fix courtesy of Peter Suschlik <peter@zilium.de> */
+#ifdef MAKE_WITH_LOG_XXXXXX
+        switch(myGlobals.traceLevel) {
+          case CONST_FATALERROR_TRACE_LEVEL:
+          case CONST_ERROR_TRACE_LEVEL:
+            syslog(LOG_ERR, "%s", buf);
+            break;
+          case CONST_WARNING_TRACE_LEVEL:
+	    syslog(LOG_WARNING, "%s", buf);
+            break;
+          case CONST_ALWAYSDISPLAY_TRACE_LEVEL:
+            syslog(LOG_NOTICE, "%s", buf);
+            break;
+          default:
+            syslog(LOG_INFO, "%s", buf);
+            break;
+        }
+#else
+        syslog(LOG_ERR, "%s", buf);
+#endif
+        closelog();
     }
+ #endif
 #endif /* WIN32 || !MAKE_WITH_SYSLOG */
+
+    if (mFile != NULL) 
+        free(mFile);
 
   }
 

@@ -343,6 +343,20 @@
  #undef MAKE_WITH_FORK_COPYONWRITE
 #endif
 
+/* EXPERIMENTAL */
+/* Define MAKE_WITH_LOG_XXXXXX if you want log messages to use more than just
+ * LOG_ERR for ntop's messages.
+ *
+ * See util.c for the mappings from CONST_TRACE_xxxx_LEVEL to LOG_xxxxxx settings.
+ *
+ * If you do this, it's STRONGLY suggested - to prevent a large # of console
+ * messages - that you:
+ *     use --use-syslog=local3 or such
+ *     add local3.none to a couple of places in /etc/syslog.conf
+ * so ntop's LOG_ERROR messages don't flood the real console.
+ */
+/* #undef MAKE_WITH_LOG_XXXXXX */
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* D E B U G  items                                                                */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

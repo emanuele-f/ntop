@@ -2185,6 +2185,15 @@
  /* #define PARM_USE_HOST */
 #endif
 
+/*
+ * Somehow, gcc under HPUX decides to build a c++ version of malloc.h
+ *   Disable the malloc.h stuff.
+ */
+#ifdef HPUX
+ #undef HAVE_MALLINFO_MALLOC_H
+ #undef HAVE_MALLOC_H
+#endif
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

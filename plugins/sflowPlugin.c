@@ -18,6 +18,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+/* This plugin works only with threads */
+
 /* ******************************************************************
 
   -----------------------------------------------------------------------
@@ -106,6 +108,7 @@ static int threadActive;
 #endif
 
 static void initSflowInSocket(); /* forward */
+static void setPluginStatus(char * status); /* forward */
 
 /* ****************************** */
 
@@ -922,6 +925,12 @@ static void writePcapPacket(SFSample *sample) {
     }
   }
 
+#ifdef CFG_MULTITHREADED
+  /* Obviously, sflow won't work without multiple threads.
+   * We said so up front!
+   * this ifdef is just here so that we don't die when loading
+   * the plugin so we can warn you...
+   */
   /*
     Fix below courtesy of
     Neil McKee <neil_mckee@inmon.com>
@@ -929,6 +938,8 @@ static void writePcapPacket(SFSample *sample) {
   if(sample->headerProtocol == INMHEADER_ETHERNET_ISO8023)
     queuePacket((u_char*)myGlobals.sflowDeviceId,
 		&hdr, sample->header); /* Pass the packet to ntop */
+#endif
+
 }
 
 /*_________________---------------------------__________________
@@ -1896,7 +1907,6 @@ static void initSflowInSocket() {
   }
 
 #ifdef CFG_MULTITHREADED
-  /* This plugin works only with threads */
   if((!threadActive) && (myGlobals.sflowInSocket > 0))
     createThread(&sFlowThread, sFlowMainLoop, NULL);
 #endif
@@ -2092,13 +2102,19 @@ static void handleSflowPacket(u_char *_deviceId,
 
 /* ****************************** */
 
-static void initsFlowFunct(void) {
+static int initsFlowFunct(void) {
   char value[32];
   int a, b, c, d, a1, b1, c1, d1;
 
+  setPluginStatus(NULL);
+
 #ifdef CFG_MULTITHREADED
   threadActive = 0;
+#else
+  setPluginStatus("Disabled - requires POSIX thread support.");
+  return(-1);
 #endif
+
   myGlobals.sflowInSocket = 0, debug = 0;
   myGlobals.numSamplesReceived = 0,
     myGlobals.initialPool = 0,
@@ -2144,7 +2160,8 @@ static void initsFlowFunct(void) {
   if(myGlobals.sflowDeviceId != -1)
     myGlobals.device[myGlobals.sflowDeviceId].activeDevice = 1;
 
-    fflush(stdout);
+  fflush(stdout);
+  return(0);
 }
 
 /* ****************************** */
@@ -2180,7 +2197,8 @@ static PluginInfo sFlowPluginInfo[] = {
     termsFlowFunct,    /* TermFunc   */
     handleSflowPacket, /* PluginFunc */
     handlesFlowHTTPrequest,
-    "ip" /* no capture */
+    "ip", /* no capture */
+    NULL /* no status */
   }
 };
 
@@ -2198,3 +2216,15 @@ PluginInfo* sflowPluginEntryFctn(void)
 
   return(sFlowPluginInfo);
 }
+
+/* This must be here so it can access the struct PluginInfo, above */
+static void setPluginStatus(char * status)
+   {
+       if (sFlowPluginInfo->pluginStatusMessage != NULL)
+           free(sFlowPluginInfo->pluginStatusMessage);
+       if (status == NULL) {
+           sFlowPluginInfo->pluginStatusMessage = NULL;
+       } else {
+           sFlowPluginInfo->pluginStatusMessage = strdup(status);
+       }
+   }

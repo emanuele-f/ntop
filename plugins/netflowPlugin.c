@@ -18,6 +18,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+/* This plugin works only with threads */
+
 #include "ntop.h"
 #include "globals-report.h"
 
@@ -35,6 +37,7 @@ static void setNetFlowInSocket();
 static void setNetFlowOutSocket();
 static void setNetFlowInterfaceMatrix();
 static void freeNetFlowMatrixMemory();
+static void setPluginStatus(char * status);
 
 /* ****************************** */
 
@@ -495,12 +498,19 @@ static void* netflowMainLoop(void* notUsed _UNUSED_) {
 
 /* ****************************** */
 
-static void initNetFlowFunct(void) {
+static int initNetFlowFunct(void) {
   int i, a, b, c, d, a1, b1, c1, d1;
   char key[256], value[256];
 
+  setPluginStatus(NULL);
+
 #ifdef CFG_MULTITHREADED
   threadActive = 0;
+
+#else
+  /* This plugin works only with threads */
+  setPluginStatus("Disabled - requires POSIX thread support.");
+  return(-1);
 #endif
 
   if(fetchPrefsValue("netFlow.netFlowInPort", value, sizeof(value)) == -1)
@@ -558,6 +568,7 @@ static void initNetFlowFunct(void) {
     createThread(&netFlowThread, netflowMainLoop, NULL);
   }
 #endif
+  return(0);
 }
 
 /* ****************************** */
@@ -874,10 +885,11 @@ static PluginInfo netflowPluginInfo[] = {
 #endif
     handleNetflowHTTPrequest,
 #ifdef DEBUG_FLOWS
-    "udp and port 2055"
+    "udp and port 2055",
 #else
-    NULL  /* no capture */
+    NULL, /* no capture */
 #endif
+    NULL  /* no status */
   }
 };
 
@@ -895,3 +907,15 @@ PluginInfo* netflowPluginEntryFctn(void)
 
   return(netflowPluginInfo);
 }
+
+/* This must be here so it can access the struct PluginInfo, above */
+static void setPluginStatus(char * status)
+   {
+       if (netflowPluginInfo->pluginStatusMessage != NULL)
+           free(netflowPluginInfo->pluginStatusMessage);
+       if (status == NULL) {
+           netflowPluginInfo->pluginStatusMessage = NULL;
+       } else {
+           netflowPluginInfo->pluginStatusMessage = strdup(status);
+       }
+   }

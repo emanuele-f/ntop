@@ -25,6 +25,7 @@
 static void NotesURL(char *addr, char *ip_addr);
 static void addNotes(char *addr, char *PostNotes);
 static void deletelastSeenURL( char *addr );
+static void setPluginStatus(char * status);
 
 #define MY_NETWORK 16
 
@@ -416,7 +417,8 @@ static PluginInfo LsPluginInfo[] = {
     termLsFunct, /* TermFunc   */
     handleLsPacket, /* PluginFunc */
     handleLsHTTPrequest,
-    "ip" /* BPF filter: filter all the ICMP packets */
+    "ip", /* BPF filter: filter all the ICMP packets */
+    NULL /* no status */
   }
 };
   
@@ -439,7 +441,21 @@ PluginInfo* lsPluginEntryFctn(void) {
   if(LsDB == NULL) {
     traceEvent(CONST_TRACE_ERROR, 
 	       "Unable to open LsWatch database. This plugin will be disabled.\n");
+    setPluginStatus("Disabled - unable to open LsWatch database.");
     disabled = 1;
+  } else {
+    setPluginStatus(NULL);
   }
   return(LsPluginInfo);
 }
+
+static void setPluginStatus(char * status)
+   {
+       if (LsPluginInfo->pluginStatusMessage != NULL)
+           free(LsPluginInfo->pluginStatusMessage);
+       if (status == NULL) {
+           LsPluginInfo->pluginStatusMessage = NULL;
+       } else {
+           LsPluginInfo->pluginStatusMessage = strdup(status);
+       }
+   }

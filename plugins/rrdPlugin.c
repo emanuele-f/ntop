@@ -18,6 +18,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+/* This plugin works only with threads */
+
 /*
 
        Plugin History
@@ -29,6 +31,8 @@
        2.0     Rolled major version due to new interface parameter.
        2.1     Added tests/creates for rrd and subdirectories, fixed timer,
                --reuse-rrd-graphics etc.
+       2.1.1   Fixed hosts / interface bug (Luca)
+       2.1.2   Added status message
 
    Remember, there are TWO paths into this - one is through the main loop,
    if the plugin is active, the other is through the http function if the 
@@ -48,6 +52,8 @@ static const char *rrd_subdirs[] =
 
 #include <dirent.h>
 
+static void setPluginStatus(char * status);
+ 
 #ifdef WIN32
 int optind, opterr;
 #endif
@@ -1461,21 +1467,29 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 
 /* ****************************** */
 
-static void initRRDfunct(void) {
+static int initRRDfunct(void) {
   char dname[256];
   int i;
 
   traceEvent(CONST_TRACE_INFO, "Welcome to the RRD plugin...");
+  setPluginStatus(NULL);
 
   if(myGlobals.rrdPath == NULL)
     commonRRDinit();
+
+#ifndef CFG_MULTITHREADED
+  /* This plugin works only with threads */
+  setPluginStatus("Disabled - requires POSIX thread support."); 
+  return(-1);
+#endif
 
   sprintf(dname, "%s", myGlobals.rrdPath);
   if (_mkdir(dname) == -1) { 
     if (errno != EEXIST) {
       traceEvent(CONST_TRACE_ERROR, "RRD: ERROR: Disabled - unable to create base directory (err %d, %s)\n", errno, dname);
+      setPluginStatus("Disabled - unable to create rrd base directory."); 
       /* Return w/o creating the rrd thread ... disabled */
-      return;
+      return(-1);
     }
   } else {
     traceEvent(CONST_TRACE_INFO, "RRD: Created base directory (%s)\n", dname);
@@ -1487,8 +1501,9 @@ static void initRRDfunct(void) {
     if (_mkdir(dname) == -1) {
       if (errno != EEXIST) {
 	traceEvent(CONST_TRACE_ERROR, "RRD: Disabled - unable to create directory (err %d, %s)\n", errno, dname);
+        setPluginStatus("Disabled - unable to create rrd subdirectory."); 
 	/* Return w/o creating the rrd thread ... disabled */
-	return;
+	return(-1);
       }
     } else {
       traceEvent(CONST_TRACE_INFO, "RRD: Note: Created directory (%s)\n", dname);
@@ -1496,13 +1511,13 @@ static void initRRDfunct(void) {
   } 
 
 #ifdef CFG_MULTITHREADED
-  /* This plugin works only with threads */
   createThread(&rrdThread, rrdMainLoop, NULL);
   traceEvent(CONST_TRACE_INFO, "RRD: Started thread (%ld) for data collection.", rrdThread);
 #endif
 
   fflush(stdout);
   numTotalRRDs = 0;
+  return(0);
 }
 
 /* ****************************** */
@@ -1537,7 +1552,7 @@ static PluginInfo rrdPluginInfo[] = {
     "This plugin is used to setup, activate and deactivate ntop's rrd support.<br>"
     "This plugin also produces the graphs of rrd data, available via a "
     "link from the various 'Info about host xxxxx' reports.",
-    "2.1.1", /* version */
+    "2.1.2", /* version */
     "<A HREF=http://luca.ntop.org/>L.Deri</A>",
     "rrdPlugin", /* http://<host>:<port>/plugins/rrdPlugin */
     1, /* Active by default */ 
@@ -1546,7 +1561,8 @@ static PluginInfo rrdPluginInfo[] = {
     termRRDfunct, /* TermFunc   */
     NULL, /* PluginFunc */
     handleRRDHTTPrequest,
-    NULL /* no capture */
+    NULL, /* no capture */
+    NULL /* no status */
   }
 };
 
@@ -1565,4 +1581,14 @@ static PluginInfo rrdPluginInfo[] = {
      return(rrdPluginInfo);
    }
  
- 
+/* This must be here so it can access the struct PluginInfo, above */
+static void setPluginStatus(char * status)
+   {
+       if (rrdPluginInfo->pluginStatusMessage != NULL)
+           free(rrdPluginInfo->pluginStatusMessage);
+       if (status == NULL) {
+           rrdPluginInfo->pluginStatusMessage = NULL;
+       } else {
+           rrdPluginInfo->pluginStatusMessage = strdup(status);
+       }
+   } 

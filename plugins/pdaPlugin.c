@@ -304,7 +304,8 @@ static PluginInfo PDAPluginInfo[] = {
     termPdaFunct,     /* TermFunc   */
     NULL,             /* PluginFunc */
     handlePDArequest, /* http request handler */
-    NULL              /* BPF Filter */
+    NULL,             /* BPF Filter */
+    NULL              /* no status */
   }
 };
 

@@ -286,8 +286,8 @@ static void handlePDArequest(char* url) {
 /* ****************************** */
 
 static void termPdaFunct(void) {
-  traceEvent(CONST_TRACE_INFO, "Thanks for using PDAWatch...\n");
-  traceEvent(CONST_TRACE_INFO, "Done.\n");
+  traceEvent(CONST_TRACE_INFO, "PDA: Thanks for using PDAWatch");
+  traceEvent(CONST_TRACE_INFO, "PDA: Done");
 }
 
 /* ****************************** */
@@ -316,7 +316,7 @@ PluginInfo* wapPluginEntryFctn(void)
   PluginInfo* PluginEntryFctn(void)
 #endif
 {
-  traceEvent(CONST_TRACE_INFO, "Welcome to %s. (C) 2001-2002 by L.Deri and W.Brock",  
+  traceEvent(CONST_TRACE_INFO, "PDA: Welcome to %s. (C) 2001-2002 by L.Deri and W.Brock",  
 	     PDAPluginInfo->pluginName);
   
   return(PDAPluginInfo);

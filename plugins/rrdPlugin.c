@@ -433,7 +433,7 @@ void graphCounter(char *rrdPath, char *rrdName, char *rrdTitle,
 
     if (rc != 0) {
       if (errno != ENOENT)
-	traceEvent(CONST_TRACE_INFO, "RRD: stat('%s') failed, %d...\n", fname, errno);
+	traceEvent(CONST_TRACE_INFO, "RRD: ERROR: stat('%s') failed, %d", fname, errno);
       reusebuf.st_mtime = 0;
     }
 
@@ -564,7 +564,7 @@ static void updateRRD(char *hostPath, char *key, Counter value, int isCounter) {
     rc = rrd_create(argc, argv);
 
     if (rrd_test_error()) {
-      traceEvent(CONST_TRACE_WARNING, "RRD: rrd_create(%s) error: %s\n", 
+      traceEvent(CONST_TRACE_WARNING, "RRD: WARNING: rrd_create(%s) error: %s", 
 		 path, rrd_get_error());
       rrd_clear_error();
       numRRDerrors++;
@@ -635,12 +635,12 @@ static void updateRRD(char *hostPath, char *key, Counter value, int isCounter) {
     int x;
 
     numRRDerrors++;
-    traceEvent(CONST_TRACE_WARNING, "RRD: rrd_update(%s) error: %s\n", path, rrd_get_error());
+    traceEvent(CONST_TRACE_WARNING, "RRD: WARNING: rrd_update(%s) error: %s", path, rrd_get_error());
     rrd_clear_error();
 
-    traceEvent(CONST_TRACE_INFO, "RRD call stack (counter created: %d):", createdCounter);
+    traceEvent(CONST_TRACE_INFO, "RRD: call stack (counter created: %d):", createdCounter);
     for	(x = 0; x < argc; x++)
-      traceEvent(CONST_TRACE_INFO, "argv[%d]: %s", x, argv[x]);
+      traceEvent(CONST_TRACE_INFO, "RRD:   argv[%d]: %s", x, argv[x]);
   }
 
 #if RRD_DEBUG > 0
@@ -1450,7 +1450,7 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 		 purgeCountErrors);
 #endif
     } else {
-      traceEvent(CONST_TRACE_ERROR, "RRD: Unable to opendir(%s), errno=%d\n", rrdPath, errno);
+      traceEvent(CONST_TRACE_ERROR, "RRD: ERROR: Unable to opendir(%s), errno=%d", rrdPath, errno);
     }
   }
 
@@ -1471,7 +1471,7 @@ static int initRRDfunct(void) {
   char dname[256];
   int i;
 
-  traceEvent(CONST_TRACE_INFO, "Welcome to the RRD plugin...");
+  traceEvent(CONST_TRACE_INFO, "RRD: Welcome to the RRD plugin");
   setPluginStatus(NULL);
 
   if(myGlobals.rrdPath == NULL)

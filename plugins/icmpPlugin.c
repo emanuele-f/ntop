@@ -466,7 +466,7 @@ PluginInfo* icmpPluginEntryFctn(void) {
 #else
   PluginInfo* PluginEntryFctn(void) {
 #endif
-    traceEvent(CONST_TRACE_INFO, "Welcome to %s. (C) 1999 by Luca Deri.\n",
+    traceEvent(CONST_TRACE_INFO, "ICMP: Welcome to %s. (C) 1999 by Luca Deri",
 	       icmpPluginInfo->pluginName);
     
     return(icmpPluginInfo);

@@ -334,7 +334,7 @@ static void deletelastSeenURL( char *addr ) {
 }
 
 static void termLsFunct(void) {
-  traceEvent(CONST_TRACE_INFO, "Thanks for using LsWatch..."); fflush(stdout);
+  traceEvent(CONST_TRACE_INFO, "LASTSEEN: Thanks for using LsWatch"); fflush(stdout);
     
   if(LsDB != NULL) {
     gdbm_close(LsDB);
@@ -342,7 +342,7 @@ static void termLsFunct(void) {
     LsDB = NULL;
   }
 
-  traceEvent(CONST_TRACE_INFO, "Done.\n"); fflush(stdout);
+  traceEvent(CONST_TRACE_INFO, "LASTSEEN: Done"); fflush(stdout);
 }
 
 
@@ -375,7 +375,7 @@ PluginInfo* lsPluginEntryFctn(void) {
 #endif
   char tmpBuf[200];
 
-  traceEvent(CONST_TRACE_INFO, "Welcome to %s. (C) 1999 by Andrea Marangoni.\n", 
+  traceEvent(CONST_TRACE_INFO, "LASTSEEN: Welcome to %s. (C) 1999 by Andrea Marangoni", 
 	     LsPluginInfo->pluginName);
   
   /* Fix courtesy of Ralf Amandi <Ralf.Amandi@accordata.net> */
@@ -385,7 +385,7 @@ PluginInfo* lsPluginEntryFctn(void) {
 
   if(LsDB == NULL) {
     traceEvent(CONST_TRACE_ERROR, 
-	       "Unable to open LsWatch database. This plugin will be disabled.\n");
+               "LASTSEEN: ERROR: Unable to open LsWatch database -  the plugin will be disabled");
     setPluginStatus("Disabled - unable to open LsWatch database.");
     disabled = 1;
   } else {

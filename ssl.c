@@ -96,8 +96,6 @@ int init_ssl(void) {
     RAND_add(configure_parameters, strlen(configure_parameters), (double)4.0);
 
     gettimeofday(&TOD, NULL);
-               long tv_sec;        /* seconds */
-               long tv_usec;  /* microseconds */
     if(snprintf(buf, sizeof(buf), "%d%u%u%x%x%x", 
                     getpid(),
                     TOD.tv_sec,

@@ -607,9 +607,9 @@ AC_CHECK_LIB(c, backtrace, AC_DEFINE(HAVE_BACKTRACE))
 dnl>
 dnl> check for `crypt' in -lcrypt (MANDATORY)
 dnl>
-AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(c, crypt, ,
-  [AC_CHECK_LIB(crypt, crypt, MORELIBS="$MORELIBS -lcrypt",
-    AC_MSG_ERROR(you need the crypt library to build ntop), $MORELIBS)]))
+AC_CHECK_LIB(crypt, crypt, , [
+    echo "ERROR: You need libcrypt to build ntop. Verify that you have libcrypt.a or libcrypt.so installed.";
+    AC_MSG_ERROR([Fatal: libcrypt not found.])], $MORELIBS)
 
 AC_CHECK_LIB(kstat, kstat_lookup)
 AC_CHECK_LIB(c, getopt_long, AC_DEFINE(HAVE_GETOPT_LONG))
@@ -618,13 +618,12 @@ dnl>
 dnl> GDChart uses functions from math library,
 dnl> so make sure we link against the math library if needed
 dnl>
-dnl> check for `sin' in -lm (MANDATORY)
+dnl> check for `sin' in -lm or -lc (MANDATORY)
+dnl> check for `ceil' in -lm or -lc (MANDATORY)
 dnl>
 if test ".$ac_disable_gdchart" = ".no"; then
-AC_CHECK_LIB(c, sin,  AC_MSG_CHECKING([The standard C library includes the math lib]),
-  AC_CHECK_LIB(m, sin, MORELIBS="$MORELIBS -lm", [
-echo "ERROR: You need libm to build ntop with GDChart support. Verify that you have libm.a or libm.so installed.";
-             AC_MSG_ERROR([Fatal: libm not found.])], $MORELIBS))
+  AC_CHECK_LIB(c, sin, ,  [AC_CHECK_LIB(m, sin,  , AC_MSG_ERROR([Fatal: sin() not found.]), $MORELIBS)], $MORELIBS)
+  AC_CHECK_LIB(c, ceil, , [AC_CHECK_LIB(m, ceil, , AC_MSG_ERROR([Fatal: ceil() not found.]), $MORELIBS)], $MORELIBS)
 fi
 
 dnl>

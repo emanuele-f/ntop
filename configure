@@ -1423,7 +1423,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-SCRIPTVER="v1.107-2003-03-29"
+SCRIPTVER="v1.108-2003-03-30"
 
 umask 002
 # Add the stamp file to the list of files AC keeps track of,
@@ -3881,7 +3881,7 @@ case "${target}:${CC}" in
 
     *-*-freebsd[45]*:*gcc* )
         VERIFIED1="2.1.90:2003-03-28:Burton Strauss <burton@ntopsupport.com>:FreeBSD-4.6.2-RELEASE"
-        VERIFIED2="2.1.51:2002-10-25:Stanley Hopcroft <anwsmh@IPAustralia.Gov.AU>:4.7-RELEASE"
+        VERIFIED2="2.1.90:2003-03-18:Stanley Hopcroft <anwsmh@IPAustralia.Gov.AU>:4.7-RELEASE-p7"
         VERIFIED3="2.1.90:2003-03-28:Burton Strauss <burton@ntopsupport.com>:5.0-RELEASE"
         DEFINEOS="FREEBSD";   STATUS="SUPPORTED"
         if test ".${LOCALEDIR}" = "."; then

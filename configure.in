@@ -620,7 +620,7 @@ case "${target}:${CC}" in
       ;;
 
     *-*-linux*:*gcc* )
-        VERIFIED1="2.1.51:2002-11-24:Burton Strauss <burton@ntopsupport.com>:RedHat 7.2, 7.3 and 8.0"
+        VERIFIED1="2.1.90:2003-03-28:Burton Strauss <burton@ntopsupport.com>:RedHat AS2.1, 7.3 and 8.0"
         VERIFIED2="2.1.51:2002-10-24:Peter Sinoros-Szabo Peter <sini@cs.bme.hu>:Suse i686, 2.4.18-4GB-SMP"
         DEFINEOS="LINUX";     STATUS="SUPPORTED"
       ;;
@@ -647,7 +647,7 @@ case "${target}:${CC}" in
 
     *-*-darwin*:* )
         VERIFIED1="2.1.51:2002-10-21:Burton Strauss <burton@ntopsupport.com>:MAC OS X 10.1 (Darwin)"
-        VERIFIED2="2.1.51:2002-10-22:Luca Deri:MAC OS X 10.2 (Jaguar)"
+        VERIFIED2="2.1.90:2003-03-28:Luca Deri:MAC OS X 10.2 (Jaguar)"
         NOTE1="'Darwin 5.5' is the kernel of the os known as MAC OS X 10.1"
         NOTE2="'Darwin 6.1' is the kernel of the os known as MAC OS X 10.2 (Jaguar)"
         DEFINEOS="DARWIN";    STATUS="SUPPORTED"
@@ -656,9 +656,9 @@ case "${target}:${CC}" in
       ;;
 
     *-*-freebsd[[45]]*:*gcc* )
-        VERIFIED1="2.1.51:2002-10-21:Burton Strauss <burton@ntopsupport.com>:FreeBSD-4.6.2-RELEASE"
+        VERIFIED1="2.1.90:2003-03-28:Burton Strauss <burton@ntopsupport.com>:FreeBSD-4.6.2-RELEASE"
         VERIFIED2="2.1.51:2002-10-25:Stanley Hopcroft <anwsmh@IPAustralia.Gov.AU>:4.7-RELEASE"
-        VERIFIED3="2.1.55:2003-01-19:Burton Strauss <burton@ntopsupport.com>:5.0-RELEASE"
+        VERIFIED3="2.1.90:2003-03-28:Burton Strauss <burton@ntopsupport.com>:5.0-RELEASE"
         DEFINEOS="FREEBSD";   STATUS="SUPPORTED"
         if test ".${LOCALEDIR}" = "."; then
             LOCALEDIR="/usr/share/locale"

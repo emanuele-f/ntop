@@ -178,7 +178,7 @@ xmldump.c: xml_*.inc globals-structtypes.h
 
 xml_*.inc: globals-structtypes.h
 	@echo "Processing globals-structtypes.h to make xml_*.inc..."
-	@awk -f utils/xmldump.awk globals-structtypes.h
+	@@AWK@ -f utils/xmldump.awk globals-structtypes.h
 
 .PHONY: snapshot
 
@@ -226,7 +226,7 @@ faq.html: docs/FAQ
 	@echo "-----------------------------------------------"
 	@echo "Converting $< to HTML format  .... Please wait"
 	@echo ""
-	@awk -f utils/faqtohtml.awk $< | sed 's/_//g' | sed 's/[ -~]//g' > html/faq.html
+	@@AWK@ -f utils/faqtohtml.awk $< | sed 's/_//g' | sed 's/[ -~]//g' > html/faq.html
 	@cp -f html/faq.html faq.html
 	@echo "$@ done !"
 	@echo "-----------------------------------------------"

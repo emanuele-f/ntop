@@ -1518,7 +1518,7 @@ done
 
 
 echo "  Checking automake version..."
-automakeversion=`automake --version | grep ^automake | awk '{ print $4 }'`
+automakeversion=`automake --version | grep ^automake | ${ac_cv_prog_AWK} '{ print $4 }'`
 case "${automakeversion}" in
     *1\.[0-5]*)
         echo "*******************************************************************"

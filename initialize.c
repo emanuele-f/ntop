@@ -1420,11 +1420,27 @@ void initLibpcap(void) {
 	myGlobals.device[i].netmask.s_addr = 0xFFFFFF00; /* dummy */
       }
 
-      myGlobals.device[i].numHosts = 0xFFFFFFFF - myGlobals.device[i].netmask.s_addr + 1 
-	+ 4096 /* Max 4096 hosts used for multicast */;
+      if ( (myGlobals.device[i].network.s_addr == 0) &&
+           (myGlobals.device[i].netmask.s_addr == 0xFFFFFFFF) ) { /* Unnumbered interface... */
+          myGlobals.device[i].numHosts = MAX_SUBNET_HOSTS;
+      } else {
+          myGlobals.device[i].numHosts = 0xFFFFFFFF - myGlobals.device[i].netmask.s_addr + 1;
+
+          /* Add some room for multicast hosts in the ipTrafficMatrix
+           * This is an arbitrary guess.
+           * We use the log function to limit growth for large networks, while the factor of 50
+           * is designed to ensure a certain minimal # even for smaller networks 
+           */
+          myGlobals.device[i].numHosts +=
+            ceil(log((double)(0xFFFFFFFF - myGlobals.device[i].netmask.s_addr + 1))+1.0)*50;
+      }
+
       if(myGlobals.device[i].numHosts > MAX_SUBNET_HOSTS) {
 	myGlobals.device[i].numHosts = MAX_SUBNET_HOSTS;
 	traceEvent(CONST_TRACE_WARNING, "INIT: WARNING: Truncated network size (device %s) to %d hosts (real netmask %s)",
+		   myGlobals.device[i].name, myGlobals.device[i].numHosts, intoa(myGlobals.device[i].netmask));
+      } else {
+	traceEvent(CONST_TRACE_WARNING, "INIT: Network size (device %s) is %d hosts (netmask %s)",
 		   myGlobals.device[i].name, myGlobals.device[i].numHosts, intoa(myGlobals.device[i].netmask));
       }
 

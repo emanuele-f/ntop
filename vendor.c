@@ -334,9 +334,7 @@ char* getMACInfo(int special, u_char* ethAddress, short encodeString) {
     return("LAA (Locally assigned address)");
   }
 
-#ifdef VENDOR_DEBUG
-  traceEvent(CONST_TRACE_INFO, "VENDOR_DEBUG: returning NOT FOUND\n");
-#endif
+  traceEvent(CONST_TRACE_NOISY, "MAC prefix '%s' not found in vendor database", tmpBuf);
 
   return("");
 }

@@ -1781,8 +1781,11 @@ XML*/
   TransactionTime transTimeHash[CONST_NUM_TRANSACTION_ENTRIES];
 
   u_char dummyEthAddress[LEN_ETHERNET_ADDRESS];
-  u_short *mtuSize;
-  u_short *headerSize;
+  u_short *mtuSize, *headerSize;
+
+  /* (Pseudo) Local Networks */
+  u_int32_t localNetworks[MAX_NUM_NETWORKS][3]; /* [0]=network, [1]=mask, [2]=broadcast */
+  u_short numLocalNetworks;
 
 #ifdef MEMORY_DEBUG
   size_t allocatedMemory;

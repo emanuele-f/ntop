@@ -37,7 +37,7 @@ u_int computeInitialHashIdx(struct in_addr *hostIpAddress,
      || ((ether_addr == NULL)
 	 && (hostIpAddress != NULL))) {
     if(myGlobals.trackOnlyLocalHosts
-       && (!isLocalAddress(hostIpAddress))
+       && (!isLocalAddress(hostIpAddress, actualDeviceId))
        && (!_pseudoLocalAddress(hostIpAddress)))
       idx = myGlobals.otherHostEntryIdx;
     else
@@ -63,12 +63,12 @@ u_int computeInitialHashIdx(struct in_addr *hostIpAddress,
   } else if(isBroadcastAddress(hostIpAddress)) {
     idx = myGlobals.broadcastEntryIdx;
     (*useIPAddressForSearching) = 1;
-  } else if(isPseudoLocalAddress(hostIpAddress)) {
+  } else if(isPseudoLocalAddress(hostIpAddress, actualDeviceId)) {
     memcpy(&idx, &ether_addr[LEN_ETHERNET_ADDRESS-sizeof(u_int)], sizeof(u_int));
     (*useIPAddressForSearching) = 0;
   } else {
     if(hostIpAddress != NULL) {
-      if(myGlobals.trackOnlyLocalHosts && (!isPseudoLocalAddress(hostIpAddress)))
+      if(myGlobals.trackOnlyLocalHosts && (!isPseudoLocalAddress(hostIpAddress, actualDeviceId)))
 	idx = myGlobals.otherHostEntryIdx;
       else
 	memcpy(&idx, &hostIpAddress->s_addr, 4);
@@ -862,7 +862,7 @@ u_int getHostInfo(struct in_addr *hostIpAddress,
       if(ether_addr != NULL) {
 	if((hostIpAddress == NULL)
 	   || ((hostIpAddress != NULL)
-	       && isPseudoLocalAddress(hostIpAddress)
+	       && isPseudoLocalAddress(hostIpAddress, actualDeviceId)
 	       /* && (!isBroadcastAddress(hostIpAddress))*/
 	       )) {
 	  /* This is a local address and then the
@@ -885,7 +885,7 @@ u_int getHostInfo(struct in_addr *hostIpAddress,
 	  if(isPrivateAddress(hostIpAddress)) FD_SET(FLAG_PRIVATE_IP_ADDRESS, &el->flags);
 
 	  if(!isBroadcastAddress(hostIpAddress)) {
-	    if(isPseudoLocalAddress(hostIpAddress))
+	    if(isPseudoLocalAddress(hostIpAddress, actualDeviceId))
 	      FD_SET(FLAG_SUBNET_PSEUDO_LOCALHOST, &el->flags);
 	    else
 	      FD_CLR(FLAG_SUBNET_PSEUDO_LOCALHOST, &el->flags);
@@ -948,7 +948,7 @@ u_int getHostInfo(struct in_addr *hostIpAddress,
 	if(isBroadcastAddress(&el->hostIpAddress)) FD_SET(FLAG_BROADCAST_HOST, &el->flags);
 	if(isMulticastAddress(&el->hostIpAddress)) FD_SET(FLAG_MULTICAST_HOST, &el->flags);
 	if(isPrivateAddress(hostIpAddress))        FD_SET(FLAG_PRIVATE_IP_ADDRESS,  &el->flags);
-	if((ether_addr == NULL) && (isPseudoLocalAddress(hostIpAddress)))
+	if((ether_addr == NULL) && (isPseudoLocalAddress(hostIpAddress, actualDeviceId)))
 	  FD_SET(FLAG_SUBNET_PSEUDO_LOCALHOST, &el->flags);
 
 	/* Trick to fill up the address cache */

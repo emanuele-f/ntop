@@ -51,8 +51,15 @@ static void handleLsPacket(u_char *_deviceId _UNUSED_,
   char tmpStr[32];
   LsHostInfo HostI;
   unsigned short rc;
+  u_int deviceId;
 
   if ( disabled ) return;
+
+#ifdef WIN32
+    deviceId = 0;
+#else
+    deviceId = (u_int)_deviceId;
+#endif
 
   ep = (struct ether_header *)p;
   memcpy(&ip, (p+sizeof(struct ether_header)), sizeof(struct ip));
@@ -64,7 +71,7 @@ static void handleLsPacket(u_char *_deviceId _UNUSED_,
   traceEvent(CONST_TRACE_INFO, "->%s [%x]\n", intoa(ip.ip_dst), ip.ip_dst.s_addr);
 #endif
 
-  rc = isPseudoLocalAddress(&ip.ip_src);
+  rc = isPseudoLocalAddress(&ip.ip_src, deviceId);
 
   if(rc == 0) 
     return;
@@ -417,7 +424,7 @@ static PluginInfo LsPluginInfo[] = {
 #ifdef STATIC_PLUGIN
 PluginInfo* lsPluginEntryFctn(void) {
 #else
-PluginInfo* PluginEntryFctn(void) {
+  PluginInfo* PluginEntryFctn(void) {
 #endif
   char tmpBuf[200];
 

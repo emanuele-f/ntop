@@ -36,14 +36,11 @@ static pthread_mutex_t stateChangeMutex;
 
 
 static SessionInfo *passiveSessions;
-static u_short numLocalNets=0, passiveSessionsLen;
-
-/* [0]=network, [1]=mask, [2]=broadcast */
-static u_int32_t networks[MAX_NUM_NETWORKS][3];
+static u_short passiveSessionsLen;
 
 /* ************************************ */
 
-u_int findHostIdxByNumIP(struct in_addr hostIpAddress, int actualDeviceId) {
+u_int findHostIdxByNumIP(struct in_addr hostIpAddress, u_int actualDeviceId) {
   u_int idx;
 
   for(idx=1; idx<myGlobals.device[actualDeviceId].actualHashSize; idx++)
@@ -57,7 +54,7 @@ u_int findHostIdxByNumIP(struct in_addr hostIpAddress, int actualDeviceId) {
 
 /* ************************************ */
 
-HostTraffic* findHostByNumIP(char* numIPaddr, int actualDeviceId) {
+HostTraffic* findHostByNumIP(char* numIPaddr, u_int actualDeviceId) {
   u_int idx;
 
   for(idx=1; idx<myGlobals.device[actualDeviceId].actualHashSize; idx++)
@@ -71,7 +68,7 @@ HostTraffic* findHostByNumIP(char* numIPaddr, int actualDeviceId) {
 
 /* ************************************ */
 
-HostTraffic* findHostByMAC(char* macAddr, int actualDeviceId) {
+HostTraffic* findHostByMAC(char* macAddr, u_int actualDeviceId) {
   u_int idx;
 
   for(idx=1; idx<myGlobals.device[actualDeviceId].actualHashSize; idx++)
@@ -164,11 +161,16 @@ unsigned short isMulticastAddress(struct in_addr *addr) {
 
 /* ********************************* */
 
-unsigned short isLocalAddress(struct in_addr *addr) {
+unsigned short isLocalAddress(struct in_addr *addr, u_int deviceId) {
   int i;
 
-  for(i=0; i<myGlobals.numDevices; i++)
-    if((addr->s_addr & myGlobals.device[i].netmask.s_addr) == myGlobals.device[i].network.s_addr) {
+  if(deviceId >= myGlobals.numDevices) {
+    traceEvent(CONST_TRACE_WARNING, "WARNING: Index %u out of range [0..%u]",
+	       deviceId, myGlobals.numDevices); 
+    return(0);
+  }
+
+    if((addr->s_addr & myGlobals.device[deviceId].netmask.s_addr) == myGlobals.device[deviceId].network.s_addr) {
 #ifdef ADDRESS_DEBUG
       traceEvent(CONST_TRACE_INFO, "ADDRESS_DEBUG: %s is local\n", intoa(*addr));
 #endif
@@ -180,7 +182,7 @@ unsigned short isLocalAddress(struct in_addr *addr) {
 
 #ifdef DEBUG
   traceEvent(CONST_TRACE_INFO, "DEBUG: %s is %s\n", intoa(*addr),
-	     isLocalAddress (addr) ? "pseudolocal" : "remote");
+	     isLocalAddress(addr) ? "pseudolocal" : "remote");
 #endif
   /* Broadcast is considered a local address */
   return(isBroadcastAddress(addr));
@@ -484,7 +486,7 @@ void handleLocalAddresses(char* addresses) {
 
   localAddresses[0] = '\0';
 
-  handleAddressLists(addresses, networks, &numLocalNets,
+  handleAddressLists(addresses, myGlobals.localNetworks, &myGlobals.numLocalNetworks,
 		     localAddresses, sizeof(localAddresses));
 
   /* Not used anymore */
@@ -530,12 +532,12 @@ unsigned short __pseudoLocalAddress(struct in_addr *addr,
 /* ********************************* */
 
 unsigned short _pseudoLocalAddress(struct in_addr *addr) {
-  return(__pseudoLocalAddress(addr, networks, numLocalNets));
+  return(__pseudoLocalAddress(addr, myGlobals.localNetworks, myGlobals.numLocalNetworks));
 }
 
 /* ********************************* */
 
-unsigned short deviceLocalAddress(struct in_addr *addr, int deviceId) {
+unsigned short deviceLocalAddress(struct in_addr *addr, u_int deviceId) {
   int rc;
 
   if((addr->s_addr & myGlobals.device[deviceId].netmask.s_addr) == myGlobals.device[deviceId].network.s_addr)
@@ -559,10 +561,10 @@ unsigned short deviceLocalAddress(struct in_addr *addr, int deviceId) {
 
 /* This function returns true when a host is considered local
    as specified using the 'm' flag */
-unsigned short isPseudoLocalAddress(struct in_addr *addr) {
+unsigned short isPseudoLocalAddress(struct in_addr *addr, u_int deviceId) {
   int i;
 
-  i = isLocalAddress(addr);
+  i = isLocalAddress(addr, deviceId);
 
   if(i == 1) {
 #ifdef ADDRESS_DEBUG
@@ -599,8 +601,8 @@ unsigned short isPseudoBroadcastAddress(struct in_addr *addr) {
   traceEvent(CONST_TRACE_WARNING, "DEBUG: Checking %8X (pseudo broadcast)\n", addr->s_addr);
 #endif
 
-  for(i=0; i<numLocalNets; i++) {
-    if(addr->s_addr == networks[i][CONST_BROADCAST_ENTRY]) {
+  for(i=0; i<myGlobals.numLocalNetworks; i++) {
+    if(addr->s_addr == myGlobals.localNetworks[i][CONST_BROADCAST_ENTRY]) {
 #ifdef ADDRESS_DEBUG
       traceEvent(CONST_TRACE_WARNING, "ADDRESS_DEBUG: --> %8X is pseudo broadcast\n", addr->s_addr);
 #endif
@@ -608,7 +610,8 @@ unsigned short isPseudoBroadcastAddress(struct in_addr *addr) {
     }
 #ifdef ADDRESS_DEBUG
     else
-      traceEvent(CONST_TRACE_WARNING, "ADDRESS_DEBUG: %8X/%8X is NOT pseudo broadcast\n", addr->s_addr, networks[i][CONST_BROADCAST_ENTRY]);
+      traceEvent(CONST_TRACE_WARNING, "ADDRESS_DEBUG: %8X/%8X is NOT pseudo broadcast\n", 
+		 addr->s_addr, networks[i][CONST_BROADCAST_ENTRY]);
 #endif
   }
 
@@ -1812,7 +1815,7 @@ char* formatTime(time_t *theTime, short encodeString) {
 
 /* ************************************ */
 
-int getActualInterface(int deviceId) {
+int getActualInterface(u_int deviceId) {
   if(myGlobals.mergeInterfaces)
     return(0);
   else
@@ -3157,7 +3160,7 @@ void allocateElementHash(int deviceId, u_short hashType) {
 
 /* *************************************************** */
 
-u_int numActiveSenders(int deviceId) {
+u_int numActiveSenders(u_int deviceId) {
   u_int numSenders = 0;
   int i;
 

@@ -2446,6 +2446,38 @@ void printNtopConfigInfo(int textPrintFlag) {
     BufferTooShort();
   printFeatureConfigInfo(textPrintFlag, "Total Hash Collisions (Vendor/Special) (lookup)", buf);
 
+  /* ******************** */
+  buf[0] = '\0';
+  for(i=0; i<myGlobals.numLocalNetworks; i++) {
+    struct in_addr addr1, addr2;
+    char buf1[64];
+    
+    addr1.s_addr = myGlobals.localNetworks[i][CONST_NETWORK_ENTRY];
+    addr2.s_addr = myGlobals.localNetworks[i][CONST_NETMASK_ENTRY];
+    
+    if(snprintf(buf1, sizeof(buf1), "%s/%s [all devices]\n", 
+		_intoa(addr1, buf1, sizeof(buf1)),
+		_intoa(addr2, buf2, sizeof(buf2))) < 0) BufferTooShort();
+    
+    strcat(buf, buf1);
+  }
+  
+  for(i=0; i<myGlobals.numDevices; i++) {
+    if(myGlobals.device[i].activeDevice) {
+      char buf1[128], buf3[64];
+      if(snprintf(buf1, sizeof(buf1), "%s/%s [device %s]\n",
+		  _intoa(myGlobals.device[i].network, buf2, sizeof(buf2)),
+		  _intoa(myGlobals.device[i].netmask, buf3, sizeof(buf3)),
+		  myGlobals.device[i].humanFriendlyName) < 0)
+	BufferTooShort();   
+      strcat(buf, buf1);
+    }
+  }
+  
+  printFeatureConfigInfo(textPrintFlag, "Local Networks", buf);
+
+
+
 #if defined(HAVE_MALLINFO_MALLOC_H) && defined(HAVE_MALLOC_H) && defined(__GNUC__)
   {
     struct mallinfo memStats;

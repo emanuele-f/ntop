@@ -229,7 +229,6 @@ extern void* cleanupExpiredHostEntriesLoop(void*);
 /* pbuf.c */
 extern void updatePacketCount(HostTraffic *srcHost, HostTraffic *dstHost,
 			      TrafficCounter length, int actualDeviceId);
-extern u_int findHostIdxByNumIP(struct in_addr hostIpAddress, int actualDeviceId);
 extern u_int getHostInfo(struct in_addr *hostIpAddress, u_char *ether_addr, 
 			 u_char checkForMultihoming,
 			 u_char forceUsingIPaddress, int actualDeviceId);
@@ -297,6 +296,7 @@ extern int isInitialFtpData(char* packetData);
 extern void updateDeviceThpt(int deviceToUpdate);
 
 /* util.c */
+extern u_int findHostIdxByNumIP(struct in_addr hostIpAddress, u_int actualDeviceId);
 extern void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS][3],
 				u_short *numNetworks, char *localAddresses, 
 				int localAddressesLen);
@@ -305,21 +305,22 @@ extern void initPassiveSessions();
 extern void termPassiveSessions();
 extern void incrementTrafficCounter(TrafficCounter *ctr, Counter value);
 extern void resetTrafficCounter(TrafficCounter *ctr);
-extern HostTraffic* findHostByNumIP(char* numIPaddr, int actualDeviceId);
-extern HostTraffic* findHostByMAC(char* macAddr, int actualDeviceId);
+extern HostTraffic* findHostByNumIP(char* numIPaddr, u_int actualDeviceId);
+extern HostTraffic* findHostByMAC(char* macAddr, u_int actualDeviceId);
 extern char* copy_argv(register char **argv);
 extern unsigned short isPrivateAddress(struct in_addr *addr);
 extern unsigned short isBroadcastAddress(struct in_addr *addr);
 extern unsigned short isMulticastAddress(struct in_addr *addr);
-extern unsigned short isLocalAddress(struct in_addr *addr);
+extern unsigned short isLocalAddress(struct in_addr *addr, u_int actualDeviceId);
 extern int dotted2bits(char *mask);
+extern void handleFlowsSpecs();
 extern void handleLocalAddresses(char* addresses);
-extern unsigned short isPseudoLocalAddress(struct in_addr *addr);
+extern unsigned short isPseudoLocalAddress(struct in_addr *addr, u_int actualDeviceId);
 extern unsigned short _pseudoLocalAddress(struct in_addr *addr);
 extern unsigned short __pseudoLocalAddress(struct in_addr *addr,
 					   u_int32_t theNetworks[MAX_NUM_NETWORKS][3],
 					   u_short numNetworks);
-extern unsigned short deviceLocalAddress(struct in_addr *addr, int deviceId);
+extern unsigned short deviceLocalAddress(struct in_addr *addr, u_int deviceId);
 extern unsigned short isPseudoBroadcastAddress(struct in_addr *addr);
 extern void printLogTime(void);
 extern int32_t gmt2local(time_t t);
@@ -375,7 +376,7 @@ extern int name_interpret(char *in, char *out, int in_len);
 
 extern char *getNwInterfaceType(int i);
 extern char *formatTime(time_t *theTime, short encodeString);
-extern int getActualInterface(int);
+extern int getActualInterface(u_int);
 extern void storeHostTrafficInstance(HostTraffic *el);
 extern void resetHostsVariables(HostTraffic* el);
 extern HostTraffic *resurrectHostTrafficInstance(char *key);
@@ -422,7 +423,7 @@ extern void unescape(char *dest, int destLen, char *url);
 extern void updateElementHash(ElementHash **list, u_short srcId, u_short dstId, 
 			      u_int32_t numPkts, u_int32_t numBytes);
 extern void allocateElementHash(int deviceId, u_short hashType);
-extern u_int numActiveSenders(int deviceId);
+extern u_int numActiveSenders(u_int deviceId);
 extern u_int32_t xaton(char *s);
 extern void addNodeInternal(u_int32_t ip, int prefix, char *country);
 extern char *ip2CountryCode(u_int32_t ip);

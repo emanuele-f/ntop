@@ -1488,6 +1488,7 @@
 #define FLAG_REMOTE_TO_LOCAL_ACCOUNTING     1
 #define FLAG_LOCAL_TO_REMOTE_ACCOUNTING     2
 #define FLAG_LOCAL_TO_LOCAL_ACCOUNTING      3
+#define FLAG_REMOTE_TO_REMOTE_ACCOUNTING    4
 
 /*
  * Flags for rrd plugin settings...

@@ -653,18 +653,16 @@ static void handleNetflowHTTPrequest(char* url) {
   sendString("> <br>[default port is "DEFAULT_NETFLOW_PORT_STR"]</td><td>"
 	     "<INPUT TYPE=submit VALUE=Set></form></td></tr>\n");
 
-  if(myGlobals.netFlowInPort != 0) {
-    sendString("<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Virtual NetFlow Interface</TH><TD "TD_BG"><FORM ACTION=/plugins/NetFlow METHOD=GET>"
+  sendString("<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Virtual NetFlow Interface</TH><TD "TD_BG"><FORM ACTION=/plugins/NetFlow METHOD=GET>"
 	       "Local Network IP Address/Mask:</td><td "TD_BG"><INPUT NAME=ifNetMask SIZE=32 VALUE=\"");
 
-    if(snprintf(buf, sizeof(buf), "%s/%s",
+  if(snprintf(buf, sizeof(buf), "%s/%s",
 		_intoa(myGlobals.netFlowIfAddress, buf1, sizeof(buf1)),
 		_intoa(myGlobals.netFlowIfMask, buf2, sizeof(buf2))) < 0)
-      BufferTooShort();
-    sendString(buf);
+    BufferTooShort();
+  sendString(buf);
 
-    sendString("\"><br>Format: digit.digit.digit.digit/digit.digit.digit.digit</td><td><INPUT TYPE=submit VALUE=Set></form></td></tr>\n");
-  }
+  sendString("\"><br>Format: digit.digit.digit.digit/digit.digit.digit.digit<br>This does not (yet) accept CIDR /xx notation)</td><td><INPUT TYPE=submit VALUE=Set></form></td></tr>\n");
 
   /* *************************************** */
 

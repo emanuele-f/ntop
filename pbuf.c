@@ -1749,6 +1749,17 @@ void processPacket(u_char *_deviceId,
       processIpPkt(p+headerDisplacement, h, length, NULL, NULL, actualDeviceId);
       break;
 
+      /* PPPoE patch courtesy of Stefano Picerno <stefanopp@libero.it> */
+#ifdef _linux
+    case DLT_LINUX_SLL: /* Linux capture interface */
+#define SLL_HDR_LEN 16
+      length = h->len;
+      length -= SLL_HDR_LEN;
+      ether_src = ether_dst = NULL;
+      processIpPkt(p+ SLL_HDR_LEN , h, length, ether_src, ether_dst, actualDeviceId);
+      break;
+#endif
+
     case DLT_IEEE802: /* Token Ring */
       trp = (struct tokenRing_header*)p;
       ether_src = (u_char*)trp->trn_shost, ether_dst = (u_char*)trp->trn_dhost;
@@ -1806,7 +1817,11 @@ void processPacket(u_char *_deviceId,
 #endif
 
     if((myGlobals.device[deviceId].datalink != DLT_PPP)
-       && (myGlobals.device[deviceId].datalink != DLT_RAW)) {
+       && (myGlobals.device[deviceId].datalink != DLT_RAW)
+#ifdef _linux
+       && (myGlobals.device[deviceId].datalink != DLT_LINUX_SLL)  
+#endif
+       ) {
       if((!myGlobals.dontTrustMACaddr) && (eth_type == 0x8137)) {
 	/* IPX */
 	IPXpacket ipxPkt;

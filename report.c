@@ -1482,6 +1482,7 @@ void printAllSessionsHTML(char* host, int actualDeviceId) {
   printHostIcmpStats(el);
   printHostFragmentStats(el, actualDeviceId);
   printHostContactedPeers(el, actualDeviceId);
+  printHostHTTPVirtualHosts(el, actualDeviceId);
   printHostUsedServices(el, actualDeviceId);
 
   /* ***************************************************** */

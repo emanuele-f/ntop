@@ -558,13 +558,13 @@ int sortHostFctn(const void *_a, const void *_b) {
   switch(myGlobals.columnSort) {
   case 1:
 #ifdef MULTITHREADED
-    if(myGlobals.numericFlag == 0) 
+    if(myGlobals.numericFlag == 0)
       accessMutex(&myGlobals.addressResolutionMutex, "sortHostFctn");
 #endif
     rc = strcasecmp((*a)->hostSymIpAddress[0] != '\0' ? (*a)->hostSymIpAddress : (*a)->ethAddressString,
 		    (*b)->hostSymIpAddress[0] != '\0' ? (*b)->hostSymIpAddress : (*b)->ethAddressString);
 #ifdef MULTITHREADED
-    if(myGlobals.numericFlag == 0) 
+    if(myGlobals.numericFlag == 0)
       releaseMutex(&myGlobals.addressResolutionMutex);
 #endif
     return(rc);
@@ -732,7 +732,7 @@ int cmpFctn(const void *_a, const void *_b) {
 
     /* Host name */
 #ifdef MULTITHREADED
-    if(myGlobals.numericFlag == 0) 
+    if(myGlobals.numericFlag == 0)
       accessMutex(&myGlobals.addressResolutionMutex, "cmpFctn");
 #endif
 
@@ -747,7 +747,7 @@ int cmpFctn(const void *_a, const void *_b) {
       rc = strcasecmp((*a)->ethAddressString, (*b)->ethAddressString);
 
 #ifdef MULTITHREADED
-    if(myGlobals.numericFlag == 0) 
+    if(myGlobals.numericFlag == 0)
       releaseMutex(&myGlobals.addressResolutionMutex);
 #endif
     return(rc);
@@ -1079,14 +1079,14 @@ int cmpMulticastFctn(const void *_a, const void *_b) {
 
   default:
 #ifdef MULTITHREADED
-    if(myGlobals.numericFlag == 0) 
+    if(myGlobals.numericFlag == 0)
       accessMutex(&myGlobals.addressResolutionMutex, "cmpMulticastFctn");
 #endif
 
     rc = strcmp((*a)->hostSymIpAddress, /* Host name */
 		(*b)->hostSymIpAddress);
 #ifdef MULTITHREADED
-    if(myGlobals.numericFlag == 0) 
+    if(myGlobals.numericFlag == 0)
       releaseMutex(&myGlobals.addressResolutionMutex);
 #endif
     return(rc);
@@ -1615,7 +1615,7 @@ void printHostFragmentStats(HostTraffic *el, int actualDeviceId) {
       if(totalSent > 0) {
 	if(snprintf(buf, sizeof(buf),
 		    "<TD "TD_BG" ALIGN=RIGHT COLSPAN=2><IMG SRC=hostFragmentDistrib-%s"CHART_FORMAT"?1 ALT=\"Sent Fragment Distribution for %s\"></TD>",
-		    linkName, 
+		    linkName,
                    el->hostNumIpAddress[0] == '\0' ?  el->ethAddressString : el->hostNumIpAddress) < 0)
 	  BufferTooShort();
 	sendString(buf);
@@ -1626,7 +1626,7 @@ void printHostFragmentStats(HostTraffic *el, int actualDeviceId) {
       if(totalRcvd > 0) {
 	if(snprintf(buf, sizeof(buf),
 		    "<TD "TD_BG" ALIGN=RIGHT COLSPAN=2><IMG SRC=hostFragmentDistrib-%s"CHART_FORMAT" ALT=\"Received Fragment Distribution for %s\"></TD>",
-		    linkName, 
+		    linkName,
                    el->hostNumIpAddress[0] == '\0' ?  el->ethAddressString : el->hostNumIpAddress) < 0)
 	  BufferTooShort();
 	sendString(buf);
@@ -1647,7 +1647,7 @@ void printHostFragmentStats(HostTraffic *el, int actualDeviceId) {
       if(totalSent > 0) {
 	if(snprintf(buf, sizeof(buf),
 		    "<TD "TD_BG" ALIGN=RIGHT COLSPAN=2><IMG SRC=hostTotalFragmentDistrib-%s"CHART_FORMAT"?1 ALT=\"Sent IP Fragment Distribution for %s\"></TD>",
-		    linkName, 
+		    linkName,
                    el->hostNumIpAddress[0] == '\0' ?  el->ethAddressString : el->hostNumIpAddress) < 0)
 	  BufferTooShort();
 	sendString(buf);
@@ -1658,7 +1658,7 @@ void printHostFragmentStats(HostTraffic *el, int actualDeviceId) {
       if(totalRcvd > 0) {
 	if(snprintf(buf, sizeof(buf),
 		    "<TD "TD_BG" ALIGN=RIGHT COLSPAN=2><IMG SRC=hostTotalFragmentDistrib-%s"CHART_FORMAT" ALT=\"Received IP Fragment Distribution for %s\"></TD>",
-		    linkName, 
+		    linkName,
                    el->hostNumIpAddress[0] == '\0' ?  el->ethAddressString : el->hostNumIpAddress) < 0)
 	  BufferTooShort();
 	sendString(buf);
@@ -1829,7 +1829,7 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
       if(totalSent > 0) {
 	if(snprintf(buf, sizeof(buf),
 		    "<TD WIDTH=250 "TD_BG" ALIGN=RIGHT COLSPAN=2><IMG SRC=hostTrafficDistrib-%s"CHART_FORMAT"?1 ALT=\"Sent Traffic Distribution for %s\"></TD>",
-                    linkName, 
+                    linkName,
                     el->hostNumIpAddress[0] == '\0' ?  el->ethAddressString : el->hostNumIpAddress) < 0)
 	  BufferTooShort();
 	sendString(buf);
@@ -1840,7 +1840,7 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
       if(totalRcvd > 0) {
 	if(snprintf(buf, sizeof(buf),
 		    "<TD "TD_BG" ALIGN=RIGHT COLSPAN=2><IMG SRC=hostTrafficDistrib-%s"CHART_FORMAT" ALT=\"Received Traffic Distribution for %s\"></TD>",
-		    linkName, 
+		    linkName,
                    el->hostNumIpAddress[0] == '\0' ?  el->ethAddressString : el->hostNumIpAddress) < 0)
 	  BufferTooShort();
 	sendString(buf);
@@ -1852,7 +1852,7 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
 
       if((el->tcpSentLoc+el->tcpSentRem+el->udpSentLoc+el->udpSentRem
 	  +el->tcpRcvdLoc+el->tcpRcvdFromRem+el->udpRcvdLoc+el->udpRcvdFromRem) > 0) {
-	if(snprintf(buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT>IP Distribution</TH>", 
+	if(snprintf(buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT>IP Distribution</TH>",
 		    getRowColor()) < 0)
 	  BufferTooShort();
 	sendString(buf);
@@ -1994,6 +1994,39 @@ void printHostIcmpStats(HostTraffic *el) {
 
 /* ************************************ */
 
+void printHostHTTPVirtualHosts(HostTraffic *el, int actualDeviceId) {
+  u_int i, titleSent = 0;
+  char buf[BUF_SIZE];
+
+  if(el->httpVirtualHosts != NULL) {
+    VirtualHostList *list = el->httpVirtualHosts;
+
+    printSectionTitle("HTTP Virtual Hosts Traffic");
+    sendString("<CENTER>\n<TABLE BORDER=0><TR><TD "TD_BG" VALIGN=TOP>\n");
+
+    sendString(""TABLE_ON"<TABLE BORDER=1 WIDTH=100%>"
+	       "<TR "TR_ON"><TH "TH_BG">Virtual Host</TH>"
+	       "<TH "TH_BG">Sent</TH><TH "TH_BG">Rcvd</TH></TR>\n");
+
+    while(list != NULL) {
+      if(snprintf(buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT>%s</TH>"
+		  "<TD "TD_BG" ALIGN=CENTER>%s&nbsp;</TD>"
+		  "<TD "TD_BG" ALIGN=CENTER>%s&nbsp;</TD></TR>\n",
+		  getRowColor(), list->virtualHostName,
+		  formatBytes(list->bytesSent, 1),
+		  formatBytes(list->bytesRcvd, 1)) < 0)
+	BufferTooShort();
+      sendString(buf);
+      list = list->next;
+    }
+    sendString("</TABLE>\n");
+    sendString("<H5>NOTE: The above table is not updated in realtime but when connections are terminated.</H5>\n");
+    sendString("</CENTER><P>\n");
+  }
+}
+
+/* ************************************ */
+
 void printHostContactedPeers(HostTraffic *el, int actualDeviceId) {
   u_int i, titleSent = 0;
   char buf[BUF_SIZE];
@@ -2003,7 +2036,7 @@ void printHostContactedPeers(HostTraffic *el, int actualDeviceId) {
 
     for(i=0; i<MAX_NUM_CONTACTED_PEERS; i++)
       if(((el->contactedSentPeers.peersIndexes[i] != NO_PEER)
-	  && (el->contactedSentPeers.peersIndexes[i] != myGlobals.otherHostEntryIdx)) 	 
+	  && (el->contactedSentPeers.peersIndexes[i] != myGlobals.otherHostEntryIdx))
 	 || ((el->contactedRcvdPeers.peersIndexes[i] != NO_PEER)
 	     && (el->contactedRcvdPeers.peersIndexes[i] != myGlobals.otherHostEntryIdx))) {
 	  ok = 1;
@@ -2541,13 +2574,13 @@ void printHostDetailedInfo(HostTraffic *el, int actualDeviceId) {
   if(el->hostSymIpAddress[0] != '\0') {
     if(snprintf(buf, sizeof(buf), "Info about host"
 		" <A HREF=http://%s/ TARGET=\"_blank\" "
-                "TITLE=\"Link to web server on host, IF available\">%s %s</A>\n", 
+                "TITLE=\"Link to web server on host, IF available\">%s %s</A>\n",
                 el->hostNumIpAddress, el->hostSymIpAddress, buf1) < 0)
       BufferTooShort();
   } else if(el->hostNumIpAddress[0] != '\0') {
     if(snprintf(buf, sizeof(buf), "Info about host"
 		" <A HREF=http://%s/ TARGET=\"_blank\" "
-                "TITLE=\"Link to web server on host, IF available\">%s %s</A>\n", 
+                "TITLE=\"Link to web server on host, IF available\">%s %s</A>\n",
                 el->hostNumIpAddress, el->hostNumIpAddress, buf1) < 0)
       BufferTooShort();
   } else {
@@ -3031,20 +3064,20 @@ void printHostDetailedInfo(HostTraffic *el, int actualDeviceId) {
     if(snprintf(buf, sizeof(buf), "<TR %s><TH "TH_BG" ALIGN=LEFT>%s</TH><TD "TD_BG" ALIGN=RIGHT>",
 		getRowColor(), "Multicast&nbsp;Traffic") < 0) BufferTooShort();
     sendString(buf);
-    
+
     if(el->pktMulticastSent > 0) {
       if(snprintf(buf, sizeof(buf), "Sent&nbsp;%s/%s&nbsp;Pkts&nbsp;-",
 		  formatBytes(el->bytesMulticastSent, 1),
 		  formatPkts(el->pktMulticastSent)) < 0) BufferTooShort();
       sendString(buf);
-    } 
+    }
 
     if(el->pktMulticastRcvd > 0) {
       if(snprintf(buf, sizeof(buf), "Rcvd&nbsp;%s/%s&nbsp;Pkts",
 		  formatBytes(el->bytesMulticastRcvd, 1),
 		  formatPkts(el->pktMulticastRcvd)) < 0) BufferTooShort();
       sendString(buf);
-    } 
+    }
 
     sendString("</TD></TR>\n");
   }
@@ -3401,7 +3434,7 @@ char* buildHTMLBrowserWindowsLabel(int i, int j) {
   int idx = i*myGlobals.device[myGlobals.actualReportDeviceId].numHosts + j;
 
 #ifdef MULTITHREADED
-  if(myGlobals.numericFlag == 0) 
+  if(myGlobals.numericFlag == 0)
     accessMutex(&myGlobals.addressResolutionMutex, "buildHTMLBrowserWindowsLabel");
 #endif
 
@@ -3472,7 +3505,7 @@ void printHostHourlyTrafficEntry(HostTraffic *el, int i,
 	   formatBytes(el->last24HoursBytesRcvd[i], 0)) < 0)
     BufferTooShort();
   sendString(buf);
- 
+
  if(tcRcvd > 0)
     pctg = (float)(el->last24HoursBytesRcvd[i]*100)/(float)tcRcvd;
   else

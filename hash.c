@@ -264,6 +264,17 @@ void freeHostInfo(int theDevice, HostTraffic *host, int actualDeviceId) {
 
   freeHostSessions(host->hostTrafficBucket, actualDeviceId);
 
+  if(host->httpVirtualHosts != NULL) {
+    VirtualHostList *list = host->httpVirtualHosts;
+    
+    while(list != NULL) {
+      VirtualHostList *next = list->next;
+      free(list->virtualHostName);
+      free(list);
+      list = next;
+    }
+  }
+
   /* ************************************* */
 
   if(myGlobals.isLsofPresent) {

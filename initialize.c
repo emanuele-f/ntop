@@ -790,14 +790,14 @@ void initGdbm(char *directory) {
   traceEvent(CONST_TRACE_INFO, "Initializing GDBM...");
 
   /* Courtesy of Andreas Pfaller <apfaller@yahoo.com.au>. */
-  if(snprintf(tmpBuf, sizeof(tmpBuf), "%s/addressCache.db", 
+  if(snprintf(tmpBuf, sizeof(tmpBuf), "%s/addressQueue.db", 
 	      directory != NULL ? directory : myGlobals.dbPath) < 0)
     BufferTooShort();
 
   unlink(tmpBuf); /* Delete the old one (if present) */
-  myGlobals.addressCache = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
+  myGlobals.addressQueueFile = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
 
-  if(myGlobals.addressCache == NULL) {
+  if(myGlobals.addressQueueFile == NULL) {
 #if defined(WIN32) && defined(__GNUC__)
     traceEvent(CONST_TRACE_ERROR, "Database '%s' open failed: %s\n",
 	       tmpBuf, "unknown gdbm errno");
@@ -837,9 +837,9 @@ void initGdbm(char *directory) {
     BufferTooShort();
 
   unlink(tmpBuf); /* Clear the cache */
-  myGlobals.gdbm_file = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
+  myGlobals.dnsCacheFile = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
 
-  if(myGlobals.gdbm_file == NULL) {
+  if(myGlobals.dnsCacheFile == NULL) {
 #if defined(WIN32) && defined(__GNUC__)
     traceEvent(CONST_TRACE_ERROR, "Database '%s' open failed: %s\n",
 	       tmpBuf, "unknown gdbm errno");

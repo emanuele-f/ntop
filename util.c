@@ -2145,7 +2145,7 @@ int getSniffedDNSName(char *hostNumIpAddress,
   name[0] = 0;
 
 #ifdef HAVE_GDBM_H
-  if((hostNumIpAddress[0] != '\0') && myGlobals.gdbm_file) {
+  if((hostNumIpAddress[0] != '\0') && myGlobals.dnsCacheFile) {
     datum key;
     datum data;
 
@@ -2155,7 +2155,7 @@ int getSniffedDNSName(char *hostNumIpAddress,
 #ifdef CFG_MULTITHREADED
     accessMutex(&myGlobals.gdbmMutex, "getSniffedDNSName");
 #endif
-    data = gdbm_fetch(myGlobals.gdbm_file, key);
+    data = gdbm_fetch(myGlobals.dnsCacheFile, key);
 #ifdef CFG_MULTITHREADED
     releaseMutex(&myGlobals.gdbmMutex);
 #endif

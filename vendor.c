@@ -394,6 +394,8 @@ char* getSpecialMacInfo(HostTraffic* el, short encodeString) {
   if((ret != NULL) && (ret[0] != '\0'))
     return(ret); 
 
+/* Garbage? - no corresponding store */
+
   /* Search the specified MAC address into 'ntop.db' */
   strncpy(tmpBuf, el->ethAddressString, sizeof(tmpBuf));
   key_data.dptr = tmpBuf;
@@ -407,7 +409,7 @@ char* getSpecialMacInfo(HostTraffic* el, short encodeString) {
   accessMutex(&myGlobals.gdbmMutex, "getSpecialMacInfo");
 #endif 
 
-  data_data = gdbm_fetch(myGlobals.gdbm_file, key_data);
+  data_data = gdbm_fetch(myGlobals.dnsCacheFile, key_data);
 
 #ifdef CFG_MULTITHREADED
   releaseMutex(&myGlobals.gdbmMutex);

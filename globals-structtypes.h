@@ -1559,7 +1559,7 @@ XML*/
 /*XMLSECTIONEND */
 
   /* Database */
-  GDBM_FILE gdbm_file, pwFile, eventFile, hostsInfoFile, addressCache, prefsFile;
+  GDBM_FILE dnsCacheFile, pwFile, eventFile, hostsInfoFile, addressQueueFile, prefsFile;
 
   /* the table of broadcast entries */
   u_int broadcastEntryIdx;
@@ -1694,17 +1694,49 @@ XML*/
   FlowFilterList *flowsList;
 
   /* Address Resolution */
-  u_long dnsSniffedCount;
+  u_long dnsSniffCount,
+         dnsSniffRequestCount,
+         dnsSniffFailedCount,
+         dnsSniffARPACount,
+         dnsSniffStoredInCache;
+
 #if defined(MAKE_ASYNC_ADDRESS_RESOLUTION)
-  u_long addressQueueCount;
-  u_int addressQueueLen, maxAddressQueueLen;
+  u_long addressQueuedCount;
+  u_int addressQueuedDup, addressQueuedCurrent, addressQueuedMax;
 #endif
 
-  u_long numResolveAddressCalls,
+  /*
+   *  We count calls to ipaddr2str()
+   *       {numipaddr2strCalls}
+   *    These are/are not resolved from cache.
+   *       {numFetchAddressFromCacheCalls}
+   *       {numFetchAddressFromCacheCallsOK}
+   *       {numFetchAddressFromCacheCallsFAIL}
+   *       {numFetchAddressFromCacheCallsSTALE}
+   *    Unfetched end up in resolveAddress() directly or via the queue if we have ASYNC
+   *       {numResolveAddressCalls}
+   *    In resolveAddress(), we have
+   *       {numResolveNoCacheDB} - i.e. ntop is shutting down
+   *    Otherwise we look it up (again) in the database
+   *       {numResolveCacheDBLookups}
+   *       {numResolvedFromCache} - these were basically sniffed while in queue!
+   *
+   *    Gives calls to the dns resolver:
+   *       {numResolvedFromHostAddresses} - /etc/hosts file (if we use it)
+   */
+  u_long numipaddr2strCalls,
+         numFetchAddressFromCacheCalls,
+         numFetchAddressFromCacheCallsOK,
+         numFetchAddressFromCacheCallsFAIL,
+         numFetchAddressFromCacheCallsSTALE,
+         numResolveAddressCalls,
          numResolveNoCacheDB,
+         numResolveCacheDBLookups,
+         numResolvedFromCache,
 #ifdef PARM_USE_HOST
          numResolvedFromHostAddresses,
 #endif
+         dnsCacheStoredLookup,
          numAttemptingResolutionWithDNS,
          numResolvedWithDNSAddresses, 
          numDNSErrorHostNotFound,
@@ -1712,8 +1744,8 @@ XML*/
          numDNSErrorNoRecovery,
          numDNSErrorTryAgain,
          numDNSErrorOther,
-         numKeptNumericAddresses,
-         numResolvedOnCacheAddresses;
+         numKeptNumericAddresses;
+
 
   /* Misc */
   char *separator;         /* html separator */

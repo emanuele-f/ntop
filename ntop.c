@@ -970,10 +970,10 @@ RETSIGTYPE cleanup(int signo) {
 #ifdef CFG_MULTITHREADED
   accessMutex(&myGlobals.gdbmMutex, "cleanup");
 #endif
-  gdbm_close(myGlobals.gdbm_file);    myGlobals.gdbm_file = NULL;
-  gdbm_close(myGlobals.addressCache); myGlobals.addressCache = NULL;
-  gdbm_close(myGlobals.pwFile);       myGlobals.pwFile = NULL;
-  gdbm_close(myGlobals.prefsFile);    myGlobals.prefsFile = NULL;
+  gdbm_close(myGlobals.dnsCacheFile);     myGlobals.dnsCacheFile = NULL;
+  gdbm_close(myGlobals.addressQueueFile); myGlobals.addressQueueFile = NULL;
+  gdbm_close(myGlobals.pwFile);           myGlobals.pwFile = NULL;
+  gdbm_close(myGlobals.prefsFile);        myGlobals.prefsFile = NULL;
 
   /* Courtesy of Wies-Software <wies@wiessoft.de> */
   gdbm_close(myGlobals.hostsInfoFile); myGlobals.hostsInfoFile = NULL;

@@ -387,19 +387,6 @@
  */
 /* #define FRAGMENT_DEBUG */
 
-/* DNS_DEBUG logs the activites in address.c related to Name resolution.
- */
-/* #define DNS_DEBUG */
-
-/* DNS_SNIFF_DEBUG logs the activites in pbuf.c and sessions.c related to
- * DNS requests and replies sniffed out of the ntop monitored traffic.
- */
-/* #define DNS_SNIFF_DEBUG */
-
-/* FRAGMENT_DEBUG logs information about packet fragments nto receives.
- */
-/* #define FRAGMENT_DEBUG */
-
 /* FTP_DEBUG logs ftp control session information.
  */
 /* #define FTP_DEBUG */
@@ -643,6 +630,12 @@
 #define CONST_PCTG_MID                      75           /* % */
 #define CONST_CONST_PCTG_MID_COLOR          "BGCOLOR=#C6EFC8"
 #define CONST_PCTG_HIGH_COLOR               "BGCOLOR=#FF3118"
+
+/*
+ * How long should we use an entry in the dnsCache database.
+ *  Default (in seconds) is 24 hours
+ */
+#define CONST_DNSCACHE_LIFETIME             24*3600
 
 /*
  *  Tunables - changing these should allow ntop to handle more or less of some thing.

@@ -996,6 +996,7 @@ void initDevices(char* devices) {
     tmpDevice->virtualDevice = 1;
     tmpDevice->datalink = DLT_EN10MB;
     tmpDevice->name = strdup("none (dummy device)");
+    tmpDevice->pcapPtr = pcap_open_dead(DLT_EN10MB, 100);
     myGlobals.device = tmpDevice;
     myGlobals.numDevices = 1;
     traceEvent(CONST_TRACE_INFO, "-i none, so initialized only a dummy device");

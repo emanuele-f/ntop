@@ -162,12 +162,16 @@ DIST_COMMON = AUTHORS CONTENTS COPYING ChangeLog \
               faq.html \
               ntop-cert.pem \
               p2c.opt.table \
-              $(ETTER_PASSIVE)
+              $(ETTER_PASSIVE) \
+              oui.txt \
+              specialMAC.txt
 
 
 NTOPDATA = ntop-cert.pem \
            p2c.opt.table \
-           $(ETTER_PASSIVE)
+           $(ETTER_PASSIVE) \
+           oui.txt \
+           specialMAC.txt
 
 
 NTOPHTML = html html/*.js html/*.html  html/*.gif html/*.jpg html/*.ico html/*.png \
@@ -234,7 +238,7 @@ libntop_la_SOURCES = address.c       dataFormat.c  \
                      sessions.c         \
                      ssl.c           term.c        traffic.c          \
                      util.c          vendor.c      version.c          \
-                     vendortable.h   ntop_darwin.c
+                     ntop_darwin.c
 
 
 libntop_la_DEPENDENCIES = config.h
@@ -325,13 +329,13 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
 	uninstall-info-recursive all-recursive install-data-recursive \
 	install-exec-recursive installdirs-recursive install-recursive \
 	uninstall-recursive check-recursive installcheck-recursive
-DIST_COMMON = README $(ETTER_PASSIVE)\ $(noinst_HEADERS) AUTHORS \
+DIST_COMMON = README $(ETTER_PASSIVE) $(noinst_HEADERS) AUTHORS \
 	CONTENTS COPYING ChangeLog INSTALL MANIFESTO Makefile.am \
 	Makefile.in NEWS PORTING SUPPORT_NTOP.txt THANKS \ acinclude.m4 \
 	aclocal.m4 config.guess config.h.in config.sub configure \
 	configure.in depcomp faq.html install-sh ltconfig ltmain.sh \
 	missing mkinstalldirs ntop-cert.pem ntop.8 ntop.html ntop.txt \
-	p2c.opt.table
+	oui.txt p2c.opt.table specialMAC.txt\
 DIST_SUBDIRS = $(SUBDIRS)
 SOURCES = $(libntop_la_SOURCES) $(libntopreport_la_SOURCES) $(ntop_SOURCES) $(ntops_SOURCES)
 
@@ -963,17 +967,13 @@ install-data-local:
           fi; \
         done
 
-# built the vendor table
-vt: vendortable.h
-	@fgrep -e "(hex)" Internet/oui.txt | cut -c1-8,9,19- | sed -f vt.sed > vendortable.h
-
-# built the IPX SAP table
+# build the IPX SAP table
 sapt: saptable.h
 	@cat Internet/novell-sap-numbers | cut -c1-3 | sed -f sapt.sed > saptable.h
 
 # download the vendor information table
 dnvt:
-	@(cd Internet; wget -c http://standards.ieee.org/regauth/oui/oui.txt)
+	@wget -c http://standards.ieee.org/regauth/oui/oui.txt
 
 # download the Novell SAP Protocol information table
 dnsapt:

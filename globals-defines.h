@@ -408,14 +408,14 @@
  */
 /* #define HOST_FREE_DEBUG */
 
-/* IDLE_PURGE_DEBUG logs the purging of idle hosts
- */
-/* #define IDLE_PURGE_DEBUG */
-
 /* HTTP_DEBUG logs the http sessions.  It logs HTTP/1... from source port 80
  * and anything to destination port 80.  Also http headers, etc.
  */
 /* #define HTTP_DEBUG */
+
+/* IDLE_PURGE_DEBUG logs the purging of idle hosts
+ */
+/* #define IDLE_PURGE_DEBUG */
 
 /* I18N_DEBUG logs the activities in and around internationalization (i18n).
  */
@@ -495,6 +495,10 @@
  * either from an unknown protocol or of an unknown ethernet type
  */
 /* #define UNKNOWN_PACKET_DEBUG */
+
+/* VENDOR_DEBUG debugs the vendor table stuff in vendor.c
+ */
+/* #define VENDOR_DEBUG */
 
 /* XMLDUMP_DEBUG causes xmldump.c to output debug information.
      define it as 0 for the minimal - enter/exit routine
@@ -724,40 +728,14 @@
 #define MAX_NUM_FIN                         4
 
 /*
- * This MUST be a little bigger than the number of entries in vendortable.h.
- * Ideally, it would be prime and big enough to minimize the collisions
- *  (check Vendor Hash Collisions in the configuration report).
- *
- * Based on the data as of 01-2003:
- *      normal: size 24177   982 collisions
- *                   16609  1326 collisions
- *                   14265  1496 collisions
- *      invert: size 24943    77 collisions 
- *                   12783   365 collisions
- *                   10257   585 collisions
- */
-#ifdef PARM_USE_MACHASH_INVERT
- #define MAX_VENDOR_NAME_HASH               10257
-#else
- #define MAX_VENDOR_NAME_HASH               14265
-#endif
-
-/*
- * This MUST be a little bigger than the number of entries in the array in vendor.c
- * Ideally, it would be prime and big enough to minimize the collisions
- *  (check special Hash Collisions in the configuration report).
- *
- * Based on the data as of 01-2003:
- *      normal: size  93   5 collisions
- *      invert: size 167   0 collisions
- *                    93   2 collisions
- */
-#define MAX_SPECIALMAC_NAME_HASH            93
-
-/*
  * This MUST be a little bigger than the number of entries in the array in vendor.c
  * Ideally, it would be prime and big enough to minimize the collisions
  *  (check IPX/SAP Hash Collisions in the configuration report).
+ *
+ * NOTE: The hashs can be optimized - look at the note in vendor.c
+ *
+ *   Don't kill yourself on this - it's not a LOT of storage - unused entries cost 
+ *   only 8 bytes...  These values are pretty good for the table as of 01-2003.
  *
  * Based on the data as of 01-2003:
  *      normal: size 181   2 collisions
@@ -770,14 +748,6 @@
 #else
  #define MAX_IPXSAP_NAME_HASH                181
 #endif
-
-/*
- * NOTE: All the hashs can be optimized - look at the note in vendor.c
- *
- *   Unless you have memory issues, don't kill yourself on this - it's not a LOT 
- *   of storage - unused entries cost only 8 bytes...  The values above are pretty
- *   good ones as of 01-2003.
- */
 
 /*
  * Size of the nfs entries hash in plugins/nfsPlugin.c.
@@ -1005,6 +975,9 @@
  *    dummyEthAddress[].
  */
 #define LEN_ETHERNET_ADDRESS                6
+#define LEN_ETHERNET_ADDRESS_DISPLAY        sizeof("00:00:00:00:00:00")
+#define LEN_ETHERNET_VENDOR                 3
+#define LEN_ETHERNET_VENDOR_DISPLAY         sizeof("00:00:00")
 
 /*
  * Maximum number of addresses in a dns packet - see handleDNSpacket()
@@ -1027,6 +1000,11 @@
  */
 #define MAX_LEN_SYM_HOST_NAME               64
 #define MAX_LEN_SYM_HOST_NAME_HTML          256
+
+/*
+ * Maximum length of a name in the IEEE OUI file.
+ */
+#define MAX_LEN_VENDOR_NAME                 64
 
 /*
  * i18n - maximum number of languages we'll support... and permit per request...

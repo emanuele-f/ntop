@@ -362,6 +362,11 @@ typedef struct storedAddress {
   time_t recordCreationTime;
 } StoredAddress;
 
+typedef struct macInfo {
+  u_char isSpecial;
+  char   vendorName[MAX_LEN_VENDOR_NAME];
+} MACInfo;
+
 typedef struct serviceStats {
   TrafficCounter numLocalReqSent, numRemReqSent;
   TrafficCounter numPositiveReplSent, numNegativeReplSent;
@@ -436,7 +441,7 @@ typedef struct hostTraffic {
   time_t           lastSeen;     /* time when this host has sent/rcvd some data  */
   u_char           ethAddress[LEN_ETHERNET_ADDRESS];
   u_char           lastEthAddress[LEN_ETHERNET_ADDRESS]; /* used for remote addresses */
-  char             ethAddressString[18];
+  char             ethAddressString[LEN_ETHERNET_ADDRESS_DISPLAY];
   char             hostNumIpAddress[17], *fullDomainName;
   char             *dotDomainName, hostSymIpAddress[MAX_LEN_SYM_HOST_NAME], *fingerprint;
   u_short          dotDomainNameIsFallback;
@@ -1562,7 +1567,7 @@ XML*/
 /*XMLSECTIONEND */
 
   /* Database */
-  GDBM_FILE dnsCacheFile, pwFile, eventFile, hostsInfoFile, addressQueueFile, prefsFile;
+  GDBM_FILE dnsCacheFile, pwFile, eventFile, hostsInfoFile, addressQueueFile, prefsFile, macPrefixFile;
 
   /* the table of broadcast entries */
   u_int broadcastEntryIdx;
@@ -1860,15 +1865,22 @@ XML*/
   u_short GnutellaIdx, KazaaIdx, WinMXIdx, DirectConnectIdx, FTPIdx;
 
   /* Hash table collisions - counted during load */
-  int hashCollisionsLookup, 
-      vendorHashLoadCollisions,
-      specialHashLoadCollisions,
-      ipxsapHashLoadCollisions;
+  int ipxsapHashLoadCollisions;
   /* Hash table sizes - counted during load */
-  int vendorHashLoadSize,
-      vendortable_h_Size,
-      specialHashLoadSize,
-      ipxsapHashLoadSize;
+  int ipxsapHashLoadSize;
+  /* Hash table collisions - counted during use */
+  int hashCollisionsLookup;
+
+  /* Vendor lookup file */
+  int numVendorLookupRead,
+      numVendorLookupAdded,
+      numVendorLookupAddedSpecial,
+      numVendorLookupCalls,
+      numVendorLookupSpecialCalls,
+      numVendorLookupFound48bit,
+      numVendorLookupFound24bit,
+      numVendorLookupFoundMulticast,
+      numVendorLookupFoundLAA;
 
   /* i18n */
 #ifdef MAKE_WITH_I18N

@@ -2545,19 +2545,9 @@ void printNtopConfigInfo(int textPrintFlag) {
   if (textPrintFlag == TRUE) {
     sendString(texthtml("\n\nMemory Usage\n\n", "<tr><th colspan=\"2\">Memory Usage</th></tr>\n"));
 
-    if(snprintf(buf, sizeof(buf), "%d", myGlobals.specialHashLoadSize) < 0)
-      BufferTooShort();
-    printFeatureConfigInfo(textPrintFlag, "Special MAC Hash Size (bytes)", buf);
-  
     if(snprintf(buf, sizeof(buf), "%d", myGlobals.ipxsapHashLoadSize) < 0)
       BufferTooShort();
     printFeatureConfigInfo(textPrintFlag, "IPX/SAP Hash Size (bytes)", buf);
-  
-    if(snprintf(buf, sizeof(buf), "%d (%.1f MB)",
-               myGlobals.vendorHashLoadSize,
-               (float) myGlobals.vendorHashLoadSize /(1024.0*1024.0)) < 0)
-      BufferTooShort();
-    printFeatureConfigInfo(textPrintFlag, "Vendor MAC Hash Size (bytes)", buf);
   
     if(snprintf(buf, sizeof(buf), "%d (%.1f MB)", myGlobals.ipCountryMem, (float)myGlobals.ipCountryMem/(1024.0*1024.0)) < 0)
         BufferTooShort();
@@ -2613,14 +2603,6 @@ void printNtopConfigInfo(int textPrintFlag) {
   if (textPrintFlag == TRUE) {
     sendString(texthtml("\n\nMAC/IPX Hash tables\n\n", "<tr><th colspan=\"2\">MAC/IPX Hash Tables</th></tr>\n"));
 
-    if(snprintf(buf, sizeof(buf), "%d", MAX_SPECIALMAC_NAME_HASH) < 0)
-      BufferTooShort();
-    printFeatureConfigInfo(textPrintFlag, "Special MAC Hash Size (entries)", buf);
-
-    if(snprintf(buf, sizeof(buf), "%d", myGlobals.specialHashLoadCollisions) < 0)
-      BufferTooShort();
-    printFeatureConfigInfo(textPrintFlag, "Special MAC Hash Collisions (load)", buf);
-
     if(snprintf(buf, sizeof(buf), "%d", MAX_IPXSAP_NAME_HASH) < 0)
       BufferTooShort();
     printFeatureConfigInfo(textPrintFlag, "IPX/SAP Hash Size (entries)", buf);
@@ -2629,17 +2611,9 @@ void printNtopConfigInfo(int textPrintFlag) {
       BufferTooShort();
     printFeatureConfigInfo(textPrintFlag, "IPX/SAP Hash Collisions (load)", buf);
 
-    if(snprintf(buf, sizeof(buf), "%d", myGlobals.vendortable_h_Size) < 0)
+    if(snprintf(buf, sizeof(buf), "%d", myGlobals.hashCollisionsLookup) < 0)
       BufferTooShort();
-    printFeatureConfigInfo(textPrintFlag, "Vendor MAC vendortable.h Size (entries)", buf);
-
-    if(snprintf(buf, sizeof(buf), "%d", MAX_VENDOR_NAME_HASH) < 0)
-      BufferTooShort();
-    printFeatureConfigInfo(textPrintFlag, "Vendor MAC Hash Size (entries)", buf);
-
-    if(snprintf(buf, sizeof(buf), "%d", myGlobals.vendorHashLoadCollisions) < 0)
-      BufferTooShort();
-    printFeatureConfigInfo(textPrintFlag, "Vendor MAC Hash Collisions (load)", buf);
+    printFeatureConfigInfo(textPrintFlag, "IPX/SAP Hash Collisions (use)", buf);
   }
 
   /* **** */
@@ -2921,6 +2895,48 @@ void printNtopConfigInfo(int textPrintFlag) {
   }
 
   /* **** */
+
+  if(textPrintFlag == TRUE) {
+      sendString("\n\nVendor Lookup Table\n\n");
+
+      if(snprintf(buf, sizeof(buf), "%d", myGlobals.numVendorLookupRead) < 0)
+        BufferTooShort();
+      printFeatureConfigInfo(textPrintFlag, "Input lines read", buf);
+
+      if(snprintf(buf, sizeof(buf), "%d", myGlobals.numVendorLookupAdded) < 0)
+        BufferTooShort();
+      printFeatureConfigInfo(textPrintFlag, "Records added total", buf);
+
+      if(snprintf(buf, sizeof(buf), "%d", myGlobals.numVendorLookupAddedSpecial) < 0)
+        BufferTooShort();
+      printFeatureConfigInfo(textPrintFlag, ".....includes special records", buf);
+
+      if(snprintf(buf, sizeof(buf), "%d", myGlobals.numVendorLookupCalls) < 0)
+        BufferTooShort();
+      printFeatureConfigInfo(textPrintFlag, "getVendorInfo() calls", buf);
+
+      if(snprintf(buf, sizeof(buf), "%d", myGlobals.numVendorLookupSpecialCalls) < 0)
+        BufferTooShort();
+      printFeatureConfigInfo(textPrintFlag, "getSpecialVendorInfo() calls", buf);
+
+      if(snprintf(buf, sizeof(buf), "%d", myGlobals.numVendorLookupFound48bit) < 0)
+        BufferTooShort();
+      printFeatureConfigInfo(textPrintFlag, "Found 48bit (xx:xx:xx:xx:xx:xx) match", buf);
+
+      if(snprintf(buf, sizeof(buf), "%d", myGlobals.numVendorLookupFound24bit) < 0)
+        BufferTooShort();
+      printFeatureConfigInfo(textPrintFlag, "Found 24bit (xx:xx:xx) match", buf);
+
+      if(snprintf(buf, sizeof(buf), "%d", myGlobals.numVendorLookupFoundMulticast) < 0)
+        BufferTooShort();
+      printFeatureConfigInfo(textPrintFlag, "Found multicast bit set", buf);
+
+      if(snprintf(buf, sizeof(buf), "%d", myGlobals.numVendorLookupFoundLAA) < 0)
+        BufferTooShort();
+      printFeatureConfigInfo(textPrintFlag, "Found LAA (Locally assigned address) bit set", buf);
+
+  }
+
   /* **** */
 
 #if defined(CFG_MULTITHREADED)

@@ -489,10 +489,18 @@ void initCounters(void) {
 
   resetStats();
 
-  myGlobals.specialHashLoadCollisions = 0;
   myGlobals.ipxsapHashLoadCollisions = 0;
-  myGlobals.vendorHashLoadCollisions = 0;
-  myGlobals.hashCollisionsLookup = 0;
+  myGlobals.hashCollisionsLookup     = 0;
+
+  myGlobals.numVendorLookupRead = 0;
+  myGlobals.numVendorLookupAdded = 0;
+  myGlobals.numVendorLookupAddedSpecial = 0;
+  myGlobals.numVendorLookupCalls = 0;
+  myGlobals.numVendorLookupSpecialCalls = 0;
+  myGlobals.numVendorLookupFound48bit = 0;
+  myGlobals.numVendorLookupFound24bit = 0;
+  myGlobals.numVendorLookupFoundMulticast = 0;
+  myGlobals.numVendorLookupFoundLAA = 0;
 
   createVendorTable();
   myGlobals.initialSniffTime = myGlobals.lastRefreshTime = time(NULL);
@@ -863,6 +871,16 @@ void initGdbm(char *directory) {
     myGlobals.hostsInfoFile = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
 
     if(myGlobals.hostsInfoFile == NULL) {
+      traceEvent(CONST_TRACE_ERROR, "FATAL ERROR: Database '%s' cannot be opened.", tmpBuf);
+      exit(-1);
+    }
+
+    if(snprintf(tmpBuf, sizeof(tmpBuf), "%s/macPrefix.db", directory != NULL ? directory : myGlobals.dbPath) < 0)
+      BufferTooShort();
+    unlink(tmpBuf); /* Clear the list */
+    myGlobals.macPrefixFile = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
+
+    if(myGlobals.macPrefixFile == NULL) {
       traceEvent(CONST_TRACE_ERROR, "FATAL ERROR: Database '%s' cannot be opened.", tmpBuf);
       exit(-1);
     }

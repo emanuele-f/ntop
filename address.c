@@ -742,8 +742,12 @@ void ipaddr2str(struct in_addr hostIpAddress, int actualDeviceId) {
 
 /* ************************************ */
 
+/* WARNING: This is not re-entrant nor multi-thread safe.
+            it returns the address of it's own static buffer.
+            Don't use it for long...
+ */
 char* etheraddr_string(const u_char *ep) {
-  static char buf[sizeof("00:00:00:00:00:00")];
+  static char buf[LEN_ETHERNET_ADDRESS_DISPLAY];
   u_int i, j;
   char *cp;
 

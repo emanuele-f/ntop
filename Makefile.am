@@ -63,11 +63,15 @@ DIST_COMMON += AUTHORS CONTENTS COPYING ChangeLog \
               faq.html \
               ntop-cert.pem \
               p2c.opt.table \
-              $(ETTER_PASSIVE)
+              $(ETTER_PASSIVE) \
+              oui.txt \
+              specialMAC.txt
 
 NTOPDATA = ntop-cert.pem \
            p2c.opt.table \
-           $(ETTER_PASSIVE)
+           $(ETTER_PASSIVE) \
+           oui.txt \
+           specialMAC.txt
 
 NTOPHTML = html html/*.js html/*.html  html/*.gif html/*.jpg html/*.ico html/*.png \
            html/*.css html/*.dtd \
@@ -130,7 +134,7 @@ libntop_la_SOURCES = address.c       dataFormat.c  \
                      sessions.c         \
                      ssl.c           term.c        traffic.c          \
                      util.c          vendor.c      version.c          \
-                     vendortable.h   ntop_darwin.c
+                     ntop_darwin.c
 
 libntop_la_DEPENDENCIES = config.h
 libntop_la_LIBADD       = 
@@ -242,18 +246,14 @@ install-data-local:
         done
 
 
-# built the vendor table
-vt: vendortable.h
-	@fgrep -e "(hex)" Internet/oui.txt | cut -c1-8,9,19- | sed -f vt.sed > vendortable.h
-
-# built the IPX SAP table
+# build the IPX SAP table
 sapt: saptable.h
 	@cat Internet/novell-sap-numbers | cut -c1-3 | sed -f sapt.sed > saptable.h
 
 
 # download the vendor information table
 dnvt:
-	@(cd Internet; wget -c http://standards.ieee.org/regauth/oui/oui.txt)
+	@wget -c http://standards.ieee.org/regauth/oui/oui.txt
 
 # download the Novell SAP Protocol information table
 dnsapt:

@@ -730,10 +730,12 @@ void handleFlowsSpecs() {
 	flowSpec[len-1] = '\0';
         flowSpec++;
 
+        traceEvent(CONST_TRACE_NOISY, "Compiling flow specification '%s'", flowSpec);
+
         rc = pcap_compile(myGlobals.device[0].pcapPtr, &fcode, flowSpec, 1, myGlobals.device[0].netmask.s_addr);
 
         if(rc < 0)
-          traceEvent(CONST_TRACE_INFO, "Wrong flow specification \"%s\" (syntax error). "
+          traceEvent(CONST_TRACE_WARNING, "Wrong flow specification \"%s\" (syntax error). "
                      "It has been ignored.\n", flowSpec);
         else {
           FlowFilterList *newFlow;

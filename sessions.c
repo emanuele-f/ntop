@@ -887,7 +887,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 
 	  rcStr = (char*)malloc(packetDataLength+1);
 	  strncpy(rcStr, packetData, packetDataLength);
-	  rcStr[packetDataLength-1] = '\0';
+	  rcStr[packetDataLength-2] = '\0';
 
 	  if((strncmp(rcStr, "USER ", 5) == 0) && strcmp(&rcStr[5], "anonymous")) {
 	    if(sport == 21)
@@ -895,7 +895,7 @@ static IPSession* handleSession(const struct pcap_pkthdr *h,
 	    else
 	      updateHostUsers(&rcStr[5], srcHost);
 
-#ifndef FTP_DEBUG
+#ifdef FTP_DEBUG
 	    printf("FTP_DEBUG: %s:%d->%s:%d [%s]\n",
 		   srcHost->hostNumIpAddress, sport, dstHost->hostNumIpAddress, dport,
 		   &rcStr[5]);

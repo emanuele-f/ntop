@@ -439,7 +439,7 @@ void resetStats(void) {
     myGlobals.device[i].numTcpSessions = 0;
 
     myGlobals.device[i].hash_hostTraffic[myGlobals.broadcastEntryIdx] = myGlobals.broadcastEntry;
-    if(yGlobals.otherHostEntryIdx != myGlobals.broadcastEntryIdx) {
+    if(myGlobals.otherHostEntryIdx != myGlobals.broadcastEntryIdx) {
       allocateOtherHosts(); /* Freed by ** */
       myGlobals.device[i].hash_hostTraffic[myGlobals.otherHostEntryIdx] = myGlobals.otherHostEntry;
     }

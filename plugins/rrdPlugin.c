@@ -1380,7 +1380,7 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 
     numLocalNets = 0;
     strcpy(rrdPath, hostsFilter); /* It avoids strtok to blanks into hostsFilter */
-    handleAddressLists(rrdPath, networks, &numLocalNets, value, sizeof(value), TRUE);
+    handleAddressLists(rrdPath, networks, &numLocalNets, value, sizeof(value), CONST_HANDLEADDRESSLISTS_RRD);
 
     /* ****************************************************** */
 

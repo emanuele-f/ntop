@@ -904,7 +904,7 @@ static PluginInfo netflowPluginInfo[] = {
 /* ***************************************** */
 
 /* Plugin entry fctn */
-#ifdef STATIC_PLUGIN
+#ifdef MAKE_STATIC_PLUGIN
 PluginInfo* netflowPluginEntryFctn(void)
 #else
      PluginInfo* PluginEntryFctn(void)

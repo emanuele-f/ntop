@@ -310,7 +310,7 @@ static PluginInfo PDAPluginInfo[] = {
 };
 
 /* Plugin entry fctn */
-#ifdef STATIC_PLUGIN
+#ifdef MAKE_STATIC_PLUGIN
 PluginInfo* wapPluginEntryFctn(void)
 #else
   PluginInfo* PluginEntryFctn(void)

@@ -85,9 +85,9 @@ static void resolveAddress(struct in_addr *hostAddr,
   StoredAddress storedAddress;
   int addr, i, addToCacheFlag;
   struct hostent *hp = NULL;
+  int h_errnop;
 #ifdef HAVE_GETHOSTBYADDR_R
   struct hostent _hp, *__hp;
-  int h_errnop;
   char buffer[512];
 #endif
   char* res;

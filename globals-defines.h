@@ -205,7 +205,6 @@
 
 /* Win32 - Force various things to make up for lack of ./configure process */
 #ifdef WIN32
-#define MAKE_STATIC_PLUGIN /* This needs to be fixed */
 
  #ifndef HAVE_GDBM_H
   #define HAVE_GDBM_H
@@ -227,8 +226,7 @@
   /* #define HAVE_LIBRRD ****/
  #endif
 
-
- #define STATIC_PLUGIN
+ #define MAKE_STATIC_PLUGIN
 
  #define CFG_LITTLE_ENDIAN                  1
  #undef  CFG_BIG_ENDIAN

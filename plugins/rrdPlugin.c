@@ -50,8 +50,6 @@ static const char *rrd_subdirs[] =
 
 #ifdef HAVE_RRD
 
-#include <dirent.h>
-
 static void setPluginStatus(char * status);
  
 #ifdef WIN32
@@ -1569,7 +1567,7 @@ static PluginInfo rrdPluginInfo[] = {
 /* ****************************** */
 
 /* Plugin entry fctn */
-#ifdef STATIC_PLUGIN
+#ifdef MAKE_STATIC_PLUGIN
  PluginInfo* rrdPluginEntryFctn(void)
 #else
    PluginInfo* PluginEntryFctn(void)

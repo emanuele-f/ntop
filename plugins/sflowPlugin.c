@@ -2240,7 +2240,7 @@ static PluginInfo sFlowPluginInfo[] = {
 /* ***************************************** */
 
 /* Plugin entry fctn */
-#ifdef STATIC_PLUGIN
+#ifdef MAKE_STATIC_PLUGIN
 PluginInfo* sflowPluginEntryFctn(void)
 #else
      PluginInfo* PluginEntryFctn(void)

@@ -368,7 +368,7 @@ static PluginInfo LsPluginInfo[] = {
 };
   
 /* Plugin entry fctn */
-#ifdef STATIC_PLUGIN
+#ifdef MAKE_STATIC_PLUGIN
 PluginInfo* lsPluginEntryFctn(void) {
 #else
   PluginInfo* PluginEntryFctn(void) {

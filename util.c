@@ -3211,8 +3211,6 @@ char *ip2CountryCode(u_int32_t ip) {
 /* ******************************************************** */
 
 
-#ifndef WIN32
-
 /* ********************************************************
  *  The following code is taken from GNU's gcc libiberty,
  *  a collection of extension and replacement routines
@@ -4037,7 +4035,7 @@ char **buildargv(const char *input) {
 
 #endif /* HAVE_BUILDARGV */
 
-#endif /* WIN32*/
+/* ******************************************************** */
 
 #ifdef PARM_SHOW_NTOP_HEARTBEAT
 void _HEARTBEAT(int beatLevel, char* file, int line, char * format, ...) {

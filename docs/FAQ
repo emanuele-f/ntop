@@ -436,6 +436,24 @@ A. Make sure you aren't running against the loopback (127.0.0.1) interface.
    for it (e.g. ping 127.0.0.1).
 
 
+Q. ntop is unable to open it's database file.  Specifically:
+   I have following messages while running ntop
+
+     wait please: ntop is coming up...
+     24/Jul/2003 15:15:23 Initializing IP services...
+     <snip />
+     24/Jul/2003 15:15:23 Initializing GDBM...
+     24/Jul/2003 15:15:23 Database '/var/ntop/addressCache.db' open failed: File open error
+     24/Jul/2003 15:15:23 Possible solution: please use '-P <directory>'
+A. Multiple possible choices...
+    1. The directory /var/ntop doesn't exist.  Create it or, as the message says, use the
+       -P parameter to point ntop at another directory.
+    2. You many not have read/write rights in /var/ntop - if you're running in non-promiscuous
+       mode from a user other than root.
+    3. Another instance of ntop may already be running, so it has the file open and locked.
+   (Added 29Jul2002 by Burton)
+
+
 Q. ntop stops capturing packets, except ARP and other broadcasts.  Why?
 A. Check if you have a daemon running that periodically checks for and 
    resets interfaces in promiscuous mode?  If that happens, all you 
@@ -1221,6 +1239,16 @@ Q. Where is info about netflow?
 A. Dale Reed pointed out a good tech doc (no flak, just the formats) for netflow V1/5/7: 
 
     http://www.cisco.com/univercd/cc/td/doc/product/rtrmgmt/nfc/nfc_2_0/nfc_ug/nfcform.htm  
+
+
+Q. How do I access netFlow or sFlow data from ntop?
+A. You need to configure ntop as a listener (it can also be a collector, but that data shows
+   up in the receiving interface, not under netFlow/sFlow).
+
+   First, use the appropriate plugin to set the parameters - basically the port you want ntop
+   to listen on.  Then, using the Admin | Set Interface menu item, switch ntop to report on
+   the sFlow/netFlow pseudo-device (NetFlow-device or sFlow-device).
+   (Added 29Jul2002 by Burton)
 
 
 Q. Is there any parameter to set to tell ntop which interface/ip address 

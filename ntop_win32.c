@@ -107,6 +107,12 @@ void initWinsock32() {
   }
 
     
+#ifdef WIN32
+  if(myGlobals.pcapLogBasePath) free(myGlobals.pcapLogBasePath); myGlobals.pcapLogBasePath = strdup(_wdir);
+  if(myGlobals.dbPath) free(myGlobals.dbPath); myGlobals.dbPath          = strdup(_wdir);
+#endif
+
+
 #ifdef WIN32_DEMO
   traceEvent(CONST_TRACE_ALWAYSDISPLAY, "\n-----------------------------------------------------------");
   traceEvent(CONST_TRACE_ALWAYSDISPLAY, "WARNING: this application is a limited ntop version able to");

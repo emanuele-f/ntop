@@ -114,7 +114,7 @@ void initIPServices(void) {
   FILE* fd;
   int idx, numSlots, len;
 
-  traceEvent(CONST_TRACE_INFO, "Initializing IP services...");
+  traceEvent(CONST_TRACE_INFO, "INIT: Initializing IP services");
 
 
   /* Let's count the entries first */
@@ -432,11 +432,11 @@ void initCounters(void) {
   if (gethostname(myGlobals.hostName, MAXHOSTNAMELEN) != 0)
       strncpy(myGlobals.hostName, "127.0.0.1", MAXHOSTNAMELEN);
   else {
-     traceEvent(CONST_TRACE_INFO, "Note: On this system, gethostname() returned '%s'.\n", myGlobals.hostName);
+     traceEvent(CONST_TRACE_INFO, "INIT: On this system, gethostname() returned '%s'", myGlobals.hostName);
 
      if (strcmp(myGlobals.hostName, myGlobals.domainName) == 0) {
          /* The returned hostName doesn't appear to have the domainName in it... */
-         traceEvent(CONST_TRACE_INFO, "Note: Appending the domain name, '%s'\n", myGlobals.domainName);
+         traceEvent(CONST_TRACE_INFO, "INIT: Appending the domain name, '%s'", myGlobals.domainName);
          sprintf(myGlobals.hostName, "%s.%s", myGlobals.hostName, myGlobals.domainName);
      }
   }
@@ -788,103 +788,56 @@ int initGlobalValues(void) {
 
 /* ******************************* */
 
-void initGdbm(char *directory) {
+void initSingleGdbm(GDBM_FILE *database, char *dbName, char *directory, int doUnlink) {
   char tmpBuf[200];
 
-  /* directory is used my intop to specify where to open the files.
+  /* Courtesy of Andreas Pfaller <apfaller@yahoo.com.au>. */
+  /* directory is used by intop to specify where to open the files.
      If called with NULL, use the myGlobals.dbPath value instead
      (Minor fix for intop - Burton Strauss (BStrauss@acm.org) - Apr2002)
   */  
-  traceEvent(CONST_TRACE_INFO, "Initializing GDBM...");
 
-  /* Courtesy of Andreas Pfaller <apfaller@yahoo.com.au>. */
-  if(snprintf(tmpBuf, sizeof(tmpBuf), "%s/addressQueue.db", 
-	      directory != NULL ? directory : myGlobals.dbPath) < 0)
-    BufferTooShort();
+  if (snprintf(tmpBuf, sizeof(tmpBuf), "%s/%s", 
+               directory != NULL ? directory : myGlobals.dbPath,
+               dbName) < 0)
+      BufferTooShort();
 
-  unlink(tmpBuf); /* Delete the old one (if present) */
-  myGlobals.addressQueueFile = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
-
-  if(myGlobals.addressQueueFile == NULL) {
-#if defined(WIN32) && defined(__GNUC__)
-    traceEvent(CONST_TRACE_ERROR, "Database '%s' open failed: %s\n",
-	       tmpBuf, "unknown gdbm errno");
-#else
-    traceEvent(CONST_TRACE_ERROR, "Database '%s' open failed: %s\n",
-	       tmpBuf, gdbm_strerror(gdbm_errno));
-#endif
-
-    if(directory == NULL) {
-      traceEvent(CONST_TRACE_ERROR, "Possible solution: please use '-P <directory>'\n");
-    }
-    exit(-1);
+  if (doUnlink == TRUE) {
+      unlink(tmpBuf); /* Delete the old one (if present) */
   }
 
-  /* ************************************************ */
+  traceEvent(CONST_TRACE_ERROR, "INIT: %s database '%s'",
+                                doUnlink == TRUE ? "creating" : "opening",
+                                tmpBuf);
+  *database = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
 
-  if(snprintf(tmpBuf, sizeof(tmpBuf), "%s/prefsCache.db", directory != NULL ? directory : myGlobals.dbPath) < 0)
-    BufferTooShort();
-
-  myGlobals.prefsFile = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
-
-  if(myGlobals.prefsFile == NULL) {
+  if(*database == NULL) {
+      traceEvent(CONST_TRACE_ERROR, "INIT: ....open failed: %s",
 #if defined(WIN32) && defined(__GNUC__)
-    traceEvent(CONST_TRACE_ERROR, "Database '%s' open failed: %s\n",
-	       tmpBuf, "unknown gdbm errno");
+                 "unknown gdbm errno"
 #else
-    traceEvent(CONST_TRACE_ERROR, "Database '%s' open failed: %s\n",
-	       tmpBuf, gdbm_strerror(gdbm_errno));
+                 gdbm_strerror(gdbm_errno)
 #endif
-    exit(-1);
+                );
+
+      if (directory == NULL) {
+          traceEvent(CONST_TRACE_ERROR, "INIT: Possible solution: please use '-P <directory>'\n");
+      }
+      exit(-1);
   }
+}
 
-  /* ************************************************ */
+void initGdbm(char *directory) {
+  char tmpBuf[200];
 
-  /* Courtesy of Andreas Pfaller <apfaller@yahoo.com.au>. */
-  if(snprintf(tmpBuf, sizeof(tmpBuf), "%s/dnsCache.db", directory != NULL ? directory : myGlobals.dbPath) < 0)
-    BufferTooShort();
+  traceEvent(CONST_TRACE_INFO, "INIT: Initializing gdbm databases");
 
-  unlink(tmpBuf); /* Clear the cache */
-  myGlobals.dnsCacheFile = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
-
-  if(myGlobals.dnsCacheFile == NULL) {
-#if defined(WIN32) && defined(__GNUC__)
-    traceEvent(CONST_TRACE_ERROR, "Database '%s' open failed: %s\n",
-	       tmpBuf, "unknown gdbm errno");
-#else
-    traceEvent(CONST_TRACE_ERROR, "Database '%s' open failed: %s\n",
-	       tmpBuf, gdbm_strerror(gdbm_errno));
-#endif
-    exit(-1);
-  } else {
-    if(snprintf(tmpBuf, sizeof(tmpBuf), "%s/ntop_pw.db", directory != NULL ? directory : myGlobals.dbPath) < 0)
-      BufferTooShort();
-    myGlobals.pwFile = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
-
-    if(myGlobals.pwFile == NULL) {
-      traceEvent(CONST_TRACE_ERROR, "FATAL ERROR: Database '%s' cannot be opened.", tmpBuf);
-      exit(-1);
-    }
-
-    if(snprintf(tmpBuf, sizeof(tmpBuf), "%s/hostsInfo.db", directory != NULL ? directory : myGlobals.dbPath) < 0)
-      BufferTooShort();
-    myGlobals.hostsInfoFile = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
-
-    if(myGlobals.hostsInfoFile == NULL) {
-      traceEvent(CONST_TRACE_ERROR, "FATAL ERROR: Database '%s' cannot be opened.", tmpBuf);
-      exit(-1);
-    }
-
-    if(snprintf(tmpBuf, sizeof(tmpBuf), "%s/macPrefix.db", directory != NULL ? directory : myGlobals.dbPath) < 0)
-      BufferTooShort();
-    unlink(tmpBuf); /* Clear the list */
-    myGlobals.macPrefixFile = gdbm_open (tmpBuf, 0, GDBM_WRCREAT, 00664, NULL);
-
-    if(myGlobals.macPrefixFile == NULL) {
-      traceEvent(CONST_TRACE_ERROR, "FATAL ERROR: Database '%s' cannot be opened.", tmpBuf);
-      exit(-1);
-    }
-  }
+  initSingleGdbm(&myGlobals.addressQueueFile, "addressQueue.db", directory, TRUE);
+  initSingleGdbm(&myGlobals.prefsFile,        "prefsCache.db",   directory, FALSE);
+  initSingleGdbm(&myGlobals.dnsCacheFile,     "dnsCache.db",     directory, TRUE);
+  initSingleGdbm(&myGlobals.pwFile,           "ntop_pw.db",      directory, FALSE);
+  initSingleGdbm(&myGlobals.hostsInfoFile,    "hostsInfo.db",    directory, FALSE);
+  initSingleGdbm(&myGlobals.macPrefixFile,    "macPrefix.db",    directory, TRUE);
 }
 
 /* ************************************************************ */
@@ -931,7 +884,7 @@ void initThreads(void) {
    */
   createMutex(&myGlobals.packetQueueMutex);
   createThread(&myGlobals.dequeueThreadId, dequeuePacket, NULL);
-  traceEvent(CONST_TRACE_INFO, "Started thread (%ld) for network packet analyser.",
+  traceEvent(CONST_TRACE_INFO, "THREADMGMT: Started thread (%ld) for network packet analyser",
 	     myGlobals.dequeueThreadId);
 
   /*
@@ -944,7 +897,7 @@ void initThreads(void) {
    */
   if (myGlobals.enableIdleHosts && (myGlobals.rFileName == NULL)) {
     createThread(&myGlobals.scanIdleThreadId, scanIdleLoop, NULL);
-    traceEvent(CONST_TRACE_INFO, "Started thread (%ld) for idle hosts detection.",
+    traceEvent(CONST_TRACE_INFO, "THREADMGMT: Started thread (%ld) for idle hosts detection",
 	       myGlobals.scanIdleThreadId);
   }
 
@@ -957,7 +910,7 @@ void initThreads(void) {
      */
     for(i=0; i<myGlobals.numDequeueThreads; i++) {
       createThread(&myGlobals.dequeueAddressThreadId[i], dequeueAddress, NULL);
-      traceEvent(CONST_TRACE_INFO, "Started thread (%ld) for DNS address resolution.",
+      traceEvent(CONST_TRACE_INFO, "THREADMGMT: Started thread (%ld) for DNS address resolution",
 		 myGlobals.dequeueAddressThreadId[i]);
     }
   }
@@ -997,7 +950,7 @@ void initApps(void) {
      */
     createMutex(&myGlobals.lsofMutex);
     createThread(&myGlobals.lsofThreadId, periodicLsofLoop, NULL);
-    traceEvent(CONST_TRACE_INFO, "Started thread (%ld) for lsof support.", myGlobals.lsofThreadId);
+    traceEvent(CONST_TRACE_INFO, "THREADMGMT: Started thread (%ld) for lsof support", myGlobals.lsofThreadId);
 #endif /* WIN32 */
 
 #else
@@ -1035,7 +988,7 @@ void initDevices(char* devices) {
   int defaultIdx = -1;
 #endif
 
-  traceEvent(CONST_TRACE_INFO, "Initializing network devices...");
+  traceEvent(CONST_TRACE_INFO, "INIT: Initializing network devices");
 
   if((devices != NULL) && (strcmp(devices, "none") == 0)) {
     /* Creating dummy device */
@@ -1059,7 +1012,7 @@ void initDevices(char* devices) {
   tmpDev = pcap_lookupdev(ebuf);
 
   if(tmpDev == NULL) {
-    traceEvent(CONST_TRACE_INFO, "Unable to locate default interface (%s)", ebuf);
+    traceEvent(CONST_TRACE_INFO, "INIT: FATAL_ERROR: Unable to locate default interface (%s)", ebuf);
     exit(-1);
   }
 
@@ -1071,7 +1024,7 @@ void initDevices(char* devices) {
 	if(ifName[0] == '\0')
 	  break;
 	else {
-	  traceEvent(CONST_TRACE_INFO, "Found interface [index=%d] '%s'", ifIdx, ifName);
+	  traceEvent(CONST_TRACE_INFO, "INIT: Found interface [index=%d] '%s'", ifIdx, ifName);
 
 	  if(ifIdx < 32) {
 	    strcpy(intNames[ifIdx], ifName);
@@ -1142,7 +1095,7 @@ void initDevices(char* devices) {
     tmpDev = pcap_lookupdev(ebuf);
 
     if(tmpDev == NULL) {
-      traceEvent(CONST_TRACE_INFO, "Unable to locate default interface (%s)", ebuf);
+      traceEvent(CONST_TRACE_INFO, "INIT: FATAL_ERROR: Unable to locate default interface (%s)", ebuf);
       exit(-1);
     }
 #endif
@@ -1162,7 +1115,7 @@ void initDevices(char* devices) {
     if(selectedDevice < ifIdx) {
       tmpDev = intNames[selectedDevice];
     } else {
-      traceEvent(CONST_TRACE_INFO, "Index out of range [0..%d]", ifIdx);
+      traceEvent(CONST_TRACE_INFO, "INIT: FATAL_ERROR: Device index out of range [0..%d]", ifIdx);
       exit(-1);
     }
 #endif
@@ -1200,7 +1153,7 @@ void initDevices(char* devices) {
 	tmpDescr = intDescr[atoi(tmpDev)];
 	tmpDev   = intNames[atoi(tmpDev)];
       } else {
-	traceEvent(CONST_TRACE_INFO, "Interface index '%d' is out of range [0..%d]", atoi(tmpDev), ifIdx);
+	traceEvent(CONST_TRACE_INFO, "INIT: FATAL_ERROR: Interface index '%d' is out of range [0..%d]", atoi(tmpDev), ifIdx);
 	exit(-1);
       }
 
@@ -1227,16 +1180,17 @@ void initDevices(char* devices) {
 
 #ifndef CFG_MULTITHREADED
       if(tmpDev != NULL) {
-	traceEvent(CONST_TRACE_WARNING, "WARNING: ntop can handle multiple interfaces only\n"
-		   "         if thread support is enabled. Only interface\n"
-		   "         '%s' will be used.\n", myGlobals.device[0].name);
+	traceEvent(CONST_TRACE_WARNING, "INIT: WARNING: ntop can handle multiple interfaces only if thread support is enabled");
+	traceEvent(CONST_TRACE_WARNING, "INIT: WARNING: Only interface '%s' will be used",
+                                        myGlobals.device[0].name);
 	break;
       }
 #endif
 
       if(myGlobals.numDevices >= MAX_NUM_DEVICES) {
-	traceEvent(CONST_TRACE_INFO, "WARNING: ntop can handle up to %d interfaces.",
+	traceEvent(CONST_TRACE_INFO, "INIT: WARNING: ntop can handle up to %d interfaces",
 		   myGlobals.numDevices);
+	traceEvent(CONST_TRACE_WARNING, "INIT: WARNING: Additional interfaces will be ignored");
 	break;
       }
     }
@@ -1343,8 +1297,8 @@ void initLibpcap(void) {
 			 100 /* ms */, ebuf);
 
 	if(myGlobals.device[i].pcapPtr == NULL) {
-	  traceEvent(CONST_TRACE_INFO, ebuf);
-	  traceEvent(CONST_TRACE_INFO, "Please select another interface using the -i flag.");
+	  traceEvent(CONST_TRACE_ERROR, "INIT: FATAL_ERROR: pcap_open_live(): '%s'", ebuf);
+          traceEvent(CONST_TRACE_ERROR, "INIT: Please correct the problem or select a different interface using the -i flag");
 	  exit(-1);
 	}
 
@@ -1363,10 +1317,10 @@ void initLibpcap(void) {
 	  myGlobals.device[i].pcapDumper = pcap_dump_open(myGlobals.device[i].pcapPtr, myName);
 
 	  if(myGlobals.device[i].pcapDumper == NULL) {
-	    traceEvent(CONST_TRACE_INFO, ebuf);
+            traceEvent(CONST_TRACE_ERROR, "INIT: FATAL_ERROR, pcap_dump_open(): '%s'", ebuf);
 	    exit(-1);
 	  } else
-		traceEvent(CONST_TRACE_INFO, "Saving packets into file %s", myName);	
+		traceEvent(CONST_TRACE_INFO, "INIT: Saving packets into file %s", myName);	
 	}
 
 	if(myGlobals.enableSuspiciousPacketDump) {
@@ -1376,7 +1330,7 @@ void initLibpcap(void) {
 	  myGlobals.device[i].pcapErrDumper = pcap_dump_open(myGlobals.device[i].pcapPtr, myName);
 
 	  if(myGlobals.device[i].pcapErrDumper == NULL)
-	    traceEvent(CONST_TRACE_INFO, ebuf);
+	    traceEvent(CONST_TRACE_ERROR, "INIT: FATAL_ERROR: pcap_dump_open() for suspicious packets: '%s'", ebuf);
 	}
       } else {
 	myGlobals.device[i].virtualDevice = 1;
@@ -1405,7 +1359,7 @@ void initLibpcap(void) {
     myGlobals.numDevices = 1;
 
     if(myGlobals.device[0].pcapPtr == NULL) {
-      traceEvent(CONST_TRACE_INFO, ebuf);
+      traceEvent(CONST_TRACE_ERROR, "INIT: FATAL_ERROR: pcap_open_offline(): '%s'", ebuf);
       exit(-1);
     }
   }
@@ -1436,20 +1390,21 @@ void initLibpcap(void) {
   /* Sanity check... */
   /*
     if((localHostAddress[0].s_addr & myGlobals.device[0].netmask) != myGlobals.device[0].localnet) {
-    struct in_addr addr1;
+    struct in_addr addr1, addr2;
 
-    traceEvent(CONST_TRACE_WARNING, "WARNING: your IP address (%s), ", intoa(localHostAddress[0]));
     addr1.s_addr = netmask[0];
-    traceEvent(CONST_TRACE_WARNING, "netmask %s", intoa(addr1));
-    addr1.s_addr = myGlobals.device[0].localnet;
-    traceEvent(CONST_TRACE_WARNING, ", network %s\ndo not match.\n", intoa(addr1));
+    addr2.s_addr = myGlobals.device[0].localnet;
+    traceEvent(CONST_TRACE_WARNING, "INIT: WARNING: your IP address (%s), netmask %s and network %s do not match",
+                                    intoa(localHostAddress[0]),
+                                    intoa(addr1),
+                                    intoa(addr2));
     myGlobals.device[0].network = localHostAddress[0].s_addr & myGlobals.device[0].netmask;
-    traceEvent(CONST_TRACE_WARNING, "ntop will use: IP address (%s), ",
-    intoa(localHostAddress[0]));
     addr1.s_addr = netmask[0];
-    traceEvent(CONST_TRACE_WARNING, "netmask %s", intoa(addr1));
-    addr1.s_addr = myGlobals.device[0].localnet;
-    traceEvent(CONST_TRACE_WARNING, ", network %s.\n", intoa(addr1));
+    addr2.s_addr = myGlobals.device[0].localnet;
+    traceEvent(CONST_TRACE_WARNING, "INIT: ntop will use: IP address (%s), netmask %s and network %s",
+                                    intoa(localHostAddress[0]),
+                                    intoa(addr1),
+                                    intoa(addr2));
     myGlobals.device[0].localnet = localHostAddress[0].s_addr & myGlobals.device[0].netmask;
     } */
 #endif
@@ -1469,7 +1424,7 @@ void initLibpcap(void) {
 	+ 4096 /* Max 4096 hosts used for multicast */;
       if(myGlobals.device[i].numHosts > MAX_SUBNET_HOSTS) {
 	myGlobals.device[i].numHosts = MAX_SUBNET_HOSTS;
-	traceEvent(CONST_TRACE_WARNING, "Truncated network size (device %s) to %d hosts (real netmask %s)",
+	traceEvent(CONST_TRACE_WARNING, "INIT: WARNING: Truncated network size (device %s) to %d hosts (real netmask %s)",
 		   myGlobals.device[i].name, myGlobals.device[i].numHosts, intoa(myGlobals.device[i].netmask));
       }
 
@@ -1482,7 +1437,7 @@ void initLibpcap(void) {
 #endif
 
       if(myGlobals.device[i].ipTrafficMatrix == NULL) {
-	traceEvent(CONST_TRACE_ERROR, "FATAL error: malloc() failed (size %d bytes)", memlen);
+	traceEvent(CONST_TRACE_ERROR, "INIT: FATAL_ERROR: malloc() failed (size %d bytes)", memlen);
 	exit(-1);
       }
 
@@ -1491,7 +1446,7 @@ void initLibpcap(void) {
 									      myGlobals.device[i].numHosts);
 
       if(myGlobals.device[i].ipTrafficMatrixHosts == NULL) {
-	traceEvent(CONST_TRACE_ERROR, "FATAL error: malloc() failed (size %d bytes)", memlen);
+	traceEvent(CONST_TRACE_ERROR, "INIT: FATAL_ERROR: malloc() failed (size %d bytes)", memlen);
 	exit(-1);
       }
     }
@@ -1513,19 +1468,19 @@ void initDeviceDatalink(void) {
       switch(myGlobals.device[i].name[0]) {
       case 't': /* TokenRing */
 	myGlobals.device[i].datalink = DLT_IEEE802;
-        traceEvent(CONST_TRACE_INFO, "Device %d(%s) is \"t...\", treating as DLT_IEEE802 (TokenRing)\n", 
+        traceEvent(CONST_TRACE_INFO, "INIT_DLT: Device %d(%s) is \"t...\", treating as DLT_IEEE802 (TokenRing)", 
                                i,
                                myGlobals.device[i].name);
 	break;
       case 'l': /* Loopback */
 	myGlobals.device[i].datalink = DLT_NULL;
-        traceEvent(CONST_TRACE_INFO, "Device %d(%s) is loopback, treating as DLT_NULL\n", 
+        traceEvent(CONST_TRACE_INFO, "INIT_DLT: Device %d(%s) is loopback, treating as DLT_NULL", 
                                i,
                                myGlobals.device[i].name);
 	break;
       default:
 	myGlobals.device[i].datalink = DLT_EN10MB; /* Ethernet */
-        traceEvent(CONST_TRACE_INFO, "Device %d(%s), treating as DLT_EN10MB (Ethernet)\n", 
+        traceEvent(CONST_TRACE_INFO, "INIT_DLT: Device %d(%s), treating as DLT_EN10MB (10/100/1000 Ethernet)", 
                                i,
                                myGlobals.device[i].name);
       }
@@ -1538,29 +1493,29 @@ void initDeviceDatalink(void) {
 #if defined(__FreeBSD__)
       if(strncmp(myGlobals.device[i].name, "tun", 3) == 0) {
 	myGlobals.device[i].datalink = DLT_PPP;
-        traceEvent(CONST_TRACE_INFO, "Device %d(%s) is \"tun\", treating as DLT_PPP\n", 
+        traceEvent(CONST_TRACE_INFO, "INIT_DLT: Device %d(%s) is \"tun\", treating as DLT_PPP", 
                                i,
                                myGlobals.device[i].name);
 #else /* Not FreeBSD */
       if((myGlobals.device[i].name[0] == 'l') /* loopback check */
 	 && (myGlobals.device[i].name[1] == 'o')) {
 	myGlobals.device[i].datalink = DLT_NULL;
-        traceEvent(CONST_TRACE_INFO, "Device %d(%s) is loopback, treating as DLT_NULL\n", 
+        traceEvent(CONST_TRACE_INFO, "INIT_DLT: Device %d(%s) is loopback, treating as DLT_NULL", 
                                i,
                                myGlobals.device[i].name);
 #endif /* FreeBSD */
       } else {
 	myGlobals.device[i].datalink = pcap_datalink(myGlobals.device[i].pcapPtr);
         if (myGlobals.device[i].datalink > MAX_DLT_ARRAY) {
-            traceEvent(CONST_TRACE_WARNING, "WARNING: Device %d(%s) DLT_ value, %d, exceeds highest known value. " \
-                                      "Processing continues OK. " \
-                                      "Please report this to the ntop-dev list.\n",
+            traceEvent(CONST_TRACE_WARNING, "INIT_DLT: WARNING: Device %d(%s) DLT_ value, %d, exceeds highest known value",
                                       i,
                                       myGlobals.device[i].name,
                                       myGlobals.device[i].datalink);
+            traceEvent(CONST_TRACE_INFO, "INIT_DLT: Processing continues OK");
+            traceEvent(CONST_TRACE_INFO, "INIT_DLT: Please report this to the ntop-dev list.");
         } else {
 #ifdef DEBUG
-	  traceEvent(CONST_TRACE_INFO, "Device %d(%s) DLT_ is %d, assuming mtu %d, header %d\n", 
+	  traceEvent(CONST_TRACE_INFO, "INIT_DLT: Device %d(%s) DLT_ is %d, assuming mtu %d, header %d", 
                                    i,
                                    myGlobals.device[i].name,
                                    myGlobals.device[i].datalink,
@@ -1569,16 +1524,16 @@ void initDeviceDatalink(void) {
 #endif
 	  if ( (myGlobals.mtuSize[myGlobals.device[i].datalink] == 0) ||
 	       (myGlobals.mtuSize[myGlobals.device[i].datalink] == CONST_UNKNOWN_MTU) ) {
-	    traceEvent(CONST_TRACE_INFO, "WARNING: MTU value for DLT_  %d, is zero or unknown. " \
-		       "Processing continues OK. " \
-		       "Please report your MTU values (e.g. ifconfig) to the ntop-dev list.\n",
+	    traceEvent(CONST_TRACE_WARNING, "INIT_DLT: WARNING: MTU value for DLT_  %d, is zero or unknown",
 		       myGlobals.device[i].datalink);
+            traceEvent(CONST_TRACE_INFO, "INIT_DLT: Processing continues OK");
+            traceEvent(CONST_TRACE_INFO, "INIT_DLT: Please report your MTU values (e.g. ifconfig) to the ntop-dev list");
 	  }
 	  if (myGlobals.headerSize[myGlobals.device[i].datalink] == 0) {
-	    traceEvent(CONST_TRACE_INFO, "NOTE: Header value for DLT_  %d, is zero. " \
-		       "Processing continues OK - don't use the nfs plugin. " \
-		       "Please report this to the ntop-dev list.\n",
+	    traceEvent(CONST_TRACE_INFO, "INIT_DLT: Header value for DLT_  %d, is zero",
 		       myGlobals.device[i].datalink);
+            traceEvent(CONST_TRACE_INFO, "INIT_DLT: Processing continues OK - don't use the nfs plugin");
+            traceEvent(CONST_TRACE_INFO, "INIT_DLT: Please report this to the ntop-dev list");
 	  }
         }
       }
@@ -1601,13 +1556,13 @@ void parseTrafficFilter(void) {
 			 myGlobals.device[i].netmask.s_addr) < 0)
 	   || (pcap_setfilter(myGlobals.device[i].pcapPtr, &fcode) < 0)) {
 	  traceEvent(CONST_TRACE_ERROR,
-		     "FATAL ERROR: wrong filter '%s' (%s) on interface %s\n",
+		     "FILTER: FATAL_ERROR: wrong filter '%s' (%s) on interface %s",
 		     myGlobals.currentFilterExpression,
 		     pcap_geterr(myGlobals.device[i].pcapPtr),
 		     myGlobals.device[i].name[0] == '0' ? "<pcap file>" : myGlobals.device[i].name);
 	  exit(-1);
 	} else
-	  traceEvent(CONST_TRACE_INFO, "Set filter \"%s\" on device %s.",
+	  traceEvent(CONST_TRACE_INFO, "FILTER: Setting to \"%s\" on device %s.",
 		     myGlobals.currentFilterExpression, myGlobals.device[i].name);
 #ifdef HAVE_PCAP_FREECODE
           pcap_freecode(&fcode);
@@ -1667,7 +1622,7 @@ void startSniffer(void) {
        * (8) - NPS - Network Packet Sniffer (main thread)
        */
       createThread(&myGlobals.device[i].pcapDispatchThreadId, pcapDispatch, (char*)i);
-      traceEvent(CONST_TRACE_INFO, "Started thread (%ld) for network packet sniffing on %s.\n",
+      traceEvent(CONST_TRACE_INFO, "THREADMGMT: Started thread (%ld) for network packet sniffing on %s",
 		 myGlobals.device[i].pcapDispatchThreadId, myGlobals.device[i].name);
     }
 #endif

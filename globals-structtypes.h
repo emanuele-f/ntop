@@ -1799,6 +1799,10 @@ XML*/
   size_t allocatedMemory;
 #endif
 
+#if defined(HAVE_MALLINFO_MALLOC_H) && defined(HAVE_MALLOC_H) && defined(__GNUC__)
+  u_int baseMemoryUsage;
+#endif
+
   /*
    * local variables
    */

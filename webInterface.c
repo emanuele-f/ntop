@@ -1989,6 +1989,15 @@ void printNtopConfigInfo(int textPrintFlag) {
   extern char pcap_version[];
 #endif /* HAVE_PCAP_VERSION */
 
+#if defined(HAVE_MALLINFO_MALLOC_H) && defined(HAVE_MALLOC_H) && defined(__GNUC__)
+    struct mallinfo memStats;
+    int totalHostsMonitored = 0;
+
+ #ifdef HAVE_SYS_RESOURCE_H
+    struct rlimit rlim;
+ #endif
+#endif
+
   if (textPrintFlag != TRUE) {
     printHTMLheader("Current ntop Configuration", 0);
   }
@@ -2493,15 +2502,9 @@ void printNtopConfigInfo(int textPrintFlag) {
 
 
 #if defined(HAVE_MALLINFO_MALLOC_H) && defined(HAVE_MALLOC_H) && defined(__GNUC__)
-  {
-    struct mallinfo memStats;
- #ifdef HAVE_SYS_RESOURCE_H
-    struct rlimit rlim;
- #endif
+    sendString(texthtml("\n\nMemory allocation - data segment\n\n", "<tr><th colspan=\"2\">Memory allocation - data segment</th></tr>\n"));
 
     memStats = mallinfo();
-
-    sendString(texthtml("\n\nMemory allocation - data segment\n\n", "<tr><th colspan=\"2\">Memory allocation - data segment</th></tr>\n"));
 
  #ifdef HAVE_SYS_RESOURCE_H
     getrlimit(RLIMIT_DATA, &rlim);
@@ -2539,7 +2542,6 @@ void printNtopConfigInfo(int textPrintFlag) {
       BufferTooShort();
     printFeatureConfigInfo(textPrintFlag, "Allocated bytes (hblkhd)", buf);
 
-  }
 #endif
 
   if (textPrintFlag == TRUE) {
@@ -2558,6 +2560,33 @@ void printNtopConfigInfo(int textPrintFlag) {
             BufferTooShort();
         printFeatureConfigInfo(textPrintFlag, "Bytes per entry", buf);
     }
+
+#if defined(HAVE_MALLINFO_MALLOC_H) && defined(HAVE_MALLOC_H) && defined(__GNUC__)
+
+    if(snprintf(buf, sizeof(buf), "%d", memStats.arena + memStats.hblkhd) < 0)
+      BufferTooShort();
+    printFeatureConfigInfo(textPrintFlag, "Current memory usage", buf);
+
+    if(snprintf(buf, sizeof(buf), "%d", myGlobals.baseMemoryUsage) < 0)
+      BufferTooShort();
+    printFeatureConfigInfo(textPrintFlag, "Base memory usage", buf);
+
+    for (i=0; i<myGlobals.numDevices; i++)
+      totalHostsMonitored += myGlobals.device[i].hostsno;
+
+    if (totalHostsMonitored > 0) {
+        if(snprintf(buf, sizeof(buf), "%d", totalHostsMonitored) < 0)
+          BufferTooShort();
+        printFeatureConfigInfo(textPrintFlag, "Hosts stored", buf);
+
+        if(snprintf(buf, sizeof(buf), "%.1fKB", 
+                    ((float)(memStats.arena + memStats.hblkhd - myGlobals.baseMemoryUsage) /
+                     (float)(totalHostsMonitored) /
+                     1024.0 + 0.05)) < 0)
+          BufferTooShort();
+        printFeatureConfigInfo(textPrintFlag, "(very) Approximate memory per host", buf);
+    }
+#endif
   }
 
   sendString(texthtml("\n\nHost Memory Cache\n\n", "<tr><th colspan=\"2\">Host Memory Cache</th></tr>\n"));
@@ -3463,6 +3492,8 @@ void initWeb() {
     struct sockaddr_in sockIn;
     char value[8];
 
+    traceEvent(CONST_TRACE_INFO, "WEB: Initializing");
+
     initReports();
     initializeWeb();
 
@@ -3475,8 +3506,8 @@ void initWeb() {
     } else {
       myGlobals.actualReportDeviceId = atoi(value);
       if(myGlobals.actualReportDeviceId >= myGlobals.numDevices) {
-        traceEvent(CONST_TRACE_INFO, "Note: stored actualReportDeviceId(%d) > numDevices(%d). "
-                               "Probably leftover, reset.\n",
+        traceEvent(CONST_TRACE_INFO, "Note: stored actualReportDeviceId(%d) > numDevices(%d) - "
+                               "probably leftover, reset",
                    myGlobals.actualReportDeviceId,
                    myGlobals.numDevices);
         storePrefsValue("actualReportDeviceId", "0");
@@ -3490,12 +3521,12 @@ void initWeb() {
 #ifndef WIN32
       if(myGlobals.webAddr) {
 	if(!inet_aton(myGlobals.webAddr, &sockIn.sin_addr)) {
-	  traceEvent(CONST_TRACE_ERROR, "Unable to convert address '%s'... "
-		     "Not binding to a particular interface!\n", myGlobals.webAddr);
+	  traceEvent(CONST_TRACE_ERROR, "WEB: ERROR: Unable to convert address '%s' - "
+		     "not binding to a particular interface", myGlobals.webAddr);
 	  sockIn.sin_addr.s_addr = INADDR_ANY;
 	} else {
-	  traceEvent(CONST_TRACE_INFO, "Converted address '%s'... "
-		     "binding to the specific interface!\n", myGlobals.webAddr);
+	  traceEvent(CONST_TRACE_INFO, "WEB: Converted address '%s' - "
+		     "binding to the specific interface", myGlobals.webAddr);
 	}
       } else {
         sockIn.sin_addr.s_addr = INADDR_ANY;
@@ -3506,7 +3537,7 @@ void initWeb() {
 
       myGlobals.sock = socket(AF_INET, SOCK_STREAM, 0);
       if(myGlobals.sock < 0) {
-	traceEvent(CONST_TRACE_ERROR, "Unable to create a new socket");
+	traceEvent(CONST_TRACE_ERROR, "WEB: FATAL_ERROR: Unable to create a new socket");
 	exit(-1);
       }
 
@@ -3519,7 +3550,7 @@ void initWeb() {
     if(myGlobals.sslInitialized) {
       myGlobals.sock_ssl = socket(AF_INET, SOCK_STREAM, 0);
       if(myGlobals.sock_ssl < 0) {
-	traceEvent(CONST_TRACE_ERROR, "unable to create a new socket");
+	traceEvent(CONST_TRACE_ERROR, "WEB: FATAL_ERROR: Unable to create a new socket");
 	exit(-1);
       }
 
@@ -3530,7 +3561,7 @@ void initWeb() {
 
     if(myGlobals.webPort > 0) {
       if(bind(myGlobals.sock, (struct sockaddr *)&sockIn, sizeof(sockIn)) < 0) {
-	traceEvent(CONST_TRACE_WARNING, "bind: port %d already in use.", myGlobals.webPort);
+	traceEvent(CONST_TRACE_WARNING, "WEB: FATAL_ERROR Port %d already in use (is another instance of ntop running?)", myGlobals.webPort);
 	closeNwSocket(&myGlobals.sock);
 	exit(-1);
       }
@@ -3543,12 +3574,12 @@ void initWeb() {
 #ifndef WIN32
       if(myGlobals.sslAddr) {
 	if(!inet_aton(myGlobals.sslAddr, &sockIn.sin_addr)) {
-	  traceEvent(CONST_TRACE_ERROR, "Unable to convert address '%s'... "
-		     "Not binding SSL to a particular interface!\n", myGlobals.sslAddr);
+	  traceEvent(CONST_TRACE_ERROR, "WEB: ERROR: Unable to convert address '%s' - "
+		     "not binding SSL to a particular interface", myGlobals.sslAddr);
 	  sockIn.sin_addr.s_addr = INADDR_ANY;
 	} else {
-	  traceEvent(CONST_TRACE_INFO, "Converted address '%s'... "
-		     "binding SSL to the specific interface!\n", myGlobals.sslAddr);
+	  traceEvent(CONST_TRACE_INFO, "WEB: ERROR: Converted address '%s' - "
+		     "binding SSL to the specific interface", myGlobals.sslAddr);
 	}
       } else {
         sockIn.sin_addr.s_addr = INADDR_ANY;
@@ -3559,7 +3590,7 @@ void initWeb() {
 
       if(bind(myGlobals.sock_ssl, (struct sockaddr *)&sockIn, sizeof(sockIn)) < 0) {
 	/* Fix below courtesy of Matthias Kattanek <mattes@mykmk.com> */
-	traceEvent(CONST_TRACE_ERROR, "bind: port %d already in use.", myGlobals.sslPort);
+	traceEvent(CONST_TRACE_ERROR, "WEB: ERROR: ssl port %d already in use (is another instance of ntop running?)", myGlobals.sslPort);
 	closeNwSocket(&myGlobals.sock_ssl);
 	exit(-1);
       }
@@ -3568,7 +3599,12 @@ void initWeb() {
 
     if(myGlobals.webPort > 0) {
       if(listen(myGlobals.sock, 2) < 0) {
-	traceEvent(CONST_TRACE_WARNING, "listen error.\n");
+	traceEvent(CONST_TRACE_WARNING, "WEB: FATAL_ERROR: listen(%d, 2) error %d %s",
+                                        myGlobals.sock,
+                                        errno == EADDRINUSE ? "EADDRINUSE" :
+                                            errno == EBADF ? "EBADF" :
+                                            errno == ENOTSOCK ? "ENOTSOCK" :
+                                            errno == EOPNOTSUPP ? "EOPNOTSUPP" : "unknown code");
 	closeNwSocket(&myGlobals.sock);
 	exit(-1);
       }
@@ -3577,7 +3613,12 @@ void initWeb() {
 #ifdef HAVE_OPENSSL
     if(myGlobals.sslInitialized)
       if(listen(myGlobals.sock_ssl, 2) < 0) {
-	traceEvent(CONST_TRACE_WARNING, "listen error.\n");
+	traceEvent(CONST_TRACE_WARNING, "WEB: FATAL_ERROR: listen(%d, 2) error %d %s",
+                                        myGlobals.sock_ssl,
+                                        errno == EADDRINUSE ? "EADDRINUSE" :
+                                            errno == EBADF ? "EBADF" :
+                                            errno == ENOTSOCK ? "ENOTSOCK" :
+                                            errno == EOPNOTSUPP ? "EOPNOTSUPP" : "unknown code");
 	closeNwSocket(&myGlobals.sock_ssl);
 	exit(-1);
       }
@@ -3586,27 +3627,27 @@ void initWeb() {
     if(myGlobals.webPort > 0) {
       /* Courtesy of Daniel Savard <daniel.savard@gespro.com> */
       if(myGlobals.webAddr)
-	traceEvent(CONST_TRACE_INFO, "Waiting for HTTP connections on %s port %d...\n",
+	traceEvent(CONST_TRACE_INFO, "WEB: Waiting for HTTP connections on %s port %d",
 		   myGlobals.webAddr, myGlobals.webPort);
       else
-	traceEvent(CONST_TRACE_INFO, "Waiting for HTTP connections on port %d...\n",
+	traceEvent(CONST_TRACE_INFO, "WEB: Waiting for HTTP connections on port %d",
 		   myGlobals.webPort);
     }
 
 #ifdef HAVE_OPENSSL
     if(myGlobals.sslInitialized) {
       if(myGlobals.sslAddr)
-	traceEvent(CONST_TRACE_INFO, "Waiting for HTTPS (SSL) connections on %s port %d...\n",
+	traceEvent(CONST_TRACE_INFO, "WEB: Waiting for HTTPS (SSL) connections on %s port %d",
 		   myGlobals.sslAddr, myGlobals.sslPort);
       else
-	traceEvent(CONST_TRACE_INFO, "Waiting for HTTPS (SSL) connections on port %d...\n",
+	traceEvent(CONST_TRACE_INFO, "WEB: Waiting for HTTPS (SSL) connections on port %d",
 		   myGlobals.sslPort);
     }
 #endif
 
 #ifdef CFG_MULTITHREADED
     createThread(&myGlobals.handleWebConnectionsThreadId, handleWebConnections, NULL);
-    traceEvent(CONST_TRACE_INFO, "Started thread (%ld) for web server.\n",
+    traceEvent(CONST_TRACE_INFO, "THREADMGMT: Started thread (%ld) for web server",
 	       myGlobals.handleWebConnectionsThreadId);
 #endif
 

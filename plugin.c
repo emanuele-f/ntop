@@ -143,7 +143,7 @@ static void loadPlugin(char* dirName, char* pluginName) {
     BufferTooShort();
 
 #ifdef PLUGIN_DEBUG
-  traceEvent(CONST_TRACE_INFO, "Loading plugin '%s'...", pluginPath);
+  traceEvent(CONST_TRACE_INFO, "PLUGIN_INIT: Loading '%s'", pluginPath);
 #endif
 
 #ifndef MAKE_STATIC_PLUGIN
@@ -160,13 +160,15 @@ static void loadPlugin(char* dirName, char* pluginName) {
 
   if(pluginPtr == NULL) {
 #if HPUX /* Courtesy Rusetsky Dmitry <dimania@mail.ru> */
-    traceEvent(CONST_TRACE_WARNING, 
-	       "WARNING: unable to load plugin '%s'\n[%s]\n", 
-	       pluginPath, strerror(errno));
+    traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: unable to load '%s'",
+	                            pluginPath);
+    traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: Message is '%s'", 
+	                            strerror(errno));
 #else
-    traceEvent(CONST_TRACE_WARNING, 
-	       "WARNING: unable to load plugin '%s'\n[%s]\n", 
-	       pluginPath, dlerror());
+    traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: unable to load '%s'",
+	                            pluginPath);
+    traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: Message is '%s'", 
+	                            dlerror());
 #endif /* HPUX */
     return;
   }
@@ -185,14 +187,14 @@ static void loadPlugin(char* dirName, char* pluginName) {
 
   if(pluginEntryFctnPtr == NULL) {
 #ifdef HPUX /* Courtesy Rusetsky Dmitry <dimania@mail.ru> */
-    traceEvent(CONST_TRACE_WARNING, "\nWARNING: unable to local plugin '%s' entry function [%s] \n",
+    traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: unable to locate plugin '%s' entry function [%s]",
 	       pluginPath, strerror(errno));
 #else
 #ifdef WIN32
-    traceEvent(CONST_TRACE_WARNING, "WARNING: unable to local plugin '%s' entry function [%li]\n", 
+    traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: unable to locate plugin '%s' entry function [%li]", 
 	       pluginPath, GetLastError());
 #else
-    traceEvent(CONST_TRACE_WARNING, "WARNING: unable to local plugin '%s' entry function [%s]\n",
+    traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: unable to locate plugin '%s' entry function [%s]",
 	       pluginPath, dlerror());
 #endif /* WIN32 */
 #endif /* HPUX */
@@ -228,7 +230,7 @@ static void loadPlugin(char* dirName, char* pluginName) {
 #endif /* MAKE_STATIC_PLUGIN */
 
   if(pluginInfo == NULL) {
-    traceEvent(CONST_TRACE_WARNING, "WARNING: %s call of plugin '%s' failed.\n",
+    traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: %s call of plugin '%s' failed",
 	       CONST_PLUGIN_ENTRY_FCTN_NAME, pluginPath);
     return;
   }
@@ -236,7 +238,7 @@ static void loadPlugin(char* dirName, char* pluginName) {
   newFlow = (FlowFilterList*)calloc(1, sizeof(FlowFilterList));
   
   if(newFlow == NULL) {
-    traceEvent(CONST_TRACE_ERROR, "Fatal error: not enough memory. Bye!\n");
+    traceEvent(CONST_TRACE_ERROR, "PLUGIN_INIT: FATAL_ERROR: not enough memory. Bye!");
     exit(-1);
   } else {
     newFlow->fcode = (struct bpf_program*)calloc(MAX_NUM_DEVICES, sizeof(struct bpf_program));
@@ -245,7 +247,7 @@ static void loadPlugin(char* dirName, char* pluginName) {
     if((pluginInfo->bpfFilter == NULL)
        || (pluginInfo->bpfFilter[0] == '\0')) {
       /*
-	traceEvent(CONST_TRACE_WARNING, "WARNING: plugin '%s' has an empty BPF filter.\n",
+	traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: plugin '%s' has an empty BPF filter",
 	pluginPath);
       */
       for(i=0; i<myGlobals.numDevices; i++)
@@ -265,14 +267,13 @@ static void loadPlugin(char* dirName, char* pluginName) {
 			    myGlobals.device[i].netmask.s_addr);
       
          if(rc < 0) {
-	    traceEvent(CONST_TRACE_INFO, 
-		       "WARNING: plugin '%s' contains a wrong filter specification\n"
-		       "         \"%s\" on interface %s (%s).\n"
-		       "         This plugin has been discarded.\n",
-		       pluginPath, 
+	    traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: plugin '%s' contains a wrong filter specification",
+		       pluginPath);
+            traceEvent(CONST_TRACE_INFO, "PLUGIN_INIT: WARNING: \"%s\" on interface %s (%s)",
 		       pluginInfo->bpfFilter, 
 		       myGlobals.device[i].name,
 		       pcap_geterr((myGlobals.device[i].pcapPtr)));
+            traceEvent(CONST_TRACE_INFO, "PLUGIN_INIT: The filter has been discarded");
 	    free(newFlow);
 	    return;
 	  }
@@ -317,7 +318,7 @@ void loadPlugins(void) {
   DIR* directoryPointer=NULL;
 #endif
   
-  traceEvent(CONST_TRACE_INFO, "Loading plugins (if any)...\n");
+  traceEvent(CONST_TRACE_INFO, "PLUGIN_INIT: Loading plugins (if any)");
   
 #ifndef MAKE_STATIC_PLUGIN
   for(idx=0; myGlobals.pluginDirs[idx] != NULL; idx++) {
@@ -331,11 +332,11 @@ void loadPlugins(void) {
   }
 
   if(directoryPointer == NULL) {
-    traceEvent(CONST_TRACE_WARNING, 
-	       "WARNING: Unable to find the plugins/ directory.\n");
+    traceEvent(CONST_TRACE_WARNING, "PLUGIN_INIT: WARNING: Unable to find the plugins/ directory");
+    traceEvent(CONST_TRACE_INFO, "PLUGIN_INIT: ntop continues OK, but without any plugins");
     return;
   } else
-    traceEvent(CONST_TRACE_INFO, "Searching plugins in %s\n", dirPath);
+    traceEvent(CONST_TRACE_INFO, "PLUGIN_INIT: Searching plugins in %s", dirPath);
 
   while((dp = readdir(directoryPointer)) != NULL) {
     if(dp->d_name[0] == '.')
@@ -367,12 +368,12 @@ void loadPlugins(void) {
 void unloadPlugins(void) {
   FlowFilterList *flows = myGlobals.flowsList;
 
-  traceEvent(CONST_TRACE_INFO, "Unloading plugins (if any)...\n");
+  traceEvent(CONST_TRACE_INFO, "PLUGIN_TERM: Unloading plugins (if any)");
 
   while(flows != NULL) {
     if(flows->pluginStatus.pluginMemoryPtr != NULL) {
 #ifdef PLUGIN_DEBUG
-      traceEvent(CONST_TRACE_INFO, "Unloading plugin '%s'...\n",
+      traceEvent(CONST_TRACE_INFO, "PLUGIN_TERM: Unloading plugin '%s'",
 		 flows->pluginStatus.pluginPtr->pluginName);
 #endif
       if((flows->pluginStatus.pluginPtr->termFunc != NULL)
@@ -410,11 +411,11 @@ void startPlugins(void) {
   int rc;
   FlowFilterList *flows = myGlobals.flowsList;
 
-  traceEvent(CONST_TRACE_INFO, "Initializing plugins (if any)...\n");
+  traceEvent(CONST_TRACE_INFO, "PLUGIN_INIT: Initializing (if any)");
 
   while(flows != NULL) {
     if(flows->pluginStatus.pluginPtr != NULL) {
-      traceEvent(CONST_TRACE_INFO, "Starting plugin '%s'...\n",
+      traceEvent(CONST_TRACE_INFO, "PLUGIN_INIT: Starting '%s'",
 		 flows->pluginStatus.pluginPtr->pluginName);
       if((flows->pluginStatus.pluginPtr->startFunc != NULL)
 	 && (flows->pluginStatus.activePlugin))

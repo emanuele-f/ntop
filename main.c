@@ -25,6 +25,10 @@
 #include "ntop.h"
 #include "globals-report.h"
 
+#if defined(HAVE_MALLINFO_MALLOC_H) && defined(HAVE_MALLOC_H) && defined(__GNUC__)
+ #include <malloc.h>
+#endif
+
 /*
   Ntop options list
   -- converted to getopts_long, Burton M. Strauss III (BStrauss@acm.org)
@@ -926,24 +930,38 @@ int main(int argc, char *argv[]) {
   userSpecified = parseOptions(argc, argv);
 #endif
 
+/* Above here, the -L value wasn't set, so we use printf(). */
+  traceEvent(CONST_TRACE_INFO, "ntop v.%s %s [%s] (%s build)",
+	     version, THREAD_MODE, osName, buildDate);
+  traceEvent(CONST_TRACE_INFO, "Copyright 1998-2003 by %s", author);
+  traceEvent(CONST_TRACE_INFO, "Get the freshest ntop from http://www.ntop.org/");
+
+/*  Note that for these critical messages we use both
+ *  printf() and traceEvent() - gotta get the message out
+ */
+
   /*
    * check for valid parameters
    */
-  if(myGlobals.webPort == 0) {
 #ifdef HAVE_OPENSSL
-    if(myGlobals.sslPort == 0) {
-      printf("WARNING: both -W and -w are set to 0. The web interface will be disabled\n");
-      /* exit(-1); */
-    }
+  if ( (myGlobals.webPort == 0) && (myGlobals.sslPort == 0) ) {
+      printf("WARNING: both -W and -w are set to 0. The web interface will be disabled.\n");
 #else
-    printf("WARNING: -w is set to 0. The web interface will be disabled\n");
-    /* exit(-1); */
+  if (myGlobals.webPort == 0) {
+      printf("WARNING: -w is set to 0. The web interface will be disabled.\n");
 #endif
+
+      traceEvent(CONST_TRACE_WARNING, "INIT: WARNING: The web interface will be disabled");
+      traceEvent(CONST_TRACE_INFO, "INIT: If enabled, the rrd plugin will collect data");
+      traceEvent(CONST_TRACE_INFO, "INIT: If enabled, the netFlow and/or sFlow plugins will collect and/or transmit data");
+      traceEvent(CONST_TRACE_INFO, "INIT: This may or may not be what you want");
+      traceEvent(CONST_TRACE_INFO, "INIT: but without the web interface you can't set plugin parameters");
+      /* exit(-1); */
   }
 
 #ifndef WIN32
   /*
-   * Must run as root since opening a network interface
+   * Must start run as root since opening a network interface
    * in promiscuous mode is a privileged operation.
    * Verify we're running as root, unless we are reading data from a file
    */
@@ -951,9 +969,12 @@ int main(int argc, char *argv[]) {
     printf ("Sorry, %s uses network interface(s) in promiscuous mode, "
 	    "so it needs root permission to run.\n",
 	    myGlobals.program_name);
+    traceEvent(CONST_TRACE_ERROR, "FATAL ERROR: not started as root, required for promiscuous mode");
     exit (-1);
   }
 #endif
+
+/* Below here, we use our traceEvent() function to print or log as requested. */
 
   /*
    * Perform here all the initialization steps required by the ntop engine to run
@@ -966,10 +987,12 @@ int main(int argc, char *argv[]) {
 #ifdef MAKE_WITH_XMLDUMP
   /* Here is where we place the divergent path for (FUTURE) xmlFileIn */
   if (myGlobals.xmlFileIn != NULL) {
-      traceEvent(CONST_TRACE_INFO, "Processing xml input file, %s...\n", myGlobals.xmlFileIn);
-      traceEvent(CONST_TRACE_INFO, "SORRY, but that function does not yet exist... continuing normally...\n");
+      traceEvent(CONST_TRACE_INFO, "XMLDUMP: Processing xml input file, %s", myGlobals.xmlFileIn);
+      traceEvent(CONST_TRACE_INFO, "XMLDUMP: SORRY, but that function does not yet exist. Continuing normally.");
    }
 #endif
+
+  traceEvent(CONST_TRACE_INFO, "INIT: Initializing ntop");
 
   /*
    * Initialize memory and data for the protocols being monitored trying to access
@@ -992,7 +1015,7 @@ int main(int argc, char *argv[]) {
 #ifndef WIN32
   if(myGlobals.daemonMode) {
     daemonize();
-    traceEvent(CONST_TRACE_INFO, "ntop is now running daemonized...\n");
+    traceEvent(CONST_TRACE_INFO, "INIT: Now running as a daemon");
   }
 #endif
 
@@ -1022,9 +1045,6 @@ int main(int argc, char *argv[]) {
    */
   initDevices(myGlobals.devices);
 
-  traceEvent(CONST_TRACE_INFO, "ntop v.%s %s [%s] (%s build)",
-	     version, THREAD_MODE, osName, buildDate);
-
   if(myGlobals.rFileName != NULL)
     strncpy(ifStr, CONST_PCAP_NW_INTERFACE_FILE, sizeof(ifStr));
   else {
@@ -1045,10 +1065,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  traceEvent(CONST_TRACE_INFO, "Listening on [%s]", ifStr);
-  traceEvent(CONST_TRACE_INFO, "Copyright 1998-2002 by %s\n", author);
-  traceEvent(CONST_TRACE_INFO, "Get the freshest ntop from http://www.ntop.org/\n");
-  traceEvent(CONST_TRACE_INFO, "Initializing...\n");
+  traceEvent(CONST_TRACE_INFO, "INIT: Listening on [%s]", ifStr);
 
   /*
    * time to initialize the libpcap
@@ -1056,7 +1073,9 @@ int main(int argc, char *argv[]) {
   initLibpcap();
 
 #ifndef MAKE_MICRO_NTOP
+  traceEvent(CONST_TRACE_INFO, "INIT: loading Plugins");
   loadPlugins();
+  traceEvent(CONST_TRACE_INFO, "INIT: Plugins loaded... continuing with initialization");
 #endif
 
   /*
@@ -1079,19 +1098,21 @@ int main(int argc, char *argv[]) {
   if((myGlobals.userId != 0) || (myGlobals.groupId != 0)) {
     /* user id specified on commandline */
     if((setgid(myGlobals.groupId) != 0) || (setuid(myGlobals.userId) != 0)) {
-      traceEvent(CONST_TRACE_ERROR, "FATAL ERROR: Unable to change user ID.\n");
+      traceEvent(CONST_TRACE_ERROR, "FATAL ERROR: Unable to change user ID.");
       exit(-1);
     }
   } else {
     if((geteuid() == 0) || (getegid() == 0)) {
       if(!userSpecified) {
-	traceEvent(CONST_TRACE_INFO, "ERROR: For security reasons you cannot run ntop as root");
-	traceEvent(CONST_TRACE_INFO, "ERROR: unless you know what you're doing.");
-	traceEvent(CONST_TRACE_INFO, "ERROR: Please specify the user name using the -u option!");
+	traceEvent(CONST_TRACE_INFO, "FATAL_ERROR: For security reasons you cannot run ntop as root");
+	traceEvent(CONST_TRACE_INFO, "FATAL_ERROR: Unless you really, really, know what you're doing");
+	traceEvent(CONST_TRACE_INFO, "FATAL_ERROR: Please specify the user name using the -u option!");
 	exit(0);
       } else {
 	traceEvent(CONST_TRACE_INFO, "INFO: For security reasons you should not run ntop as root (-u)!");
       }
+    } else {
+      traceEvent(CONST_TRACE_INFO, "INFO: Now running as requested user... continuing with initialization");
     }
   }
 #endif
@@ -1124,13 +1145,32 @@ int main(int argc, char *argv[]) {
   initThreads();
 
 #ifndef MAKE_MICRO_NTOP
+  traceEvent(CONST_TRACE_INFO, "INIT: starting Plugins");
   startPlugins();
+  traceEvent(CONST_TRACE_INFO, "INIT: Plugins started... continuing with initialization");
 #endif
 
   /* create the main listener */
+  traceEvent(CONST_TRACE_INFO, "INIT: starting web server");
   initWeb();
+  traceEvent(CONST_TRACE_INFO, "INIT: web server started... continuing with initialization");
 
-  traceEvent(CONST_TRACE_INFO, "Sniffying...\n");
+#if defined(HAVE_MALLINFO_MALLOC_H) && defined(HAVE_MALLOC_H) && defined(__GNUC__)
+  {
+    struct mallinfo memStats;
+
+    memStats = mallinfo();
+    myGlobals.baseMemoryUsage = memStats.arena + memStats.hblkhd;
+
+    traceEvent(CONST_TRACE_INFO, "INIT: Base memory load is %.1fMB (%d+%d)",
+                                 ( (float)(myGlobals.baseMemoryUsage) / (float)(1024*1024)) + 0.05,
+                                 memStats.arena,
+                                 memStats.hblkhd);
+
+  }
+#endif
+
+  traceEvent(CONST_TRACE_INFO, "Sniffying...");
 
 #ifdef MEMORY_DEBUG
   resetLeaks();

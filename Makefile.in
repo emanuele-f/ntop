@@ -61,8 +61,8 @@ pkgincludedir = $(includedir)/@PACKAGE@
 top_builddir = .
 
 ACLOCAL = @ACLOCAL@
-AUTOCONF = @AUTOCONF@
-AUTOMAKE = @AUTOMAKE@
+AUTOCONF = /bin/sh /home/deri/network/ntop/missing --run echo
+AUTOMAKE = /bin/sh /home/deri/network/ntop/missing --run echo
 AUTOHEADER = @AUTOHEADER@
 
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
@@ -104,16 +104,17 @@ DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
 DYN_FLAGS = @DYN_FLAGS@
-ECHO = @ECHO@
 INCS = @INCS@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 INTOP = @INTOP@
+LD = @LD@
 LIBCURSES = @LIBCURSES@
 LIBREADLINE = @LIBREADLINE@
 LIBTERMCAP = @LIBTERMCAP@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LN_S = @LN_S@
+NM = @NM@
 NTOP_VERSION_EXTRA = @NTOP_VERSION_EXTRA@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
@@ -1097,7 +1098,7 @@ xmldump.c: xml_*.inc globals-structtypes.h
 
 xml_*.inc: globals-structtypes.h
 	@echo "Processing globals-structtypes.h to make xml_*.inc..."
-	@@AWK@ -f utils/xmldump.awk globals-structtypes.h
+	@awk -f utils/xmldump.awk globals-structtypes.h
 
 .PHONY: snapshot
 
@@ -1143,7 +1144,7 @@ faq.html: docs/FAQ
 	@echo "-----------------------------------------------"
 	@echo "Converting $< to HTML format  .... Please wait"
 	@echo ""
-	@@AWK@ -f utils/faqtohtml.awk $< | sed 's/_//g' | sed 's/[ -~]//g' > html/faq.html
+	@awk -f utils/faqtohtml.awk $< | sed 's/_//g' | sed 's/[ -~]//g' > html/faq.html
 	@cp -f html/faq.html faq.html
 	@echo "$@ done !"
 	@echo "-----------------------------------------------"

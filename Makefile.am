@@ -118,7 +118,7 @@ ntop_CFLAGS        =
 
 ntops_SOURCES      = $(ntop_SOURCES)
 ntops_DEPENDENCIES = $(ntop_DEPENDENCIES)
-ntops_LDADD        = $(ntop_LDADD) -lrrd
+ntops_LDADD        = $(ntop_LDADD)
 ntops_LDFLAGS      = $(ntop_LDFLAGS) -static
 
 #
@@ -178,7 +178,7 @@ xmldump.c: xml_*.inc globals-structtypes.h
 
 xml_*.inc: globals-structtypes.h
 	@echo "Processing globals-structtypes.h to make xml_*.inc..."
-	@@AWK@ -f utils/xmldump.awk globals-structtypes.h
+	@awk -f utils/xmldump.awk globals-structtypes.h
 
 .PHONY: snapshot
 
@@ -226,7 +226,7 @@ faq.html: docs/FAQ
 	@echo "-----------------------------------------------"
 	@echo "Converting $< to HTML format  .... Please wait"
 	@echo ""
-	@@AWK@ -f utils/faqtohtml.awk $< | sed 's/_//g' | sed 's/[ -~]//g' > html/faq.html
+	@awk -f utils/faqtohtml.awk $< | sed 's/_//g' | sed 's/[ -~]//g' > html/faq.html
 	@cp -f html/faq.html faq.html
 	@echo "$@ done !"
 	@echo "-----------------------------------------------"

@@ -44,7 +44,7 @@ dnl>       into the stamp.
 dnl>
 AC_INIT([ntop],[2.1.90])
 AC_PREREQ([2.50])
-SCRIPTVER="v1.106-2003-03-29"
+SCRIPTVER="v1.105-2003-03-29"
 
 dnl>
 dnl> generate the config header
@@ -98,6 +98,11 @@ echo
 dnl> early since we need it for --enable-showoses and autotool version check.
 AC_PROG_AWK
 
+echo "  Checking for automake ..."
+AC_PATH_PROG(AUTOMAKE, automake)
+
+if test "x${ac_cv_prog_AUTOMAKE}" != "x"; then
+
 dnl>
 dnl> Check versions of autotools
 
@@ -137,6 +142,22 @@ case "${automakeversion}" in
         exit 1
         ;;
 esac
+else
+ mv Makefile.in Makefile.in.tmp
+ cat Makefile.in.tmp | sed -e "s|@AUTOMAKE@|${SHELL} `pwd`/missing --run echo|" > Makefile.in
+ rm -f Makefile.in.tmp
+ mv plugins/Makefile.in plugins/Makefile.in.tmp
+ cat plugins/Makefile.in.tmp | sed -e "s|@AUTOMAKE@|${SHELL} `pwd`/missing --run echo|" > plugins/Makefile.in
+ rm -f plugins/Makefile.in.tmp
+ mv intop/Makefile.in intop/Makefile.in.tmp
+ cat intop/Makefile.in.tmp | sed -e "s|@AUTOCONF@|${SHELL} `pwd`/missing --run echo|" > intop/Makefile.in
+ rm -f intop/Makefile.in.tmp
+fi
+
+echo "  Checking for autoconf ..."
+AC_PATH_PROG(AUTOCONF, autoconf)
+
+if test "x${ac_cv_prog_AUTOCONF}" != "x"; then
 echo "  Checking autoconf version..."
 case "${autoconfversion}" in
     *2\.[[0-4]]*)
@@ -171,6 +192,17 @@ case "${autoconfversion}" in
         exit 1
         ;;
 esac
+else
+ mv Makefile.in Makefile.in.tmp
+ cat Makefile.in.tmp | sed -e "s|@AUTOCONF@|${SHELL} `pwd`/missing --run echo|" > Makefile.in
+ rm -f Makefile.in.tmp
+ mv plugins/Makefile.in plugins/Makefile.in.tmp
+ cat plugins/Makefile.in.tmp | sed -e "s|@AUTOCONF@|${SHELL} `pwd`/missing --run echo|" > plugins/Makefile.in
+ rm -f plugins/Makefile.in.tmp
+ mv intop/Makefile.in intop/Makefile.in.tmp
+ cat intop/Makefile.in.tmp | sed -e "s|@AUTOCONF@|${SHELL} `pwd`/missing --run echo|" > intop/Makefile.in
+ rm -f intop/Makefile.in.tmp
+fi
 
 dnl> Then check for a match with the scripts...
 dnl>
@@ -182,13 +214,21 @@ dnl>
 if test -f /tmp/autotoolversions; then
      rm -f /tmp/autotoolversions
 fi
-automake --version | head -n 1 | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print "     " $3 " " $4 }'  >/tmp/autotoolversions
-autoconf --version | head -n 1 | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print "     " $3 " " $4 }' >>/tmp/autotoolversions
+if test "x${ac_cv_prog_AUTOMAKE}" != "x"; then
+  automake --version | head -n 1 | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print "     " $3 " " $4 }'  >/tmp/autotoolversions
+fi
+if test "x${ac_cv_prog_AUTOCONF}" != "x"; then
+  autoconf --version | head -n 1 | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print "     " $3 " " $4 }' >>/tmp/autotoolversions
+fi
 libtool --version | head -n 1  | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print "     " $3 " " $4 }' >>/tmp/autotoolversions
 
 touch autotoolversions
 diff autotoolversions /tmp/autotoolversions >/dev/null 2>/dev/null 
 rc=$?
+
+if test "x${ac_cv_prog_AUTOMAKE}" = "x" -o "x${ac_cv_prog_AUTOCONF}" = "x"; then
+ rc=0
+fi
 
 if test ".${rc}" = ".1"; then
     echo
@@ -208,10 +248,8 @@ if test ".${rc}" = ".1"; then
     echo "*>>> We are going to:"
     echo "*>>>     1. delete the existing generated files"
     echo "*>>>     2. use the auto* tools to recreate them"
-    echo "*                (if you do not have automake and autoconf installed,"
-    echo "*                 this will fail)"
-    echo "*                (if you do not have libtool installed, it will"
-    echo "*                 not give an error message, but will fail later)"
+    echo "*                (if you do not have automake, autoconf and libtool"
+    echo "*                 intalled, this will fail)"
     echo "*>>>     3. tell you to rerun ./configure"
     echo "*"
     echo "*    Please, tell the ntop-dev mailing list if there are problems..."
@@ -248,9 +286,6 @@ if test ".${rc}" = ".1"; then
         echo "*"
         echo "*******************************************************************"
         echo
-        if test -f /tmp/autotoolversions; then
-            rm -f /tmp/autotoolversions
-        fi
         exit 1
     fi
     for i in aclocal \
@@ -272,9 +307,6 @@ if test ".${rc}" = ".1"; then
             echo "*"
             echo "*******************************************************************"
             echo
-            if test -f /tmp/autotoolversions; then
-                rm -f /tmp/autotoolversions
-            fi
             exit 1
         fi
     done
@@ -294,9 +326,6 @@ if test ".${rc}" = ".1"; then
     echo
     exit 1
 else
-    if test -f /tmp/autotoolversions; then
-        rm -f /tmp/autotoolversions
-    fi
     echo "auto* tools are OK, continuing with ./configure"
 fi
 
@@ -1606,7 +1635,7 @@ elif test ".${ac_cv_lib_dl_dlopen}"    != ".yes" &&
     echo
     echo "*******************************************************************"
     echo "*"
-    echo "* ERROR: Critical c library routine is missing."
+    echo "* ERROR: Basic c library routines are missing."
     echo "*"
     case "$target" in
       *-hpux* )
@@ -2220,7 +2249,7 @@ if test ".${ac_disable_gdchart}" != ".yes"; then
           test ".${ac_cv_lib_gd_gdImageDestroy}"          = ".yes" &&
           test ".${ac_cv_lib_png_png_read_info}"          = ".yes"; then
            mass_gdchart_test_result="yes"
-           dnl> Add this because it is not done in the non-existent AC_CHECK_LIB
+           dnl> Add this because it is not done in the non-existant AC_CHECK_LIB
            LIBS="${LIBS} -lgdchart -lgd -lpng"
            AC_DEFINE_UNQUOTED([HAVE_GDCHART], 1, [Enable GDChart])
            if test ".${GDCHART_ROOT}" != "."; then

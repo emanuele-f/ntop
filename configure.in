@@ -44,7 +44,7 @@ dnl>       into the stamp.
 dnl>
 AC_INIT([ntop],[2.1.90])
 AC_PREREQ([2.50])
-SCRIPTVER="v1.103-2003-02-11"
+SCRIPTVER="v1.104-2003-03-29"
 
 dnl>
 dnl> generate the config header
@@ -187,7 +187,7 @@ autoconf --version | head -n 1 | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print 
 libtool --version | head -n 1  | ${ac_cv_prog_AWK} '{ gsub(/\)/, "", $3); print "     " $3 " " $4 }' >>/tmp/autotoolversions
 
 touch autotoolversions
-diff -q autotoolversions /tmp/autotoolversions 2>/dev/null
+diff autotoolversions /tmp/autotoolversions >/dev/null 2>/dev/null 
 rc=$?
 
 if test ".${rc}" = ".1"; then

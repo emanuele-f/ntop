@@ -264,7 +264,7 @@ static void loadPlugin(char* dirName, char* pluginName) {
 			    &newFlow->fcode[i], tmpBuf, 1, 
 			    myGlobals.device[i].netmask.s_addr);
       
-	  if(rc < 0) {
+         if(rc < 0) {
 	    traceEvent(CONST_TRACE_INFO, 
 		       "WARNING: plugin '%s' contains a wrong filter specification\n"
 		       "         \"%s\" on interface %s (%s).\n"
@@ -407,6 +407,7 @@ void unloadPlugins(void) {
 /* Courtesy of Andreas Pfaller <apfaller@yahoo.com.au> */
 
 void startPlugins(void) {
+  int rc;
   FlowFilterList *flows = myGlobals.flowsList;
 
   traceEvent(CONST_TRACE_INFO, "Initializing plugins (if any)...\n");
@@ -417,7 +418,9 @@ void startPlugins(void) {
 		 flows->pluginStatus.pluginPtr->pluginName);
       if((flows->pluginStatus.pluginPtr->startFunc != NULL)
 	 && (flows->pluginStatus.activePlugin))
-	flows->pluginStatus.pluginPtr->startFunc();
+	rc = flows->pluginStatus.pluginPtr->startFunc();
+        if (rc != 0)
+	  flows->pluginStatus.activePlugin = 0;
     }
     flows = flows->next;
   }

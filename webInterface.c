@@ -195,6 +195,8 @@ void showPluginsList(char* pluginName) {
 	} else {
 	  if(flows->pluginStatus.pluginPtr->startFunc != NULL)
 	    flows->pluginStatus.pluginPtr->startFunc();
+            if (flows->pluginStatus.pluginPtr->pluginStatusMessage != NULL)
+              newPluginStatus = 0 /* Disabled */;
 	}
 
 	flows->pluginStatus.activePlugin = newPluginStatus;
@@ -222,15 +224,27 @@ void showPluginsList(char* pluginName) {
 		  flows->pluginStatus.pluginPtr->pluginURLname, flows->pluginStatus.pluginPtr->pluginURLname) < 0)
 	BufferTooShort();
 
-      if(snprintf(tmpBuf, sizeof(tmpBuf), "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT>%s</TH>"
-		  "<TD "TD_BG" ALIGN=LEFT>%s</TD>"
+      if(snprintf(tmpBuf, sizeof(tmpBuf), "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT %s>%s</TH>\n",
+		  getRowColor(),
+                  flows->pluginStatus.pluginPtr->pluginStatusMessage != NULL ? "rowspan=\"2\"" : "",
+		  (flows->pluginStatus.activePlugin || 
+	           flows->pluginStatus.pluginPtr->inactiveSetup) ? tmpBuf1 : flows->pluginStatus.pluginPtr->pluginURLname) < 0)
+	BufferTooShort();
+      sendString(tmpBuf);
+
+      if(flows->pluginStatus.pluginPtr->pluginStatusMessage != NULL) {
+          if(snprintf(tmpBuf, sizeof(tmpBuf), "<TD colspan=\"4\"><font COLOR=\"#FF0000\">%s</font></TD></TR>\n<TR "TR_ON" %s>\n",
+                      flows->pluginStatus.pluginPtr->pluginStatusMessage,
+	              getRowColor()) < 0)
+	      BufferTooShort();
+          sendString(tmpBuf);
+      }
+
+      if(snprintf(tmpBuf, sizeof(tmpBuf), "<TD "TD_BG" ALIGN=LEFT>%s</TD>"
 		  "<TD "TD_BG" ALIGN=CENTER>%s</TD>"
 		  "<TD "TD_BG" ALIGN=LEFT>%s</TD>"
 		  "<TD "TD_BG" ALIGN=CENTER><A HREF="STR_SHOW_PLUGINS"?%s=%d>%s</A></TD>"
 		  "</TR>\n",
-		  getRowColor(),
-		  (flows->pluginStatus.activePlugin || 
-	           flows->pluginStatus.pluginPtr->inactiveSetup) ? tmpBuf1 : flows->pluginStatus.pluginPtr->pluginURLname,
 		  flows->pluginStatus.pluginPtr->pluginDescr,
 		  flows->pluginStatus.pluginPtr->pluginVersion,
 		  flows->pluginStatus.pluginPtr->pluginAuthor,

@@ -242,8 +242,15 @@ static void initIPCountryTable(void) {
         char buff[256];
         char *strtokState, *cc, *ip, *prefix;
 
-        if (fgets(buff, sizeof(buff), fd)==NULL)
+        if (fgets(buff, sizeof(buff), fd)==NULL) {
+          if (errno != 0) {
+              traceEvent(CONST_TRACE_ERROR, "IP2CC: reading file '%s'", tmpStr);
+              traceEvent(CONST_TRACE_ERROR, "IP2CC: problem is %s(%d)", strerror(errno), errno);
+              traceEvent(CONST_TRACE_INFO, "IP2CC: ntop continues OK, but with partial or no file");
+              break;
+          }
           continue;
+        }
 
         if ((cc=strtok_r(buff, ":", &strtokState))==NULL)
           continue;

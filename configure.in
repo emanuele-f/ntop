@@ -607,10 +607,9 @@ AC_CHECK_LIB(c, backtrace, AC_DEFINE(HAVE_BACKTRACE))
 dnl>
 dnl> check for `crypt' in -lc or -lcrypt (MANDATORY)
 dnl>
-AC_CHECK_LIB(crypt, crypt, , [
-AC_CHECK_LIB(c, crypt, , [
-     echo "ERROR: You need libcrypt to build ntop. Verify that you have libcrypt.a or libcrypt.so installed.";
-     AC_MSG_ERROR([Fatal: libcrypt not found.])], $MORELIBS)], $MORELIBS)
+AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(c, crypt, ,
+  [AC_CHECK_LIB(crypt, crypt, MORELIBS="$MORELIBS -lcrypt",
+    AC_MSG_ERROR(you need the crypt library to build ntop), $MORELIBS)]))
 
 AC_CHECK_LIB(kstat, kstat_lookup)
 AC_CHECK_LIB(c, getopt_long, AC_DEFINE(HAVE_GETOPT_LONG))

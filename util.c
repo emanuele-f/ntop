@@ -170,12 +170,12 @@ unsigned short isLocalAddress(struct in_addr *addr, u_int deviceId) {
     return(0);
   }
 
-    if((addr->s_addr & myGlobals.device[deviceId].netmask.s_addr) == myGlobals.device[deviceId].network.s_addr) {
+  if((addr->s_addr & myGlobals.device[deviceId].netmask.s_addr) == myGlobals.device[deviceId].network.s_addr) {
 #ifdef ADDRESS_DEBUG
-      traceEvent(CONST_TRACE_INFO, "ADDRESS_DEBUG: %s is local\n", intoa(*addr));
+    traceEvent(CONST_TRACE_INFO, "ADDRESS_DEBUG: %s is local\n", intoa(*addr));
 #endif
-      return 1;
-    }
+    return 1;
+  }
 
   if(myGlobals.trackOnlyLocalHosts)
     return(0);
@@ -385,12 +385,12 @@ void handleAddressLists(char* addresses, u_int32_t theNetworks[MAX_NUM_NETWORKS]
       /* Special case the /32 mask - yeah, we could probably do it with some fancy
          u long long stuff, but this is simpler...
          Burton Strauss <Burton@ntopsupport.com> Jun2002
-       */
+      */
       if (bits == 32) {
-          networkMask = 0xffffffff;
+	networkMask = 0xffffffff;
       } else {
-          networkMask = 0xffffffff >> bits;
-          networkMask = ~networkMask;
+	networkMask = 0xffffffff >> bits;
+	networkMask = ~networkMask;
       }
 
 #ifdef DEBUG
@@ -578,12 +578,12 @@ unsigned short isPseudoLocalAddress(struct in_addr *addr, u_int deviceId) {
     return 1;
 
   /*
-     We don't check for broadcast as this check has been
-     performed already by isLocalAddress() just called
+    We don't check for broadcast as this check has been
+    performed already by isLocalAddress() just called
   */
 
 #ifdef ADDRESS_DEBUG
-    traceEvent(CONST_TRACE_WARNING, "ADDRESS_DEBUG: %s is remote\n", intoa(*addr));
+  traceEvent(CONST_TRACE_WARNING, "ADDRESS_DEBUG: %s is remote\n", intoa(*addr));
 #endif
 
   return(0);
@@ -840,7 +840,7 @@ int getLocalHostAddress(struct in_addr *hostAddress, char* device) {
 
   /* ******************************* */
 
-close(fd);
+  close(fd);
 #endif
 
   return(rc);
@@ -890,7 +890,7 @@ int _createMutex(PthreadMutex *mutexId, char* fileName, int fileLine) {
                rc, errno, fileName, fileLine);
   } else {
 
-      mutexId->isInitialized = 1;
+    mutexId->isInitialized = 1;
 
   }
 
@@ -963,6 +963,7 @@ int _accessMutex(PthreadMutex *mutexId, char* where,
 
   rc = pthread_mutex_lock(&(mutexId->mutex));
 
+  pthread_mutex_lock(&stateChangeMutex);
   mutexId->lockAttemptFile[0] = '\0';
   mutexId->lockAttemptLine=0;
   mutexId->lockAttemptPid=(pid_t) 0;
@@ -978,7 +979,6 @@ int _accessMutex(PthreadMutex *mutexId, char* where,
 #endif
 
     mutexId->numLocks++;
-    pthread_mutex_lock(&stateChangeMutex);
     mutexId->isLocked = 1;
     mutexId->lockTime = time(NULL);
     mutexId->lockPid  = myPid;
@@ -986,11 +986,11 @@ int _accessMutex(PthreadMutex *mutexId, char* where,
       strcpy(mutexId->lockFile, fileName);
       mutexId->lockLine = fileLine;
     }
-    pthread_mutex_unlock(&stateChangeMutex);
     if(where != NULL) {
       strcpy(mutexId->where, where);
     }
   }
+  pthread_mutex_unlock(&stateChangeMutex);
 
   return(rc);
 }
@@ -1023,13 +1023,13 @@ int _tryLockMutex(PthreadMutex *mutexId, char* where,
 
   myPid=getpid();
   if(mutexId->isLocked) {
-      if ( (strcmp(fileName, mutexId->lockFile) == 0) && 
-           (fileLine == mutexId->lockLine) &&
-           (myPid == mutexId->lockPid) ) {
-          traceEvent(CONST_TRACE_WARNING,
-                     "WARNING: tryLockMutex() call with a self-LOCKED mutex [from %d at %s:%d %s]\n",
-                     myPid, fileName, fileLine, where);
-      }
+    if ( (strcmp(fileName, mutexId->lockFile) == 0) && 
+	 (fileLine == mutexId->lockLine) &&
+	 (myPid == mutexId->lockPid) ) {
+      traceEvent(CONST_TRACE_WARNING,
+		 "WARNING: tryLockMutex() call with a self-LOCKED mutex [from %d at %s:%d %s]\n",
+		 myPid, fileName, fileLine, where);
+    }
   }
 
   strcpy(mutexId->lockAttemptFile, fileName);
@@ -1037,13 +1037,13 @@ int _tryLockMutex(PthreadMutex *mutexId, char* where,
   mutexId->lockAttemptPid=myPid;
 
   /*
-     Return code:
+    Return code:
 
-     0:    lock succesful
-     EBUSY (mutex already locked)
+    0:    lock succesful
+    EBUSY (mutex already locked)
   */
   rc = pthread_mutex_trylock(&(mutexId->mutex));
-
+  pthread_mutex_lock(&stateChangeMutex);
   mutexId->lockAttemptFile[0] = '\0';
   mutexId->lockAttemptLine=0;
   mutexId->lockAttemptPid=(pid_t) 0;
@@ -1059,9 +1059,7 @@ int _tryLockMutex(PthreadMutex *mutexId, char* where,
 #endif
 
     mutexId->numLocks++;
-    pthread_mutex_lock(&stateChangeMutex);
     mutexId->isLocked = 1;
-    pthread_mutex_unlock(&stateChangeMutex);
     mutexId->lockTime = time(NULL);
     mutexId->lockPid=myPid;
     if(fileName != NULL) {
@@ -1073,6 +1071,7 @@ int _tryLockMutex(PthreadMutex *mutexId, char* where,
     }
   }
 
+  pthread_mutex_unlock(&stateChangeMutex);
   return(rc);
 }
 
@@ -1103,10 +1102,10 @@ int _isMutexLocked(PthreadMutex *mutexId, char* fileName, int fileLine) {
   rc = pthread_mutex_trylock(&(mutexId->mutex));
 
   /*
-     Return code:
+    Return code:
 
-     0:    lock succesful
-     EBUSY (mutex already locked)
+    0:    lock succesful
+    EBUSY (mutex already locked)
   */
 
   if(rc == 0) {
@@ -1150,7 +1149,6 @@ int _releaseMutex(PthreadMutex *mutexId,
   traceEvent(CONST_TRACE_INFO, "Unlocking 0x%X [%s:%d]\n", &(mutexId->mutex), fileName, fileLine);
 #endif
   rc = pthread_mutex_unlock(&(mutexId->mutex));
-  pthread_mutex_unlock(&stateChangeMutex);
 
   if(rc != 0)
     traceEvent(CONST_TRACE_ERROR, "ERROR: unlock failed 0x%X [%s:%d]\n",
@@ -1174,13 +1172,11 @@ int _releaseMutex(PthreadMutex *mutexId,
 		   mutexId->maxLockedDuration);
       }
 #endif
-   }
+    }
 
     /* traceEvent(CONST_TRACE_ERROR, "UNLOCKED 0x%X", &(mutexId->mutex));  */
-    pthread_mutex_lock(&stateChangeMutex);
     mutexId->isLocked = 0;
     mutexId->lockLine = 0;
-    pthread_mutex_unlock(&stateChangeMutex);
     mutexId->numReleases++;
     mutexId->unlockPid=getpid();
     if(fileName != NULL) {
@@ -1188,6 +1184,8 @@ int _releaseMutex(PthreadMutex *mutexId,
       mutexId->unlockLine = fileLine;
     }
   }
+
+  pthread_mutex_unlock(&stateChangeMutex);
 
 #ifdef SEMAPHORE_DEBUG
   traceEvent(CONST_TRACE_INFO, "Unlocked 0x%X [%s:%d]\n",
@@ -1245,7 +1243,7 @@ int timedwaitCondvar(ConditionalVariable *condvarId, struct timespec *expiration
   while(condvarId->predicate <= 0) {
     rc = pthread_cond_timedwait(&condvarId->condvar, &condvarId->mutex, expiration);
     if (rc == ETIMEDOUT) {
-        return rc;
+      return rc;
     }
   }
 
@@ -1352,40 +1350,40 @@ int checkCommand(char* commandName) {
                sizeof(buf),
                "which %s 2>/dev/null",
                commandName) < 0) {
-      BufferTooShort();
-      return(0);
+    BufferTooShort();
+    return(0);
   }
   rc=0;
   fd = popen(buf, "r");
   if (errno == 0) {
-      workBuf = fgets(buf, sizeof(buf), fd);
-      pclose(fd);
-      if(workBuf != NULL) {
-          workBuf = strchr(buf, '\n');
-          if(workBuf != NULL) workBuf[0] = '\0';
-          rc = stat(buf, &statBuf);
-          if (rc == 0) {
-              if ((statBuf.st_mode & (S_IROTH | S_IXOTH) ) == (S_IROTH | S_IXOTH) ) {
-                  if ((statBuf.st_mode & (S_ISUID | S_ISGID) ) != 0) {
-                      traceEvent(CONST_TRACE_ERROR,
-                                 "External tool %s is suid root. FYI: This is good for ntop, but could be dangerous for the system!\n",
-                                 commandName);
-                      return(1);
-                  } else {
-                    ecode=7;
-                  }
-              } else {
-                  ecode=6;
-              }
-          } else {
-              ecode=5;
-          }
+    workBuf = fgets(buf, sizeof(buf), fd);
+    pclose(fd);
+    if(workBuf != NULL) {
+      workBuf = strchr(buf, '\n');
+      if(workBuf != NULL) workBuf[0] = '\0';
+      rc = stat(buf, &statBuf);
+      if (rc == 0) {
+	if ((statBuf.st_mode & (S_IROTH | S_IXOTH) ) == (S_IROTH | S_IXOTH) ) {
+	  if ((statBuf.st_mode & (S_ISUID | S_ISGID) ) != 0) {
+	    traceEvent(CONST_TRACE_ERROR,
+		       "External tool %s is suid root. FYI: This is good for ntop, but could be dangerous for the system!\n",
+		       commandName);
+	    return(1);
+	  } else {
+	    ecode=7;
+	  }
+	} else {
+	  ecode=6;
+	}
       } else {
-          ecode=4;
+	ecode=5;
       }
+    } else {
+      ecode=4;
+    }
   } else {
-      pclose(fd);
-      ecode=3;
+    pclose(fd);
+    ecode=3;
   }
   /* test failed ... */
   traceEvent(CONST_TRACE_ERROR,
@@ -1949,13 +1947,13 @@ time_t getTimeMapping(u_int16_t transactionId,
 
   /* ****************************************
 
-     As  Andreas Pfaller <apfaller@yahoo.com.au>
-     pointed out, the hash code needs to be optimised.
-     Actually the hash is scanned completely
-     if (unlikely but possible) the searched entry
-     is not present into the table.
+  As  Andreas Pfaller <apfaller@yahoo.com.au>
+  pointed out, the hash code needs to be optimised.
+  Actually the hash is scanned completely
+  if (unlikely but possible) the searched entry
+  is not present into the table.
 
-     **************************************** */
+  **************************************** */
 
   for(i=0; i<CONST_NUM_TRANSACTION_ENTRIES; i++) {
     if(myGlobals.transTimeHash[idx].transactionId == transactionId) {
@@ -1991,78 +1989,78 @@ void traceEvent(int eventTraceLevel, char* file,
     time_t theTime = time(NULL);
     struct tm t;
 
-/* We have two paths - one if we're logging, one if we aren't
- *   Note that the no-log case is those systems which don't support it (WIN32),
- *                                those without the headers !defined(MAKE_WITH_SYSLOG)
- *                                those where it's parametrically off...
- */
+    /* We have two paths - one if we're logging, one if we aren't
+     *   Note that the no-log case is those systems which don't support it (WIN32),
+     *                                those without the headers !defined(MAKE_WITH_SYSLOG)
+     *                                those where it's parametrically off...
+     */
 
-        memset(buf, 0, LEN_GENERAL_WORK_BUFFER);
+    memset(buf, 0, LEN_GENERAL_WORK_BUFFER);
 
 #if defined(WIN32) || !defined(MAKE_WITH_SYSLOG)
-        strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &t));
-        if(myGlobals.traceLevel == CONST_DETAIL_TRACE_LEVEL) {
-			int beginFileIdx;
+    strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &t));
+    if(myGlobals.traceLevel == CONST_DETAIL_TRACE_LEVEL) {
+      int beginFileIdx;
 
-			for(beginFileIdx=strlen(file)-1; beginFileIdx>1; beginFileIdx--)
-  				if(file[beginFileIdx-1] == '\\') break;
-			printf("%s [%s:%d] ", theDate, &file[beginFileIdx], line);
-        } else {
-                printf("%s ", theDate);
-        }
+      for(beginFileIdx=strlen(file)-1; beginFileIdx>1; beginFileIdx--)
+	if(file[beginFileIdx-1] == '\\') break;
+      printf("%s [%s:%d] ", theDate, &file[beginFileIdx], line);
+    } else {
+      printf("%s ", theDate);
+    }
 
 #if defined(WIN32)
-        /* Windows lacks vsnprintf */
-        vsprintf(buf, format, va_ap);
+    /* Windows lacks vsnprintf */
+    vsprintf(buf, format, va_ap);
 #else /* WIN32 - vsnprintf */
-        vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, format, va_ap);
+    vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, format, va_ap);
 #endif /* WIN32 - vsnprintf */
 
-	printf("%s%s", buf, (format[strlen(format)-1] != '\n') ? "\n" : "");
-	fflush(stdout);
+    printf("%s%s", buf, (format[strlen(format)-1] != '\n') ? "\n" : "");
+    fflush(stdout);
 
 #else /* WIN32 || !MAKE_WITH_SYSLOG */
 
-       	vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, format, va_ap);
+    vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, format, va_ap);
 
-	if(myGlobals.useSyslog != FLAG_SYSLOG_NONE) {
+    if(myGlobals.useSyslog != FLAG_SYSLOG_NONE) {
 
-		openlog("ntop", LOG_PID, myGlobals.useSyslog);
+      openlog("ntop", LOG_PID, myGlobals.useSyslog);
 
-		/* syslog(..) call fix courtesy of Peter Suschlik <peter@zilium.de> */
-	    #if (0)
-		switch(myGlobals.traceLevel) {
-		  case 0:
-			syslog(LOG_ERR, "%s", buf);
-			break;
-		  case 1:
-			syslog(LOG_WARNING, "%s", buf);
-			break;
-		  case 2:
-			syslog(LOG_NOTICE, "%s", buf);
-			break;
-		  default:
-			syslog(LOG_INFO, "%s", buf);
-			break;
-		}
-	    #else
-		syslog(LOG_ERR, "%s", buf);
-	    #endif
-		closelog();
+      /* syslog(..) call fix courtesy of Peter Suschlik <peter@zilium.de> */
+#if (0)
+      switch(myGlobals.traceLevel) {
+      case 0:
+	syslog(LOG_ERR, "%s", buf);
+	break;
+      case 1:
+	syslog(LOG_WARNING, "%s", buf);
+	break;
+      case 2:
+	syslog(LOG_NOTICE, "%s", buf);
+	break;
+      default:
+	syslog(LOG_INFO, "%s", buf);
+	break;
+      }
+#else
+      syslog(LOG_ERR, "%s", buf);
+#endif
+      closelog();
 
-	} else {
+    } else {
 
-        	strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &t));
-	        if(myGlobals.traceLevel == CONST_DETAIL_TRACE_LEVEL) {
-        	        printf("%s [%s:%d] ", theDate, file, line);
-	        } else {
-        	        printf("%s ", theDate);
-	        }
+      strftime(theDate, 32, "%d/%b/%Y %H:%M:%S", localtime_r(&theTime, &t));
+      if(myGlobals.traceLevel == CONST_DETAIL_TRACE_LEVEL) {
+	printf("%s [%s:%d] ", theDate, file, line);
+      } else {
+	printf("%s ", theDate);
+      }
 
-		printf("%s%s", buf, (format[strlen(format)-1] != '\n') ? "\n" : "");
-		fflush(stdout);
+      printf("%s%s", buf, (format[strlen(format)-1] != '\n') ? "\n" : "");
+      fflush(stdout);
 
-	}
+    }
 #endif /* WIN32 || !MAKE_WITH_SYSLOG */
 
   }
@@ -2090,25 +2088,25 @@ char* _strncpy(char *dest, const char *src, size_t n) {
 #ifndef HAVE_STRTOK_R
 /* Reentrant string tokenizer.  Generic myGlobals.version.
 
-   Slightly modified from: glibc 2.1.3
+Slightly modified from: glibc 2.1.3
 
-   Copyright (C) 1991, 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+Copyright (C) 1991, 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+This file is part of the GNU C Library.
 
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
-   License, or (at your option) any later version.
+The GNU C Library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public License as
+published by the Free Software Foundation; either version 2 of the
+License, or (at your option) any later version.
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+The GNU C Library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If not,
-   write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+You should have received a copy of the GNU Library General Public
+License along with the GNU C Library; see the file COPYING.LIB.  If not,
+write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.  */
 
 char *strtok_r(char *s, const char *delim, char **save_ptr) {
   char *token;
@@ -2190,14 +2188,14 @@ char *strtolower(char *s) {
  * '\0' if (n != 0 and dst != NULL),  and doesn't do padding
  */
 char *xstrncpy(char *dest, const char *src, size_t n) {
-    char *r = dest;
-    if (!n || !dest)
-	return dest;
-    if (src)
-	while (--n != 0 && *src != '\0')
-	    *dest++ = *src++;
-    *dest = '\0';
-    return r;
+  char *r = dest;
+  if (!n || !dest)
+    return dest;
+  if (src)
+    while (--n != 0 && *src != '\0')
+      *dest++ = *src++;
+  *dest = '\0';
+  return r;
 }
 
 /* *************************************** */
@@ -2371,7 +2369,7 @@ void fillDomainName(HostTraffic *el) {
     /* Let's use the local domain name */
 #ifdef DEBUG
     traceEvent(CONST_TRACE_INFO, "DEBUG: '%s' [%s/%s]\n",
-	   el->hostSymIpAddress, myGlobals.domainName, myGlobals.shortDomainName);
+	       el->hostSymIpAddress, myGlobals.domainName, myGlobals.shortDomainName);
 #endif
     if((myGlobals.domainName[0] != '\0')
        && (strcmp(el->hostSymIpAddress, el->hostNumIpAddress))) {
@@ -2405,7 +2403,7 @@ void fillDomainName(HostTraffic *el) {
       i++;
 
   if((el->hostSymIpAddress[i] == '.')
-	 && (strlen(el->hostSymIpAddress) > (i+1)))
+     && (strlen(el->hostSymIpAddress) > (i+1)))
     el->fullDomainName = &el->hostSymIpAddress[i+1];
 
   /* traceEvent(CONST_TRACE_INFO, "'%s'\n", el->domainName); */
@@ -2829,14 +2827,14 @@ int _incrementUsageCounter(UsageCounter *counter,
     return(0);
   }
 
- if((theHost = myGlobals.device[actualDeviceId].
-     hash_hostTraffic[checkSessionIdx(peerIdx)]) == NULL) {
+  if((theHost = myGlobals.device[actualDeviceId].
+      hash_hostTraffic[checkSessionIdx(peerIdx)]) == NULL) {
     traceEvent(CONST_TRACE_WARNING, "WARNING: wrong Index %u @ %s:%d",
 	       peerIdx, file, line);
     return(0);
- }
+  }
 
- counter->value.value++;
+  counter->value.value++;
 
   for(i=0; i<MAX_NUM_CONTACTED_PEERS; i++) {
     if(counter->peersIndexes[i] == FLAG_NO_PEER) {
@@ -2899,8 +2897,8 @@ int fetchPrefsValue(char *key, char *value, int valueLen) {
   memset(value, 0, valueLen);
 
   if(data_data.dptr != NULL) {
-	int len = min(valueLen,data_data.dsize);
-	strncpy(value, data_data.dptr, len);
+    int len = min(valueLen,data_data.dsize);
+    strncpy(value, data_data.dptr, len);
     value[len] = '\0';
     free(data_data.dptr);
     /* traceEvent(CONST_TRACE_INFO, "Read %s=%s.", key, value); */
@@ -3060,8 +3058,8 @@ void resetTrafficCounter(TrafficCounter *ctr) {
 /* ******************************** */
 
 static void updateElementHashItem(ElementHash **theHash,
-		       u_short srcId, u_short dstId,
-		       Counter numPkts, Counter numBytes, u_char dataSent) {
+				  u_short srcId, u_short dstId,
+				  Counter numPkts, Counter numBytes, u_char dataSent) {
   u_int myIdx = 0, idx = srcId % MAX_ELEMENT_HASH;
   ElementHash *hash, *prev;
 
@@ -3256,35 +3254,35 @@ char *ip2CountryCode(u_int32_t ip) {
  */
 
 /*
-         This file is part of the libiberty library.
-         Libiberty is free software; you can redistribute it and/or
-         modify it under the terms of the GNU Library General Public
-         License as published by the Free Software Foundation; either
-         version 2 of the License, or(at your option) any later version.
+  This file is part of the libiberty library.
+  Libiberty is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or(at your option) any later version.
 
-         Libiberty is distributed in the hope that it will be useful,
-         but WITHOUT ANY WARRANTY; without even the implied warranty of
-         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-         Library General Public License for more details.
+  Libiberty is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-         You should have received a copy of the GNU Library General Public
-         License along with libiberty; see the file COPYING.LIB.  If
-         not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-         Boston, MA 02111-1307, USA.
- */
+  You should have received a copy of the GNU Library General Public
+  License along with libiberty; see the file COPYING.LIB.  If
+  not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+  Boston, MA 02111-1307, USA.
+*/
 
 /*
  *  Specifically,
  *
  *     The getopt_long routine is from libiberty's getopt.c and getopt1.c
  *
-            NOTE: This source is derived from an old version taken from the GNU C
-            Library(glibc).
+ NOTE: This source is derived from an old version taken from the GNU C
+ Library(glibc).
  *
  *     The argv[] routines are from libiberty's argv.c
  *
-            Copyright(C) 1992, 2001 Free Software Foundation, Inc.
-            Written by Fred Fish @ Cygnus Support
+ Copyright(C) 1992, 2001 Free Software Foundation, Inc.
+ Written by Fred Fish @ Cygnus Support
  *
  */
 
@@ -3320,9 +3318,9 @@ static int last_nonopt;
 
 static char *my_index(const char *str, int chr) {
   while(*str) {
-      if(*str == chr)
-          return(char *) str;
-      str++;
+    if(*str == chr)
+      return(char *) str;
+    str++;
   }
   return 0;
 }
@@ -3509,27 +3507,27 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 	 Skip the initial punctuation.  */
 
       nextchar =(argv[optind] + 1
-		  +(longopts != NULL && argv[optind][1] == '-'));
+		 +(longopts != NULL && argv[optind][1] == '-'));
     }
 
   /* Decode the current option-ARGV-element.  */
 
   /* Check whether the ARGV-element is a long option.
 
-     If long_only and the ARGV-element has the form "-f", where f is
-     a valid short option, don't consider it an abbreviated form of
-     a long option that starts with f.  Otherwise there would be no
-     way to give the -f short option.
+  If long_only and the ARGV-element has the form "-f", where f is
+  a valid short option, don't consider it an abbreviated form of
+  a long option that starts with f.  Otherwise there would be no
+  way to give the -f short option.
 
-     On the other hand, if there's a long option "fubar" and
-     the ARGV-element is "-fu", do consider that an abbreviation of
-     the long option, just like "--fu", and not "-f" with arg "u".
+  On the other hand, if there's a long option "fubar" and
+  the ARGV-element is "-fu", do consider that an abbreviation of
+  the long option, just like "--fu", and not "-f" with arg "u".
 
-     This distinction seems to be the most useful approach.  */
+  This distinction seems to be the most useful approach.  */
 
   if(longopts != NULL
-      &&(argv[optind][1] == '-'
-	  ||(long_only &&(argv[optind][2] || !my_index(optstring, argv[optind][1])))))
+     &&(argv[optind][1] == '-'
+	||(long_only &&(argv[optind][2] || !my_index(optstring, argv[optind][1])))))
     {
       char *nameend;
       const struct option *p;
@@ -3548,7 +3546,7 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 	if(!strncmp(p->name, nextchar, nameend - nextchar))
 	  {
 	    if((unsigned int)(nameend - nextchar)
-		==(unsigned int) strlen(p->name))
+	       ==(unsigned int) strlen(p->name))
 	      {
 		/* Exact match found.  */
 		pfound = p;
@@ -3571,7 +3569,7 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 	{
 	  if(opterr)
 	    fprintf(stderr, "%s: option `%s' is ambiguous\n",
-		     argv[0], argv[optind]);
+		    argv[0], argv[optind]);
 	  nextchar += strlen(nextchar);
 	  optind++;
 	  optopt = 0;
@@ -3595,13 +3593,13 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 		      if(argv[optind - 1][1] == '-')
 			/* --option */
 			fprintf(stderr,
-				 "%s: option `--%s' doesn't allow an argument\n",
-				 argv[0], pfound->name);
+				"%s: option `--%s' doesn't allow an argument\n",
+				argv[0], pfound->name);
 		      else
 			/* +option or -option */
 			fprintf(stderr,
-				 "%s: option `%c%s' doesn't allow an argument\n",
-				 argv[0], argv[optind - 1][0], pfound->name);
+				"%s: option `%c%s' doesn't allow an argument\n",
+				argv[0], argv[optind - 1][0], pfound->name);
 
 		      nextchar += strlen(nextchar);
 
@@ -3618,8 +3616,8 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 		{
 		  if(opterr)
 		    fprintf(stderr,
-			   "%s: option `%s' requires an argument\n",
-			   argv[0], argv[optind - 1]);
+			    "%s: option `%s' requires an argument\n",
+			    argv[0], argv[optind - 1]);
 		  nextchar += strlen(nextchar);
 		  optopt = pfound->val;
 		  return optstring[0] == ':' ? ':' : '?';
@@ -3641,18 +3639,18 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 	 option, then it's an error.
 	 Otherwise interpret it as a short option.  */
       if(!long_only || argv[optind][1] == '-'
-	  || my_index(optstring, *nextchar) == NULL)
+	 || my_index(optstring, *nextchar) == NULL)
 	{
 	  if(opterr)
 	    {
 	      if(argv[optind][1] == '-')
 		/* --option */
 		fprintf(stderr, "%s: unrecognized option `--%s'\n",
-			 argv[0], nextchar);
+			argv[0], nextchar);
 	      else
 		/* +option or -option */
 		fprintf(stderr, "%s: unrecognized option `%c%s'\n",
-			 argv[0], argv[optind][0], nextchar);
+			argv[0], argv[optind][0], nextchar);
 	    }
 	  nextchar =(char *) "";
 	  optind++;
@@ -3678,10 +3676,10 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 	    if(posixly_correct)
 	      /* 1003.2 specifies the format of this message.  */
 	      fprintf(stderr, "%s: illegal option -- %c\n",
-		       argv[0], c);
+		      argv[0], c);
 	    else
 	      fprintf(stderr, "%s: invalid option -- %c\n",
-		       argv[0], c);
+		      argv[0], c);
 	  }
 	optopt = c;
 	return '?';
@@ -3711,7 +3709,7 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 	      {
 		/* 1003.2 specifies the format of this message.  */
 		fprintf(stderr, "%s: option requires an argument -- %c\n",
-			 argv[0], c);
+			argv[0], c);
 	      }
 	    optopt = c;
 	    if(optstring[0] == ':')
@@ -3758,7 +3756,7 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 	  {
 	    if(opterr)
 	      fprintf(stderr, "%s: option `-W %s' is ambiguous\n",
-		       argv[0], argv[optind]);
+		      argv[0], argv[optind]);
 	    nextchar += strlen(nextchar);
 	    optind++;
 	    return '?';
@@ -3776,7 +3774,7 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 		  {
 		    if(opterr)
 		      fprintf(stderr, "%s: option `-W %s' doesn't allow an argument\n",
-			       argv[0], pfound->name);
+			      argv[0], pfound->name);
 
 		    nextchar += strlen(nextchar);
 		    return '?';
@@ -3790,8 +3788,8 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 		  {
 		    if(opterr)
 		      fprintf(stderr,
-			       "%s: option `%s' requires an argument\n",
-			       argv[0], argv[optind - 1]);
+			      "%s: option `%s' requires an argument\n",
+			      argv[0], argv[optind - 1]);
 		    nextchar += strlen(nextchar);
 		    return optstring[0] == ':' ? ':' : '?';
 		  }
@@ -3806,8 +3804,8 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 	      }
 	    return pfound->val;
 	  }
-	  nextchar = NULL;
-	  return 'W';	/* Let the application handle it.   */
+	nextchar = NULL;
+	return 'W';	/* Let the application handle it.   */
       }
     if(temp[1] == ':')
       {
@@ -3839,8 +3837,8 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 		  {
 		    /* 1003.2 specifies the format of this message.  */
 		    fprintf(stderr,
-			   "%s: option requires an argument -- %c\n",
-			   argv[0], c);
+			    "%s: option requires an argument -- %c\n",
+			    argv[0], c);
 		  }
 		optopt = c;
 		if(optstring[0] == ':')
@@ -3861,10 +3859,10 @@ int _getopt_internal(argc, argv, optstring, longopts, longind, long_only)
 
 int
 getopt_long(int argc,
-             char *const *argv,
-             const char *options,
-             const struct option *long_options,
-             int *opt_index)
+	    char *const *argv,
+	    const char *options,
+	    const struct option *long_options,
+	    int *opt_index)
 {
   return _getopt_internal(argc, argv, options, long_options, opt_index, 0);
 }
@@ -3878,10 +3876,10 @@ getopt_long(int argc,
 #ifndef HAVE_FREEARGV
 
 /*
-Free an argument vector that was built using buildargv.  Simply
-scans through vector, freeing the memory for each argument until
-the terminating NULL is found, and then frees vector
-itself.
+  Free an argument vector that was built using buildargv.  Simply
+  scans through vector, freeing the memory for each argument until
+  the terminating NULL is found, and then frees vector
+  itself.
 */
 
 void freeargv(char **vector) {
@@ -3902,35 +3900,35 @@ void freeargv(char **vector) {
 #ifndef HAVE_BUILDARGV
 
 /*
-Given a pointer to a string, parse the string extracting fields
-separated by whitespace and optionally enclosed within either single
-or double quotes(which are stripped off), and build a vector of
-pointers to copies of the string for each field.  The input string
-remains unchanged.  The last element of the vector is followed by a
-NULL element.
+  Given a pointer to a string, parse the string extracting fields
+  separated by whitespace and optionally enclosed within either single
+  or double quotes(which are stripped off), and build a vector of
+  pointers to copies of the string for each field.  The input string
+  remains unchanged.  The last element of the vector is followed by a
+  NULL element.
 
-All of the memory for the pointer array and copies of the string
-is obtained from malloc.  All of the memory can be returned to the
-system with the single function call freeargv, which takes the
-returned result of buildargv, as it's argument.
+  All of the memory for the pointer array and copies of the string
+  is obtained from malloc.  All of the memory can be returned to the
+  system with the single function call freeargv, which takes the
+  returned result of buildargv, as it's argument.
 
-Returns a pointer to the argument vector if successful.  Returns
-NULL if sp is NULL or if there is insufficient memory to complete
- building the argument vector. If the input is a null string(as
-opposed to a NULL pointer), then buildarg returns an argument
-vector that has one arg, a null string.
+  Returns a pointer to the argument vector if successful.  Returns
+  NULL if sp is NULL or if there is insufficient memory to complete
+  building the argument vector. If the input is a null string(as
+  opposed to a NULL pointer), then buildarg returns an argument
+  vector that has one arg, a null string.
 
-The memory for the argv array is dynamically expanded as necessary.
+  The memory for the argv array is dynamically expanded as necessary.
 
-In order to provide a working buffer for extracting arguments into,
-with appropriate stripping of quotes and translation of backslash
-sequences, we allocate a working buffer at least as long as the input
-string.  This ensures that we always have enough space in which to
-work, since the extracted arg is never larger than the input string.
+  In order to provide a working buffer for extracting arguments into,
+  with appropriate stripping of quotes and translation of backslash
+  sequences, we allocate a working buffer at least as long as the input
+  string.  This ensures that we always have enough space in which to
+  work, since the extracted arg is never larger than the input string.
 
-The argument vector is always kept terminated with a NULL arg
-pointer, so it can be passed to freeargv at any time, or
-returned, as appropriate.
+  The argument vector is always kept terminated with a NULL arg
+  pointer, so it can be passed to freeargv at any time, or
+  returned, as appropriate.
 
 */
 
@@ -3999,7 +3997,7 @@ char **buildargv(const char *input) {
 		    }
 		  else if(*input == '\\')
 		    {
-			  bsquote = 1;
+		      bsquote = 1;
 		    }
 		  else if(squote)
 		    {
@@ -4074,17 +4072,17 @@ void _HEARTBEAT(int beatLevel, char* file, int line, char * format, ...) {
   myGlobals.heartbeatCounter++;
 
   if((format != NULL) &&(PARM_SHOW_NTOP_HEARTBEAT >= beatLevel) ) {
-      memset(buf, 0, LEN_GENERAL_WORK_BUFFER);
-      va_start(va_ap, format);
+    memset(buf, 0, LEN_GENERAL_WORK_BUFFER);
+    va_start(va_ap, format);
 #if defined(WIN32)
-      /* Windows lacks vsnprintf */
-      vsprintf(buf, format, va_ap);
+    /* Windows lacks vsnprintf */
+    vsprintf(buf, format, va_ap);
 #else /* WIN32 - vsnprintf */
-      vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, format, va_ap);
+    vsnprintf(buf, LEN_GENERAL_WORK_BUFFER-1, format, va_ap);
 #endif /* WIN32 - vsnprintf */
-      va_end(va_ap);
+    va_end(va_ap);
 
-      traceEvent(CONST_TRACE_INFO, "HEARTBEAT(%09u)[%s:%d]: %s\n", myGlobals.heartbeatCounter, file, line, buf);
+    traceEvent(CONST_TRACE_INFO, "HEARTBEAT(%09u)[%s:%d]: %s\n", myGlobals.heartbeatCounter, file, line, buf);
   }
 }
 #endif
@@ -4100,19 +4098,19 @@ char *i18n_xvert_locale2common(const char *input) {
    *       (html_ll_XX) where the Accept-Language version(ll-XX) wouldn't always be.
    *
    */
-   char *output, *work;
+  char *output, *work;
 
-   output = strdup(input);
+  output = strdup(input);
 
-   work = strchr(output, '.');
-   if(work != NULL) {
-       work[0] = '\0';
-   }
-   work = strchr(output, '@');
-   if(work != NULL) {
-       work[0] = '\0';
-   }
-   return output;
+  work = strchr(output, '.');
+  if(work != NULL) {
+    work[0] = '\0';
+  }
+  work = strchr(output, '@');
+  if(work != NULL) {
+    work[0] = '\0';
+  }
+  return output;
 }
 
 char *i18n_xvert_acceptlanguage2common(const char *input) {
@@ -4125,28 +4123,28 @@ char *i18n_xvert_acceptlanguage2common(const char *input) {
    *       (html_ll_XX) where the Accept-Language version(ll-XX) wouldn't always be.
    *
    */
-   char *output, *work;
+  char *output, *work;
 
-   output = strdup(input);
+  output = strdup(input);
 
-   work = strchr(output, '*');
-   if(work != NULL) {
-       /* Backup to erase the - of the -* combo */
-       work--;
-       work[0] = '\0';
-   }
-   work = strchr(output, '-');
-   if(work != NULL) {
-       work[0] = '_';
-   }
-   work = strchr(output, '_');
-   if(work != NULL) {
-       while(work[0] != '\0') {
-           work[0] = toupper(work[0]);
-           work++;
-       }
-   }
-   return output;
+  work = strchr(output, '*');
+  if(work != NULL) {
+    /* Backup to erase the - of the -* combo */
+    work--;
+    work[0] = '\0';
+  }
+  work = strchr(output, '-');
+  if(work != NULL) {
+    work[0] = '_';
+  }
+  work = strchr(output, '_');
+  if(work != NULL) {
+    while(work[0] != '\0') {
+      work[0] = toupper(work[0]);
+      work++;
+    }
+  }
+  return output;
 }
 #endif /* MAKE_WITH_I18N */
 
@@ -4236,7 +4234,7 @@ void setHostFingerprint(HostTraffic *srcHost) {
       fclose(fd);
     }
 
-	if(done) break;
+    if(done) break;
   }
 
   if(!done) {

@@ -1646,7 +1646,10 @@
 /*
  * How often should we update rrd statistics?  Overridden in rrd plugin
  */
-#define DEFAULT_RRD_INTERVAL                300      /* rrd counter (default) interval */
+#define DEFAULT_RRD_INTERVAL                300  /* seconds - rrd counter (default) interval */
+#define DEFAULT_RRD_HOURS                   72   /* hours of interval by interval data (default) */
+#define DEFAULT_RRD_DAYS                    90   /* days of hour by hour data (default) */
+#define DEFAULT_RRD_MONTHS                  36   /* months of day by day data (default) */
 
 /*
  * What should we set tracing to unless we have a parameter?

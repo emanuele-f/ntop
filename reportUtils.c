@@ -1896,96 +1896,122 @@ void printHostIcmpStats(HostTraffic *el) {
 	     "<TH "TH_BG" ALIGN=LEFT>Pkt&nbsp;Sent</TH>"
 	     "<TH "TH_BG" ALIGN=LEFT>Pkt&nbsp;Rcvd</TH></TR>\n");
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Echo Request</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_ECHO]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_ECHO])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_ECHO]+el->icmpInfo->icmpMsgRcvd[ICMP_ECHO] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Echo Request</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_ECHO]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_ECHO])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Echo Reply</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_ECHOREPLY]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_ECHOREPLY])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_ECHOREPLY]+el->icmpInfo->icmpMsgRcvd[ICMP_ECHOREPLY] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Echo Reply</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_ECHOREPLY]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_ECHOREPLY])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Unreach</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_UNREACH]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_UNREACH])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_UNREACH]+el->icmpInfo->icmpMsgRcvd[ICMP_UNREACH] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Unreach</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_UNREACH]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_UNREACH])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Redirect</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_REDIRECT]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_REDIRECT])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_REDIRECT]+el->icmpInfo->icmpMsgRcvd[ICMP_REDIRECT] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Redirect</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_REDIRECT]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_REDIRECT])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Router Advertisement</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_ROUTERADVERT]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_ROUTERADVERT])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_ROUTERADVERT]+el->icmpInfo->icmpMsgRcvd[ICMP_ROUTERADVERT] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Router Advertisement</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_ROUTERADVERT]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_ROUTERADVERT])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Time Exceeded</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_TIMXCEED]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_TIMXCEED])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_TIMXCEED]+el->icmpInfo->icmpMsgRcvd[ICMP_TIMXCEED] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Time Exceeded</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_TIMXCEED]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_TIMXCEED])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Parameter Problem</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_PARAMPROB]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_PARAMPROB])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_PARAMPROB]+el->icmpInfo->icmpMsgRcvd[ICMP_PARAMPROB] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Parameter Problem</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_PARAMPROB]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_PARAMPROB])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Network Mask Request</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_MASKREQ]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_MASKREQ])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_MASKREQ]+el->icmpInfo->icmpMsgRcvd[ICMP_MASKREQ] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Network Mask Request</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_MASKREQ]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_MASKREQ])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Network Mask Reply</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_MASKREPLY]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_MASKREPLY])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_MASKREPLY]+el->icmpInfo->icmpMsgRcvd[ICMP_MASKREPLY] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Network Mask Reply</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_MASKREPLY]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_MASKREPLY])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Source Quench</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_SOURCE_QUENCH]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_SOURCE_QUENCH])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_SOURCE_QUENCH]+el->icmpInfo->icmpMsgRcvd[ICMP_SOURCE_QUENCH] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Source Quench</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_SOURCE_QUENCH]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_SOURCE_QUENCH])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Timestamp</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_TIMESTAMP]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_TIMESTAMP])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_TIMESTAMP]+el->icmpInfo->icmpMsgRcvd[ICMP_TIMESTAMP] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Timestamp</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_TIMESTAMP]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_TIMESTAMP])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Info Request</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_INFO_REQUEST]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_INFO_REQUEST])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_INFO_REQUEST]+el->icmpInfo->icmpMsgRcvd[ICMP_INFO_REQUEST] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Info Request</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_INFO_REQUEST]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_INFO_REQUEST])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
-  if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Info Reply</TH>"
-	      "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
-	      formatPkts(el->icmpInfo->icmpMsgSent[ICMP_INFO_REPLY]),
-	      formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_INFO_REPLY])) < 0)
-    BufferTooShort();
-  sendString(buf);
+  if(el->icmpInfo->icmpMsgSent[ICMP_INFO_REPLY]+el->icmpInfo->icmpMsgRcvd[ICMP_INFO_REPLY] > 0) {
+    if(snprintf(buf, sizeof(buf), "<TR "TR_ON"><TH "TH_BG" ALIGN=LEFT>Info Reply</TH>"
+		"<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>",
+		formatPkts(el->icmpInfo->icmpMsgSent[ICMP_INFO_REPLY]),
+		formatPkts(el->icmpInfo->icmpMsgRcvd[ICMP_INFO_REPLY])) < 0)
+      BufferTooShort();
+    sendString(buf);
+  }
 
   sendString("</TABLE>"TABLE_OFF"</CENTER>\n");
 }
@@ -2528,24 +2554,24 @@ void checkHostProvidedServices(HostTraffic *el) {
 		"<TD "TD_BG" ALIGN=RIGHT>", getRowColor(), "Host Type") < 0) BufferTooShort();
     sendString(buf);
 
-    if(isServer(el))           sendString("Server<BR>");
-    if(isWorkstation(el))      sendString("Workstation<BR>");
-    if(isMasterBrowser(el))    sendString("Master Browser<BR>");
-    if(isPrinter(el))          sendString("Printer&nbsp;<IMG ALT=Printer SRC=printer.gif BORDER=0><BR>");
-    if(isBridgeHost(el))       sendString("Bridge<BR>");
+    if(isServer(el))           sendString("Server<BR>\n");
+    if(isWorkstation(el))      sendString("Workstation<BR>\n");
+    if(isMasterBrowser(el))    sendString("Master Browser<BR>\n");
+    if(isPrinter(el))          sendString("Printer&nbsp;<IMG ALT=Printer SRC=printer.gif BORDER=0><BR>\n");
+    if(isBridgeHost(el))       sendString("Bridge<BR>\n");
 
-    if(nameServerHost(el))     sendString("&nbsp;<IMG ALT=\"DNS Server\" SRC=/dns.gif BORDER=0>&nbsp;Name Server<BR>");
-    if(gatewayHost(el))        sendString("Gateway&nbsp;<IMG ALT=Router SRC=/router.gif BORDER=0>&nbsp;<BR>");
-    if(isSMTPhost(el))         sendString("SMTP Server&nbsp;<IMG ALT=\"Mail Server (SMTP)\"  SRC=/mail.gif BORDER=0>&nbsp;<BR>");
-    if(isPOPhost(el))          sendString("POP Server<BR>");
-    if(isIMAPhost(el))         sendString("IMAP Server<BR>");
-    if(isDirectoryHost(el))    sendString("Directory Server<BR>");
-    if(isFTPhost(el))          sendString("FTP Server<BR>");
-    if(isHTTPhost(el))         sendString("HTTP Server<BR>");
-    if(isWINShost(el))         sendString("WINS Server<BR>");
+    if(nameServerHost(el))     sendString("&nbsp;<IMG ALT=\"DNS Server\" SRC=/dns.gif BORDER=0>&nbsp;Name Server<BR>\n");
+    if(gatewayHost(el))        sendString("Gateway&nbsp;<IMG ALT=Router SRC=/router.gif BORDER=0>&nbsp;<BR>\n");
+    if(isSMTPhost(el))         sendString("SMTP Server&nbsp;<IMG ALT=\"Mail Server (SMTP)\"  SRC=/mail.gif BORDER=0>&nbsp;<BR>\n");
+    if(isPOPhost(el))          sendString("POP Server<BR>\n");
+    if(isIMAPhost(el))         sendString("IMAP Server<BR>\n");
+    if(isDirectoryHost(el))    sendString("Directory Server<BR>\n");
+    if(isFTPhost(el))          sendString("FTP Server<BR>\n");
+    if(isHTTPhost(el))         sendString("HTTP Server&nbsp;<IMG ALT=\"HTTP Server\" SRC=/web.gif BORDER=0><BR>\n");
+    if(isWINShost(el))         sendString("WINS Server<BR>\n");
 
-    if(isDHCPClient(el))          sendString("BOOTP/DHCP Client&nbsp;<IMG ALT=\"DHCP Client\" SRC=/bulb.gif BORDER=0><BR>");
-    if(isDHCPServer(el))          sendString("BOOTP/DHCP Server&nbsp;<IMG ALT=\"DHCP Server\" SRC=/antenna.gif BORDER=0>&nbsp;<BR>");
+    if(isDHCPClient(el))          sendString("BOOTP/DHCP Client&nbsp;<IMG ALT=\"DHCP Client\" SRC=/bulb.gif BORDER=0><BR>\n");
+    if(isDHCPServer(el))          sendString("BOOTP/DHCP Server&nbsp;<IMG ALT=\"DHCP Server\" SRC=/antenna.gif BORDER=0>&nbsp;<BR>\n");
     sendString("</TD></TR>");
   }
 }

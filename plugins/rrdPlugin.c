@@ -681,19 +681,40 @@ static void updateRRD(char *hostPath, char *key, Counter value, int isCounter) {
 
   if (rrd_test_error()) {
     int x;
+    char *rrdError;
+    struct tm workT;
 
     numRRDerrors++;
-    traceEvent(CONST_TRACE_WARNING, "RRD: rrd_update(%s) error: %s", path, rrd_get_error());
+    rrdError = rrd_get_error();
+    if (strcmp(rrdError, "error: illegal attempt to update using time") != NULL) {
+        char errTimeBuf1[32], errTimeBuf2[32], errTimeBuf3[32];
+        time_t rrdLast;
+        strftime(errTimeBuf1, sizeof(errTimeBuf1), "%Y-%m-%d %H:%M:%S", localtime_r(&myGlobals.actTime, &workT));
+        rrdTime = time(NULL);
+        strftime(errTimeBuf2, sizeof(errTimeBuf2), "%H:%M:%S", localtime_r(&rrdTime, &workT));
+        argc = 0;
+        argv[argc++] = "rrd_last";
+        argv[argc++] = path;
+        rrdLast = rrd_last(argc, argv);
+        strftime(errTimeBuf3, sizeof(errTimeBuf3), "%H:%M:%S", localtime_r(&rrdLast, &workT));
+        traceEvent(CONST_TRACE_WARNING,
+                   "RRD: update time error actTime = %d(%s), now %d(%s), lastrrdupd %d(%s)",
+                   myGlobals.actTime,
+                   errTimeBuf1,
+                   rrdTime,
+                   errTimeBuf2,
+                   rrdLast,
+                   rrdLast == -1 ? "rrdlast ERROR" : errTimeBuf3);
+    } else
+        traceEvent(CONST_TRACE_WARNING, "RRD: rrd_update(%s) error: %s", path, rrdError);
+    free(rrdError);
+
     rrd_clear_error();
 
-    traceEvent(CONST_TRACE_INFO, "RRD: call stack (counter created: %d):", createdCounter);
+    traceEvent(CONST_TRACE_NOISY, "RRD: call stack (counter created: %d):", createdCounter);
     for	(x = 0; x < argc; x++)
-      traceEvent(CONST_TRACE_INFO, "RRD:   argv[%d]: %s", x, argv[x]);
+      traceEvent(CONST_TRACE_NOISY, "RRD:   argv[%d]: %s", x, argv[x]);
   }
-
-#if RRD_DEBUG > 0
-  traceEvent(CONST_TRACE_INFO, "RRD_DEBUG: rrd_update(%s, %u, %u)=%d", path, (unsigned long)value, rc);
-#endif
 
 }
 

@@ -445,7 +445,8 @@ typedef struct ntopGlobals {
   /* Flow reception */
   int netFlowInSocket, netFlowDeviceId;
   u_short netFlowInPort;
-  
+  u_long numNetFlowsPktsRcvd, numNetFlowsRcvd, numBadFlowsVersionsRcvd;
+
   /* sFlow */
   int sflowOutSocket, sflowInSocket, sflowDeviceId;
   u_short sflowInPort; 

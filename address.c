@@ -95,6 +95,7 @@ static void resolveAddress(struct in_addr *hostAddr,
   char tmpBuf[96];
   datum key_data;
   datum data_data;
+  int reportedFreaky = FALSE;
 
   if(myGlobals.capturePackets != FLAG_NTOPSTATE_RUN) return;
 
@@ -288,7 +289,7 @@ static void resolveAddress(struct in_addr *hostAddr,
 #ifdef DNS_DEBUG
     traceEvent(CONST_TRACE_INFO, "DNS_DEBUG: Called gethostbyaddr(): RC=%d 0x%X [%s]", 
                h_errno,
-	       hp, hp != NULL ? (char*)hp->h_name : "");
+	       hp, hp != NULL ? (char*)hp->h_name : "not meaningful, hp is null");
 #endif
 
 #endif
@@ -336,6 +337,20 @@ static void resolveAddress(struct in_addr *hostAddr,
               h_errnop
 #endif
              ) {
+        case NETDB_SUCCESS:
+            /* This is the freaky one - it returned NULL (nothing) which tells you to look
+             * at the error code, but the error code says SUCCESS.
+             *
+             * Treat as NOT FOUND, but use reportedFreaky to put out one message per run.
+             * Known to happen under Linux, other OSes uncertain...
+             */
+            if (reportedFreaky == FALSE) {
+                reportedFreaky = TRUE;
+                traceEvent(CONST_TRACE_INFO, "gethost... call returned NULL/NETDB_SUCCESS - "
+                                             "this is odd, but apparently normal");
+            }
+            myGlobals.numDNSErrorHostNotFound++;
+            break;
         case HOST_NOT_FOUND:
             myGlobals.numDNSErrorHostNotFound++;
             break;
@@ -352,17 +367,14 @@ static void resolveAddress(struct in_addr *hostAddr,
         default:
             myGlobals.numDNSErrorOther++;
             addToCacheFlag = 1 /* Don't add this */;
-            traceEvent(CONST_TRACE_ERROR, "DNS: gethost... call, returned unknown error code, %d return 0x%x '%s'\n",
+            traceEvent(CONST_TRACE_ERROR, "gethost... call, returned unknown error code %d",
 #ifdef HAVE_NETDB_H
-                  h_errno,
+                  h_errno
 #elif HAVE_GETIPNODEBYADDR
-                  error_num,
+                  error_num
 #else
-                  h_errnop,
+                  h_errnop
 #endif
-
-                  (hp != NULL) ? hp : 0,
-                  (hp != NULL) && (hp->h_name != NULL) ? hp->h_name : ""
             );
       }
       res = _intoa(*hostAddr, tmpBuf , sizeof(tmpBuf));

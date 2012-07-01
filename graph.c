@@ -37,27 +37,20 @@ struct bar_elements {
 
 /* ******************************************************************* */
 
-static void send_graph_header(char *title) {
-  sendString("<HTML>\n"
-	     "<HEAD>\n"
-	     "<TITLE>ntop chart</TITLE>\n"
-	     "<META HTTP-EQUIV=REFRESH CONTENT=60>\n"
-	     "<META HTTP-EQUIV=Pragma CONTENT=no-cache>\n"
-	     "<META HTTP-EQUIV=Cache-Control CONTENT=no-cache>\n");
-
-  sendJSLibraries(1);
-
-  sendString("</head>\n<body>\n");
-
+static void send_graph_header(char *name) {
+  sendString("<div id=\"");
+  sendString(name);
+  sendString("\" style=\"width: 350px; height: 320px; margin: 0 auto\"></div>\n");
   sendString("\n\n<script type=\"text/javascript\">\n");
   sendString("var data = [\n");
 }
 
 /**********************************************************/
 
-static void send_graph_footer(void) {
-  sendString("$(document).ready(function(){\n\n");
-  sendString("  $.jqplot('container', [data], \n");
+static void send_graph_footer(char *name) {
+  sendString("  $.jqplot('");
+  sendString(name);
+  sendString("', [data], \n");
   sendString("			     { \n");
   sendString("			     seriesDefaults: {\n");
   sendString("			       renderer: jQuery.jqplot.PieRenderer, \n");
@@ -78,24 +71,33 @@ static void send_graph_footer(void) {
   sendString("				 legend: { show:true, location: 'e' }\n");
   sendString("			     }\n");
   sendString("			     );\n");
-  sendString("    });\n");
   sendString("  </script>\n\n");
-
-  sendString("<div id=\"container\" style=\"width: 350px; height: 320px; margin: 0 auto\"></div>\n");
-  sendString("</body>\n</html>\n");
 }
 
 /**********************************************************/
 
-static void build_pie(char *title,
-		      int num, float *p, char **lbl) {
-  int i, elems = 0;
-  char buf[256];
+static void build_pie(char *title, int num, float *p, char **lbl) {
+  int i, j, elems = 0;
+  char buf[256], name[256];
   float tot = 0;
+  static u_int graph_id = 0;
 
   if(num == 0) return;
 
-  send_graph_header(title);
+  for(j=0, i=0; title[i] != '\0'; i++) {
+    if(title[i] != ' ')
+      name[j++] = title[i];
+
+    if(j >= (sizeof(buf)-1))
+      break;
+  }
+
+  name[j] = '\0';
+
+  j = strlen(name);
+  snprintf(&name[j], sizeof(name)-j-1, "_%u", graph_id++);
+  
+  send_graph_header(name);
 
   for(i=0; i<num; i++) {
     if(p[i] > 0) {
@@ -115,7 +117,7 @@ static void build_pie(char *title,
 
   sendString("];\n");
   sendString("\n");
-  send_graph_footer();
+  send_graph_footer(name);
 }
 
 /* ******************************************************************* */
@@ -1121,18 +1123,9 @@ void buildTalkersGraph(char **labels, HostTalkerSeries *talkers,
 void drawThroughputMeter() {
   char buf[256];
 
-  sendString("<HTML>\n"
-	     "<HEAD>\n"
-	     "<META HTTP-EQUIV=REFRESH CONTENT=120>\n"
-	     "<META HTTP-EQUIV=Pragma CONTENT=no-cache>\n"
-	     "<META HTTP-EQUIV=Cache-Control CONTENT=no-cache>\n");
-
-  sendJSLibraries(1);
-
-  sendString("</head>\n<body>\n");
+  sendString("<div id=\"netspeed\" style=\"align: center; width: 180px; height: 120px; margin: 0 auto\"></div>\n");
 
   sendString("<script type=\"text/javascript\">\n");
-  sendString("  $(document).ready(function() {\n");
   sendString("	  s1 = [\n");
   safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "%.1f", myGlobals.device[myGlobals.actualReportDeviceId].actualThpt); sendString(buf);
   sendString("];\n");
@@ -1156,10 +1149,6 @@ void drawThroughputMeter() {
   sendString("		    }\n");
   sendString("	      }\n");
   sendString("	    });\n");
-  sendString("  });\n");
 
   sendString("</script>\n");
-
-  sendString("<div id=\"netspeed\" style=\"align: center; width: 180px; height: 120px; margin: 0 auto\"></div>\n");
-  sendString("</body>\n</html>\n");
 }

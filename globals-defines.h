@@ -1002,7 +1002,6 @@
 #define CONST_HOME_UNDERSCORE_HTML          "home_.html"
 #define CONST_HOST_HTML                     "host.html"
 #define CONST_BAR_HOST_DISTANCE             "hostsDistanceChart"
-#define CONST_THROUGHPUT_METER              "throughputMeter"
 #define CONST_HOSTS_INFO_HTML               "hostsInfo.html"
 #define CONST_HOST_SORT_NOTE_HTML           "hostSortNote.html"
 #define CONST_INDEX_HTML                    "index.html"
@@ -1078,15 +1077,8 @@
 #define CONST_FIND_HOST_JSON                "findHost.json"
 #define CONST_W3C_P3P_XML                   "w3c/p3p.xml"
 #define CONST_XMLDUMP_PLUGIN_NAME           "xmldump"
-
 #define CONST_HOST_SERVICE_DISTR_HTML       "hostServiceDistrib"
-#define CONST_HOST_TRAFFIC_DISTR_HTML       "hostTrafficDistrib"
-#define CONST_HOST_IP_TRAFFIC_DISTR_HTML    "hostIPTrafficDistrib"
-#define CONST_HOST_FRAGMENT_DISTR_HTML      "hostFragmentDistrib"
-#define CONST_HOST_TOT_FRAGMENT_DISTR_HTML  "hostTotalFragmentDistrib"
-#define CONST_HOST_TIME_TRAFFIC_DISTR_HTML  "hostTimeTrafficDistribution"
 #define CONST_HOST_IP_MAP_HTML              "hostIPMap"
-
 
 #define CONST_NTOP_LOGO                     "ntop_logo.png"
 

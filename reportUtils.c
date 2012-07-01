@@ -1979,6 +1979,61 @@ int printPacketStats(HostTraffic *el, int actualDeviceId) {
 
 /* ************************************ */
 
+void hostReport(int idx, char *hostName, int vlanId, int sortedColumn) {
+  HostTraffic *el;
+  int i;
+
+  urlFixupFromRFC1945Inplace(hostName);
+
+#ifdef URL_DEBUG
+  traceEvent(CONST_TRACE_INFO, "Searching hostname: '%s'", hostName);
+#endif
+
+  for(el=getFirstHost(myGlobals.actualReportDeviceId);
+      el != NULL; el = getNextHost(myGlobals.actualReportDeviceId, el)) {
+
+    if((el != myGlobals.broadcastEntry)
+       && (el->hostNumIpAddress != NULL)
+       && ((el->vlanId <= 0) || (el->vlanId == vlanId))
+       && ((strcmp(el->hostNumIpAddress, hostName) == 0)		   
+	   || (strcmp(el->ethAddressString, hostName) == 0))) {
+      break;
+    }
+  } /* for */
+
+  if(el) {
+    if(el->community && (!isAllowedCommunity(el->community))) {
+      returnHTTPpageBadCommunity();
+    } else {
+      sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
+
+      switch(idx) {
+      case 0:
+	hostTrafficDistrib(el, sortedColumn);
+	break;
+      case 1:
+	hostFragmentDistrib(el, sortedColumn);
+	break;
+      case 2:
+	hostTotalFragmentDistrib(el, sortedColumn);
+	break;
+      case 3:
+	hostTimeTrafficDistribution(el, sortedColumn);
+	break;
+      case 4:
+	hostIPTrafficDistrib(el, sortedColumn);
+	break;
+      case 5:
+	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 0);
+	createHostMap(el);
+	break;
+      }
+    }       
+  }
+}
+
+/* ************************************ */
+
 void printHostFragmentStats(HostTraffic *el, int actualDeviceId) {
   Counter totalSent, totalRcvd;
   char buf[LEN_GENERAL_WORK_BUFFER];
@@ -2032,21 +2087,17 @@ void printHostFragmentStats(HostTraffic *el, int actualDeviceId) {
 	vlanStr[0] = '\0';
 
      if(totalSent > 0) {
-	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		    "<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>"
-		    "\n<iframe frameborder=0 SRC=\""CONST_HOST_FRAGMENT_DISTR_HTML"-%s%s"CHART_FORMAT"?1\" width=380 height=360\"></iframe>\n</TD>",
-		      linkName, vlanStr);
-	sendString(buf);
+	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+	hostReport(1, linkName, vlanStr, 1);
+	sendString("</TD>");
       } else {
 	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
       }
 
       if(totalRcvd > 0) {
-	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		      "<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>"
-		      "\n<iframe frameborder=0 SRC=\""CONST_HOST_FRAGMENT_DISTR_HTML"-%s%s"CHART_FORMAT"\" width=380 height=360></iframe>\n</TD>",
-		      linkName, vlanStr);
-	sendString(buf);
+	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+	hostReport(1, linkName, vlanStr, 1);
+	sendString("</TD>");
       } else {
 	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
       }
@@ -2061,21 +2112,17 @@ void printHostFragmentStats(HostTraffic *el, int actualDeviceId) {
       sendString(buf);
 
       if(totalSent > 0) {
-	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		      "<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>"
-		      "\n<iframe frameborder=0 SRC=\""CONST_HOST_TOT_FRAGMENT_DISTR_HTML"-%s%s"CHART_FORMAT"?1\" width=380 height=360></iframe>\n</TD>",
-		      linkName, vlanStr);
-	sendString(buf);
+	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+	hostReport(2, linkName, vlanStr, 1);
+	sendString("</TD>");
       } else {
 	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
       }
 
       if(totalRcvd > 0) {
-	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		      "<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>"
-		      "\n<iframe frameborder=0 SRC=\""CONST_HOST_TOT_FRAGMENT_DISTR_HTML"-%s%s"CHART_FORMAT"\" width=380 height=360></iframe>\n</TD>",
-		      linkName, vlanStr);
-	sendString(buf);
+	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+	hostReport(2, linkName, vlanStr, 0);
+	sendString("</TD>");
       } else {
 	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
       }
@@ -2396,29 +2443,18 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
       /* For Ethernet and Ipv6 addresses */
       urlFixupToRFC1945Inplace(linkName);
 
-     if(el->vlanId > 0) {
-	safe_snprintf(__FILE__, __LINE__, vlanStr, sizeof(vlanStr), "-%d", el->vlanId);
-      } else
-	vlanStr[0] = '\0';
-
      if(totalSent > 0) {
-	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		      "<TD WIDTH=250 "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>"
-		      "\n<iframe frameborder=0 SRC=\""CONST_HOST_TRAFFIC_DISTR_HTML"-%s%s"CHART_FORMAT"?1\""
-		      " width=380 height=360></iframe>\n</TD>",
-		      linkName, vlanStr);
-	sendString(buf);
+       sendString("<TD WIDTH=250 "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+       hostReport(0, linkName, el->vlanId, 1);
+       sendString("</TD>");
       } else {
 	sendString("<TD width=250 "TD_BG" ALIGN=RIGHT COLSPAN=2 WIDTH=250>&nbsp;</TD>");
       }
 
       if(totalRcvd > 0) {
-	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		    "<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>"
-		      "\n<iframe frameborder=0 SRC=\""CONST_HOST_TRAFFIC_DISTR_HTML"-"
-		      "%s%s"CHART_FORMAT"\" width=380 height=360></iframe>\n</TD>",
-		      linkName, vlanStr);
-	sendString(buf);
+       sendString("<TD WIDTH=250 "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+       hostReport(0, linkName, el->vlanId, 0);
+       sendString("</TD>");
       } else {
 	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 WIDTH=250>&nbsp;</TD>");
       }
@@ -2457,22 +2493,16 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
 	sendString(buf);
 
 	if(sent > 0) {
-	  safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-			"<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>"
-			"\n<iframe frameborder=0 SRC=\""CONST_HOST_IP_TRAFFIC_DISTR_HTML"-%s%s"CHART_FORMAT"?1\""
-			"  width=380 height=360></iframe>\n</TD>",
-			linkName, vlanStr);
-	  sendString(buf);
+	  sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+	  hostReport(4, linkName, el->vlanId, 1);
+	  sendString("</TD>");
 	} else
 	  sendString("<TD "TD_BG" COLSPAN=2 WIDTH=250>&nbsp;</TD>");
 
 	if(rcvd > 0) {
-	  safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-			"<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>"
-			"\n<iframe frameborder=0 SRC=\""CONST_HOST_IP_TRAFFIC_DISTR_HTML"-"
-			"%s%s"CHART_FORMAT"\" width=380 height=360></iframe>\n</TD></TR>\n",
-			linkName, vlanStr);
-	  sendString(buf);
+	  sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+	  hostReport(4, linkName, el->vlanId, 0);
+	  sendString("</TD>");
 	} else
 	  sendString("<TD "TD_BG" COLSPAN=2 WIDTH=250>&nbsp;</TD>");
 

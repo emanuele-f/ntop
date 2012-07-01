@@ -382,9 +382,9 @@ void printTrafficSummary (int revertOrder) {
       }
 
     if(found) {
-      sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>"
-		 "<iframe frameborder=0 SRC=\"" CONST_PIE_INTERFACE_DIST CHART_FORMAT
-		 "\" width=380 height=360></iframe></TH></TR>\n");
+      sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>");
+      interfaceTrafficPie();
+      sendString("</TH></TR>\n");      
     }
   }
 
@@ -471,9 +471,11 @@ void printTrafficSummary (int revertOrder) {
     /* ****************** */
 
     if(!myGlobals.device[myGlobals.actualReportDeviceId].dummyDevice) {
-      updateThpt(0);
-
       sendString("<TR><TH "TH_BG" ALIGN=LEFT "DARK_BG">Network Load</TH><TD "TH_BG">\n");
+
+      updateThpt(0);
+      drawThroughputMeter();
+
       sendString("<TABLE BORDER=1 "TABLE_DEFAULTS" WIDTH=\"100%\">");
       safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">Actual</th><TD "TD_BG" align=right>%s</td>"
 		    "<TD "TD_BG" align=right>%.1f&nbsp;Pkt/s</td></TR>\n",
@@ -749,8 +751,9 @@ void printTrafficStatistics(int revertOrder) {
       }
 
     if(found) {
-      sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>"
-		 "<iframe frameborder=0 SRC=\"" CONST_PIE_INTERFACE_DIST CHART_FORMAT "\" width=380 height=360></iframe></TH></TR>\n");
+      sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>");
+      interfaceTrafficPie();
+      sendString("</TH></TR>\n");
     }
   }
 
@@ -845,10 +848,11 @@ void printTrafficStatistics(int revertOrder) {
 		  formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].multicastPkts.value, formatBuf, sizeof(formatBuf)));
     sendString(buf);
 
-    if(myGlobals.device[myGlobals.actualReportDeviceId].ipv4Bytes.value > 0)
-      sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>"
-		 "<iframe frameborder=0 SRC=\"" CONST_PIE_PKT_CAST_DIST CHART_FORMAT "\" "
-		 "width=380 height=360></iframe></TH></TR>\n");
+    if(myGlobals.device[myGlobals.actualReportDeviceId].ipv4Bytes.value > 0) {
+      sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>");
+      pktCastDistribPie();
+      sendString("</TH></TR>\n");
+    }
 
     if(!myGlobals.device[myGlobals.actualReportDeviceId].dummyDevice) {
       /*
@@ -958,9 +962,11 @@ void printTrafficStatistics(int revertOrder) {
       sendString(buf);
 #endif /* MAKE_WITH_JUMBO_FRAMES */
 
-      if(myGlobals.device[myGlobals.actualReportDeviceId].ipv4Bytes.value > 0)
-	sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>"
-		   "<iframe frameborder=0 SRC=\"" CONST_PIE_PKT_SIZE_DIST  CHART_FORMAT "\" width=380 height=360></iframe></TH></TR>\n");
+      if(myGlobals.device[myGlobals.actualReportDeviceId].ipv4Bytes.value > 0) {
+	sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>");
+	pktSizeDistribPie();
+	sendString("</TH></TR>\n");
+      }
 
       safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">Packets&nbsp;too&nbsp;long [> %d]</th>"
 		    "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
@@ -1010,9 +1016,11 @@ void printTrafficStatistics(int revertOrder) {
 		  getRowColor(), formatBytes(dummyCounter, 1, formatBuf, sizeof(formatBuf)));
     sendString(buf);
 
-    if(myGlobals.device[myGlobals.actualReportDeviceId].ethernetBytes.value > 0)
-      sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>"
-		 "<iframe frameborder=0 SRC=\"" CONST_PIE_IP_TRAFFIC  CHART_FORMAT "\" width=380 height=360></iframe></TH></TR>\n");
+    if(myGlobals.device[myGlobals.actualReportDeviceId].ethernetBytes.value > 0) {
+      sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>");	
+      drawTrafficPie();
+      sendString("</TH></TR>\n");
+    }
 
     /* ********************* */
 
@@ -1099,8 +1107,9 @@ void printTrafficStatistics(int revertOrder) {
 				 formatBuf, sizeof(formatBuf)));
 	sendString(buf);
 
-	sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>"
-		   "<iframe frameborder=0 SRC=\"" CONST_PIE_TTL_DIST  CHART_FORMAT "\" width=380 height=360></iframe></TH></TR>\n");
+	sendString("<TR "TR_ON" BGCOLOR=white><TH "TH_BG" ALIGN=CENTER COLSPAN=3 BGCOLOR=white>");
+	pktTTLDistribPie();
+	sendString("</TH></TR>\n");
       }
     }
 
@@ -1108,11 +1117,11 @@ void printTrafficStatistics(int revertOrder) {
 
     /* ************************ */
 
-    if(myGlobals.runningPref.enableSessionHandling && drawHostsDistanceGraph(1))
-      sendString("<TR><TH "TH_BG" ALIGN=LEFT "DARK_BG">Remote Hosts Distance</TH>"
-                 "<TD BGCOLOR=white ALIGN=CENTER>"
-		 "<iframe frameborder=0 SRC=\"" CONST_BAR_HOST_DISTANCE CHART_FORMAT "\" width=380 height=360></iframe>"
-                 "</TD></TR>\n");
+    if(myGlobals.runningPref.enableSessionHandling && drawHostsDistanceGraph(1)) {
+      sendString("<TR><TH "TH_BG" ALIGN=LEFT "DARK_BG">Remote Hosts Distance</TH><TD BGCOLOR=white ALIGN=CENTER>");    
+      drawHostsDistanceGraph(0);
+      sendString("</TD></TR>\n");
+    }
 
     if(!myGlobals.device[myGlobals.actualReportDeviceId].dummyDevice) {
       updateThpt(0);
@@ -1120,7 +1129,7 @@ void printTrafficStatistics(int revertOrder) {
       sendString("<TR><TH "TH_BG" ALIGN=LEFT "DARK_BG">Network Load</TH><TD "TH_BG">\n");
 
       if(myGlobals.device[myGlobals.actualReportDeviceId].actualThpt > 0) {
-	sendString("<iframe frameborder=0 SRC=\"" CONST_THROUGHPUT_METER CHART_FORMAT "\" width=200 height=150 align=center scrolling=no></iframe>");
+	drawThroughputMeter();
       }
 
       sendString("<TABLE BORDER=1 "TABLE_DEFAULTS" WIDTH=\"100%\">");
@@ -4431,10 +4440,9 @@ void printProtoTraffic(int printGraph) {
 		       myGlobals.device[myGlobals.actualReportDeviceId].ethernetBytes.value), 0, 0, 0);
 
   if(printGraph) {
-    sendString("<TR "TR_ON"><TD "TD_BG" COLSPAN=4 ALIGN=CENTER BGCOLOR=white>"
-	       "<iframe frameborder=0 SRC=\"" CONST_BAR_ALLPROTO_DIST  CHART_FORMAT "\" "
-	       "width=650 height=360></iframe>"
-	       "</TD></TR>\n");
+    sendString("<TR "TR_ON"><TD "TD_BG" COLSPAN=4 ALIGN=CENTER BGCOLOR=white>");
+    drawGlobalProtoDistribution();
+    sendString("</TD></TR>\n");
   }
 
   total = 0;
@@ -4451,10 +4459,9 @@ void printProtoTraffic(int printGraph) {
     sendString("<TR "TR_ON" "DARK_BG"><TH "TH_BG" WIDTH=150>Application Protocol</TH>"
 	       "<TH "TH_BG" WIDTH=50>Data</TH><TH "TH_BG" WIDTH=250 COLSPAN=2>Percentage</TH></TR>\n");
 
-    sendString("\n<TR "TR_ON"><TD "TD_BG" COLSPAN=4 ALIGN=CENTER BGCOLOR=white>"
-	       "<iframe frameborder=0 SRC=\"" CONST_HOST_SERVICE_DISTR_HTML CHART_FORMAT "\" "
-	       "width=650 height=360></iframe>"
-	       "</TD></TR>\n");
+    sendString("\n<TR "TR_ON"><TD "TD_BG" COLSPAN=4 ALIGN=CENTER BGCOLOR=white>");
+    drawDeviceServiceDistribution();
+    sendString("</TD></TR>\n");
 
     for(i=0; i<myGlobals.l7.numSupportedProtocols; i++) {
       float val;
@@ -5498,7 +5505,7 @@ void listNetFlows(void) {
 void printHostHourlyTraffic(HostTraffic *el) {
   Counter tcSent, tcRcvd;
   int i, hourId, j;
-  char theDate[8], macAddr[24], vlanStr[32];
+  char theDate[8], macAddr[24];
   struct tm t;
   char buf[LEN_GENERAL_WORK_BUFFER], targetStr[64];
   char hours[][24] = {"12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM", "6 AM",
@@ -5549,27 +5556,17 @@ void printHostHourlyTraffic(HostTraffic *el) {
 		"%s", el->hostNumIpAddress[0] == '\0' ?  macAddr : el->hostNumIpAddress);
   urlFixupToRFC1945Inplace(targetStr);
 
-  if(el->vlanId > 0) {
-    safe_snprintf(__FILE__, __LINE__, vlanStr, sizeof(vlanStr), "-%d", el->vlanId);
-  } else
-    vlanStr[0] = '\0';
-
   if(tcSent > 0) {
-    safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		  "<TD ALIGN=CENTER COLSPAN=2 "TD_BG" BGCOLOR=white>"
-		  "<iframe frameborder=0 SRC=\"/hostTimeTrafficDistribution-%s%s"CHART_FORMAT"?1\" "
-		  "width=450 height=360></iframe></TD>\n",
-		  targetStr, vlanStr);
-    sendString(buf);
+    sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+    hostReport(3, targetStr, el->vlanId, 1);
+    sendString("</TD>");
   } else
     sendString("<TD COLSPAN=2 "TD_BG">&nbsp;</TD>\n");
 
   if(tcRcvd > 0) {
-    safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TD ALIGN=CENTER COLSPAN=2 "TD_BG" BGCOLOR=white>"
-		  "<iframe frameborder=0 SRC=\"/hostTimeTrafficDistribution-%s%s"CHART_FORMAT"\" width=450 height=360></iframe>"
-		  "</TD>\n",
-		  targetStr, vlanStr);
-    sendString(buf);
+    sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+    hostReport(3, targetStr, el->vlanId, 0);
+    sendString("</TD>");
   } else
     sendString("<TD COLSPAN=2 "TD_BG">&nbsp;</TD>\n");
 

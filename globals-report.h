@@ -100,6 +100,7 @@ extern void printHostThtpShort(HostTraffic *el, int reportType, u_int hourId);
 extern int cmpHostsFctn(const void *_a, const void *_b);
 extern int cmpFcHostsFctn(const void *_a, const void *_b);
 extern int printPacketStats(HostTraffic *el, int actualDeviceId);
+extern void hostReport(int idx, char *hostName, int vlanId, int sortedColumn);
 extern void printFcPacketStats(HostTraffic *el, int actualDeviceId);
 extern void printHostTrafficStats(HostTraffic *el, int actualDeviceId);
 extern void printFcHostTrafficStats(HostTraffic *el, int actualDeviceId);

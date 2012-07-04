@@ -61,6 +61,7 @@ extern char *memoryDebug;
 /* util.c */
 extern void _lowMemory(char *file, int line);
 #define lowMemory() _lowMemory(__FILE__, __LINE__)
+extern char* proto2name(u_int8_t proto);
 #ifndef HAVE_GETOPT_H
 /* Our own, minimal extract from getopt.h */
 extern char *optarg;

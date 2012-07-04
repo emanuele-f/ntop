@@ -2842,42 +2842,6 @@ void printNtopConfigHInfo(int textPrintFlag) {
   printFeatureConfigInfo(textPrintFlag, "CONST_AS_LIST_HTML", "undefined");
 #endif
 
-#ifdef CONST_BAR_ALLPROTO_DIST
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_ALLPROTO_DIST", CONST_BAR_ALLPROTO_DIST);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_ALLPROTO_DIST", "undefined");
-#endif
-
-#ifdef CONST_BAR_FC_PROTO_DIST
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_FC_PROTO_DIST", CONST_BAR_FC_PROTO_DIST);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_FC_PROTO_DIST", "undefined");
-#endif
-
-#ifdef CONST_BAR_HOST_DISTANCE
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_HOST_DISTANCE", CONST_BAR_HOST_DISTANCE);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_HOST_DISTANCE", "undefined");
-#endif
-
-#ifdef CONST_BAR_LUNSTATS_DIST
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_LUNSTATS_DIST", CONST_BAR_LUNSTATS_DIST);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_LUNSTATS_DIST", "undefined");
-#endif
-
-#ifdef CONST_BAR_VSAN_TRAF_DIST_RCVD
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_VSAN_TRAF_DIST_RCVD", CONST_BAR_VSAN_TRAF_DIST_RCVD);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_VSAN_TRAF_DIST_RCVD", "undefined");
-#endif
-
-#ifdef CONST_BAR_VSAN_TRAF_DIST_SENT
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_VSAN_TRAF_DIST_SENT", CONST_BAR_VSAN_TRAF_DIST_SENT);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_BAR_VSAN_TRAF_DIST_SENT", "undefined");
-#endif
-
 #ifdef CONST_BROADCAST_ENTRY
   printFeatureConfigNum(textPrintFlag, "CONST_BROADCAST_ENTRY", CONST_BROADCAST_ENTRY);
 #else
@@ -3064,42 +3028,6 @@ void printNtopConfigHInfo(int textPrintFlag) {
   printFeatureConfigInfo(textPrintFlag, "CONST_FAVICON_ICO", "undefined");
 #endif
 
-#ifdef CONST_FC_ACTIVITY_HTML
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_ACTIVITY_HTML", CONST_FC_ACTIVITY_HTML);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_ACTIVITY_HTML", "undefined");
-#endif
-
-#ifdef CONST_FC_DATA_HTML
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_DATA_HTML", CONST_FC_DATA_HTML);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_DATA_HTML", "undefined");
-#endif
-
-#ifdef CONST_FC_HOSTS_INFO_HTML
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_HOSTS_INFO_HTML", CONST_FC_HOSTS_INFO_HTML);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_HOSTS_INFO_HTML", "undefined");
-#endif
-
-#ifdef CONST_FC_SESSIONS_HTML
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_SESSIONS_HTML", CONST_FC_SESSIONS_HTML);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_SESSIONS_HTML", "undefined");
-#endif
-
-#ifdef CONST_FC_THPT_HTML
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_THPT_HTML", CONST_FC_THPT_HTML);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_THPT_HTML", "undefined");
-#endif
-
-#ifdef CONST_FC_TRAFFIC_HTML
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_TRAFFIC_HTML", CONST_FC_TRAFFIC_HTML);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_FC_TRAFFIC_HTML", "undefined");
-#endif
-
 #ifdef CONST_FILTER_INFO_HTML
   printFeatureConfigInfo(textPrintFlag, "CONST_FILTER_INFO_HTML", CONST_FILTER_INFO_HTML);
 #else
@@ -3250,30 +3178,6 @@ void printNtopConfigHInfo(int textPrintFlag) {
   printFeatureConfigInfo(textPrintFlag, "CONST_IMG_DNS_SERVER", CONST_IMG_DNS_SERVER);
 #else
   printFeatureConfigInfo(textPrintFlag, "CONST_IMG_DNS_SERVER", "undefined");
-#endif
-
-#ifdef CONST_IMG_FC_VEN_BROCADE
-  printFeatureConfigInfo(textPrintFlag, "CONST_IMG_FC_VEN_BROCADE", CONST_IMG_FC_VEN_BROCADE);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_IMG_FC_VEN_BROCADE", "undefined");
-#endif
-
-#ifdef CONST_IMG_FC_VEN_EMULEX
-  printFeatureConfigInfo(textPrintFlag, "CONST_IMG_FC_VEN_EMULEX", CONST_IMG_FC_VEN_EMULEX);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_IMG_FC_VEN_EMULEX", "undefined");
-#endif
-
-#ifdef CONST_IMG_FC_VEN_SEAGATE
-  printFeatureConfigInfo(textPrintFlag, "CONST_IMG_FC_VEN_SEAGATE", CONST_IMG_FC_VEN_SEAGATE);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_IMG_FC_VEN_SEAGATE", "undefined");
-#endif
-
-#ifdef CONST_IMG_FIBRECHANNEL_SWITCH
-  printFeatureConfigInfo(textPrintFlag, "CONST_IMG_FIBRECHANNEL_SWITCH", CONST_IMG_FIBRECHANNEL_SWITCH);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_IMG_FIBRECHANNEL_SWITCH", "undefined");
 #endif
 
 #ifdef CONST_IMG_FTP_SERVER
@@ -3802,12 +3706,6 @@ void printNtopConfigHInfo(int textPrintFlag) {
   printFeatureConfigNum(textPrintFlag, "CONST_PCTG_MID", CONST_PCTG_MID);
 #else
   printFeatureConfigInfo(textPrintFlag, "CONST_PCTG_MID", "undefined");
-#endif
-
-#ifdef CONST_PIE_FC_PKT_SZ_DIST
-  printFeatureConfigInfo(textPrintFlag, "CONST_PIE_FC_PKT_SZ_DIST", CONST_PIE_FC_PKT_SZ_DIST);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_PIE_FC_PKT_SZ_DIST", "undefined");
 #endif
 
 #ifdef CONST_PIE_INTERFACE_DIST
@@ -4660,18 +4558,6 @@ void printNtopConfigHInfo(int textPrintFlag) {
   printFeatureConfigInfo(textPrintFlag, "LEN_ETHERNET_VENDOR", "undefined");
 #endif
 
-#ifdef LEN_FC_ADDRESS_DISPLAY
-  printFeatureConfigNum(textPrintFlag, "LEN_FC_ADDRESS_DISPLAY", LEN_FC_ADDRESS_DISPLAY);
-#else
-  printFeatureConfigInfo(textPrintFlag, "LEN_FC_ADDRESS_DISPLAY", "undefined");
-#endif
-
-#ifdef LEN_FC_ADDRESS
-  printFeatureConfigNum(textPrintFlag, "LEN_FC_ADDRESS", LEN_FC_ADDRESS);
-#else
-  printFeatureConfigInfo(textPrintFlag, "LEN_FC_ADDRESS", "undefined");
-#endif
-
 #ifdef LEN_FGETS_BUFFER
   printFeatureConfigNum(textPrintFlag, "LEN_FGETS_BUFFER", LEN_FGETS_BUFFER);
 #else
@@ -4814,12 +4700,6 @@ void printNtopConfigHInfo(int textPrintFlag) {
   printFeatureConfigNum(textPrintFlag, "MAX_ELEMENT_HASH", MAX_ELEMENT_HASH);
 #else
   printFeatureConfigInfo(textPrintFlag, "MAX_ELEMENT_HASH", "undefined");
-#endif
-
-#ifdef MAX_FC_DOMAINS
-  printFeatureConfigNum(textPrintFlag, "MAX_FC_DOMAINS", MAX_FC_DOMAINS);
-#else
-  printFeatureConfigInfo(textPrintFlag, "MAX_FC_DOMAINS", "undefined");
 #endif
 
 #ifdef MAX_HASHDUMP_ENTRY
@@ -5677,31 +5557,6 @@ void printNtopConfigHInfo(int textPrintFlag) {
   printFeatureConfigInfo(textPrintFlag, "DARK_BG", "undefined");
 #endif
 
-#ifdef DISPLAY_FC_ALIAS
-  printFeatureConfigNum(textPrintFlag, "DISPLAY_FC_ALIAS", DISPLAY_FC_ALIAS);
-#else
-  printFeatureConfigInfo(textPrintFlag, "DISPLAY_FC_ALIAS", "undefined");
-#endif
-
-#ifdef DISPLAY_FC_DEFAULT
-  printFeatureConfigNum(textPrintFlag, "DISPLAY_FC_DEFAULT", DISPLAY_FC_DEFAULT);
-#else
-  printFeatureConfigInfo(textPrintFlag, "DISPLAY_FC_DEFAULT", "undefined");
-#endif
-
-#ifdef DISPLAY_FC_FCID
-  printFeatureConfigNum(textPrintFlag, "DISPLAY_FC_FCID", DISPLAY_FC_FCID);
-#else
-  printFeatureConfigInfo(textPrintFlag, "DISPLAY_FC_FCID", "undefined");
-#endif
-
-#ifdef DISPLAY_FC_WWN
-  printFeatureConfigNum(textPrintFlag, "DISPLAY_FC_WWN", DISPLAY_FC_WWN);
-#else
-  printFeatureConfigInfo(textPrintFlag, "DISPLAY_FC_WWN", "undefined");
-#endif
-
-
 #ifdef SORT_DATA_HOST_TRAFFIC
   printFeatureConfigNum(textPrintFlag, "SORT_DATA_HOST_TRAFFIC", SORT_DATA_HOST_TRAFFIC);
 #else
@@ -5772,24 +5627,6 @@ void printNtopConfigHInfo(int textPrintFlag) {
   printFeatureConfigNum(textPrintFlag, "SORT_DATA_THPT", SORT_DATA_THPT);
 #else
   printFeatureConfigInfo(textPrintFlag, "SORT_DATA_THPT", "undefined");
-#endif
-
-#ifdef SORT_FC_ACTIVITY
-  printFeatureConfigNum(textPrintFlag, "SORT_FC_ACTIVITY", SORT_FC_ACTIVITY);
-#else
-  printFeatureConfigInfo(textPrintFlag, "SORT_FC_ACTIVITY", "undefined");
-#endif
-
-#ifdef SORT_FC_DATA
-  printFeatureConfigNum(textPrintFlag, "SORT_FC_DATA", SORT_FC_DATA);
-#else
-  printFeatureConfigInfo(textPrintFlag, "SORT_FC_DATA", "undefined");
-#endif
-
-#ifdef SORT_FC_THPT
-  printFeatureConfigNum(textPrintFlag, "SORT_FC_THPT", SORT_FC_THPT);
-#else
-  printFeatureConfigInfo(textPrintFlag, "SORT_FC_THPT", "undefined");
 #endif
 
 #ifdef TABLE_DEFAULTS

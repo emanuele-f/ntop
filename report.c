@@ -838,14 +838,16 @@ void printTrafficStatistics(int revertOrder) {
 		  "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		  getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].broadcastPkts.value)/
 		  (float)myGlobals.device[myGlobals.actualReportDeviceId].ethernetPkts.value,
-		  formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].broadcastPkts.value, formatBuf, sizeof(formatBuf)));
+		  formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].broadcastPkts.value, 
+			     formatBuf, sizeof(formatBuf)));
     sendString(buf);
 
     safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">Multicast</th>"
 		  "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		  getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].multicastPkts.value)/
 		  (float)myGlobals.device[myGlobals.actualReportDeviceId].ethernetPkts.value,
-		  formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].multicastPkts.value, formatBuf, sizeof(formatBuf)));
+		  formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].multicastPkts.value, 
+			     formatBuf, sizeof(formatBuf)));
     sendString(buf);
 
     if(myGlobals.device[myGlobals.actualReportDeviceId].ipv4Bytes.value > 0) {
@@ -862,7 +864,8 @@ void printTrafficStatistics(int revertOrder) {
       safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">Shortest</th>"
 		    "<TD "TD_BG" align=right colspan=2>%s bytes</td></TR>\n",
 		    getRowColor(),
-		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.shortest.value, formatBuf, sizeof(formatBuf)));
+		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.shortest.value, 
+			       formatBuf, sizeof(formatBuf)));
       sendString(buf);
       avgPktLen = (96*myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo128.value
 		   +192*myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo256.value
@@ -870,7 +873,8 @@ void printTrafficStatistics(int revertOrder) {
 		   +768*myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo1024.value
 		   +1271*myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo1518.value)/
 	(myGlobals.device[myGlobals.actualReportDeviceId].ethernetPkts.value+1);
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">Average&nbsp;Size</th>"
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		    "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">Average&nbsp;Size</th>"
 		    "<TD "TD_BG" align=right colspan=2>%s bytes</td></TR>\n",
 		    getRowColor(), formatPkts(avgPktLen, formatBuf, sizeof(formatBuf)));
       sendString(buf);
@@ -880,42 +884,52 @@ void printTrafficStatistics(int revertOrder) {
 					      rcvdPktStats.longest.value, formatBuf, sizeof(formatBuf)));
       sendString(buf);
 
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">Size&nbsp;&lt;=&nbsp;64&nbsp;bytes</th>"
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		    "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">Size&nbsp;&lt;=&nbsp;64&nbsp;bytes</th>"
 		    "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		    getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].
 					   rcvdPktStats.upTo64.value)/
 		    (float)myGlobals.device[myGlobals.actualReportDeviceId].ethernetPkts.value,
-		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo64.value, formatBuf, sizeof(formatBuf)));
+		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo64.value, 
+			       formatBuf, sizeof(formatBuf)));
       sendString(buf);
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">64&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;128&nbsp;bytes</th>"
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
+		    "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">64&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;128&nbsp;bytes</th>"
 		    "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		    getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].
 					   rcvdPktStats.upTo128.value)/
 		    (float)myGlobals.device[myGlobals.actualReportDeviceId].ethernetPkts.value,
-		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo128.value, formatBuf, sizeof(formatBuf)));
+		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo128.value, 
+			       formatBuf, sizeof(formatBuf)));
       sendString(buf);
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">128&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;256&nbsp;bytes</th>"
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		    "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">128&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;256&nbsp;bytes</th>"
 		    "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		    getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].
 					   rcvdPktStats.upTo256.value)/
 		    (float)myGlobals.device[myGlobals.actualReportDeviceId].ethernetPkts.value,
-		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo256.value, formatBuf, sizeof(formatBuf)));
+		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo256.value, 
+			       formatBuf, sizeof(formatBuf)));
       sendString(buf);
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">256&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;512&nbsp;bytes</th>"
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		    "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">256&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;512&nbsp;bytes</th>"
 		    "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		    getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].
 					   rcvdPktStats.upTo512.value)/
 		    (float)myGlobals.device[myGlobals.actualReportDeviceId].ethernetPkts.value,
 		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo512.value, formatBuf, sizeof(formatBuf)));
       sendString(buf);
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">512&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;1024&nbsp;bytes</th>"
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		    "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">512&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;1024&nbsp;bytes</th>"
 		    "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		    getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].
 					   rcvdPktStats.upTo1024.value)/
 		    (float)myGlobals.device[myGlobals.actualReportDeviceId].ethernetPkts.value,
-		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo1024.value, formatBuf, sizeof(formatBuf)));
+		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo1024.value, 
+			       formatBuf, sizeof(formatBuf)));
       sendString(buf);
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">1024&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;1518&nbsp;bytes</th>"
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		    "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">1024&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;1518&nbsp;bytes</th>"
 		    "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		    getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].
 					   rcvdPktStats.upTo1518.value)/
@@ -924,21 +938,24 @@ void printTrafficStatistics(int revertOrder) {
       sendString(buf);
 
 #ifdef MAKE_WITH_JUMBO_FRAMES
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">1518&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;2500&nbsp;bytes</th>"
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		    "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">1518&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;2500&nbsp;bytes</th>"
 		    "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		    getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].
 					   rcvdPktStats.upTo2500.value)/
 		    (float)myGlobals.device[myGlobals.actualReportDeviceId].ethernetPkts.value,
 		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo2500.value, formatBuf, sizeof(formatBuf)));
       sendString(buf);
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">2500&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;6500&nbsp;bytes</th>"
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		    "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">2500&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;6500&nbsp;bytes</th>"
 		    "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		    getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].
 					   rcvdPktStats.upTo6500.value)/
 		    (float)myGlobals.device[myGlobals.actualReportDeviceId].ethernetPkts.value,
 		    formatPkts(myGlobals.device[myGlobals.actualReportDeviceId].rcvdPktStats.upTo6500.value, formatBuf, sizeof(formatBuf)));
       sendString(buf);
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">6500&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;9000&nbsp;bytes</th>"
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		    "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">6500&nbsp;&lt;&nbsp;Size&nbsp;&lt;=&nbsp;9000&nbsp;bytes</th>"
 		    "<TD "TD_BG" align=right>%.1f%%</td><TD "TD_BG" align=right>%s</td></TR>\n",
 		    getRowColor(), (float)(100*myGlobals.device[myGlobals.actualReportDeviceId].
 					   rcvdPktStats.upTo9000.value)/
@@ -979,7 +996,8 @@ void printTrafficStatistics(int revertOrder) {
 
     /* ****************** */
 
-    sendString("</TABLE>"TABLE_OFF"</TR><TR><TH "TH_BG" ALIGN=LEFT "DARK_BG">Traffic</TH><TD "TH_BG">\n<TABLE BORDER=1 "TABLE_DEFAULTS" WIDTH=\"100%\">");
+    sendString("</TABLE>"TABLE_OFF"</TR><TR><TH "TH_BG" ALIGN=LEFT "DARK_BG">Traffic</TH>"
+	       "<TD "TH_BG">\n<TABLE BORDER=1 "TABLE_DEFAULTS" WIDTH=\"100%\">");
     safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" align=left "DARK_BG">Total</th>"
 		  "<TD "TD_BG" align=right COLSPAN=2>%s [%s Pkts]</td></TR>\n",
 		  getRowColor(),
@@ -3135,7 +3153,7 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
     custom_host_name[128], buf2[128], linkName[64], vlanStr[16];
   u_short found = 0;
   char *tok;
-  u_int8_t search_mac = isMacAddress(host), showServices;
+  u_int8_t search_mac = isMacAddress(host), showServices, have_sessions;
   Counter fragments;
 
   if((tok = strchr(host, '-')) != NULL) {
@@ -3187,6 +3205,14 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
     returnHTTPpageBadCommunity();
     return;
   }
+
+  if((myGlobals.device[actualDeviceId].sessions != NULL)
+     && (myGlobals.device[actualDeviceId].numSessions > 0)
+     && (el->numHostSessions > 0))
+    have_sessions = 1;
+  else
+    have_sessions = 0;
+    
 
   fragments = el->tcpFragmentsSent.value
     + el->udpFragmentsSent.value
@@ -3258,8 +3284,13 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
 	     "</script>\n"
 	     "<center>\n"
 	     "<div id=\"tabs\" style=\"width: 100%; \">\n"
-	     "    <ul>\n"
-	     "    <li><a href=\"#tabs-1\">Host Details</a></li>\n");
+	     "    <ul>\n");
+
+  if(have_sessions)
+    sendString("    <li><a href=\"#tabs-0\">Overview</a></li>\n");
+  
+
+  sendString("    <li><a href=\"#tabs-1\">Host Details</a></li>\n");
 
   if(el->trafficDistribution)
     sendString("<li><a href=\"#tabs-21\">Hourly Distribution</a></li>\n");
@@ -3296,8 +3327,7 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
   if(el->clientDelay || el->serverDelay)
     sendString("<li><a href=\"#tabs-9\">Network Delay</a></li>\n");
 
-  if((myGlobals.device[actualDeviceId].sessions != NULL)
-     && (myGlobals.device[actualDeviceId].numSessions > 0))
+  if(have_sessions)
     sendString("<li><a href=\"#tabs-10\">Active Sessions</a></li>\n");
 
   if(el->hostNumIpAddress[0] != '\0') {
@@ -3322,6 +3352,33 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
   sendString(buf);
 
   sendString("</ul>\n");
+
+  if(have_sessions) {
+  sendString("\n\n<!------ DIV ------>\n");
+  sendString("\n\n<div id=\"tabs-0\">\n");
+  {
+    FILE *fd = fopen("./html/sankey.min.html", "r");
+
+    if(fd) {
+      char line[LINE_MAX];
+
+      while(fgets(line, LINE_MAX, fd) != NULL) {
+	char *token = strstr(line, "@HOST@");
+	
+	if(token) {
+	  token[0] = '\0';
+	  sendString(line);
+	  sendString(host);
+	  sendString(&token[6]);
+	} else
+	  sendString(line);
+      }
+      
+      fclose(fd);
+    }
+  }
+  sendString("\n</div>\n");
+  }
 
   sendString("\n\n<!------ DIV ------>\n");
   sendString("\n\n<div id=\"tabs-1\">\n");
@@ -3592,10 +3649,7 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
     sendString("\n</div>\n");
   }
 
-  if((myGlobals.device[actualDeviceId].sessions == NULL)
-     || (myGlobals.device[actualDeviceId].numSessions == 0))
-    ;
-  else {
+  if(have_sessions) {
     sendString("\n\n<!------ DIV ------>\n");
     sendString("\n\n<div id=\"tabs-10\">\n");
     printActiveSessions(actualDeviceId, 0, el);
@@ -3902,27 +3956,6 @@ static char* print_flags(IPSession *session, char *buf, int buf_len) {
   return(buf);
 }
 #endif
-
-/* ********************************** */
-
-static char* proto2name(u_int8_t proto) {
-  static char p[8];
-  
-  switch(proto) {
-  case IPPROTO_TCP:
-    return("TCP");
-    break;
-  case IPPROTO_UDP:
-    return("UDP");
-    break;
-  case IPPROTO_ICMP:
-    return("ICMP");
-    break;
-  default:
-    safe_snprintf(__FILE__, __LINE__, p, sizeof(p), "%d", proto);
-    return(p);
-  }
-}
 
 /* ********************************** */
 
@@ -5986,4 +6019,3 @@ char* hostRRdGraphLink(HostTraffic *el, int network_mode,
   return(tmpStr);
 }
 
-/* ************************************************** */

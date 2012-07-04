@@ -6305,9 +6305,31 @@ void web_sanitize(char *value) {
 
 /* ***************************************** */
 
-extern void _lowMemory(char *file, int line) {
+void _lowMemory(char *file, int line) {
   if(!myGlobals.lowMemoryMsgShown) {
     traceEvent(CONST_TRACE_ERROR, "Low memory @ %s:%d", file, line);
     myGlobals.lowMemoryMsgShown = 1;
   }
 }
+
+/* ********************************** */
+
+char* proto2name(u_int8_t proto) {
+  static char p[8];
+  
+  switch(proto) {
+  case IPPROTO_TCP:
+    return("TCP");
+    break;
+  case IPPROTO_UDP:
+    return("UDP");
+    break;
+  case IPPROTO_ICMP:
+    return("ICMP");
+    break;
+  default:
+    safe_snprintf(__FILE__, __LINE__, p, sizeof(p), "%d", proto);
+    return(p);
+  }
+}
+

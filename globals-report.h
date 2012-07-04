@@ -218,8 +218,7 @@ extern void handleNtopConfig (char *url, UserPrefDisplayPage page, int postLen);
 extern void purgeHost(HostSerialIndex theSerial);
 extern void printInterfaceStats(void);
 extern void findHost(char *key);
-extern char* hostRRdGraphLink(HostTraffic *el, 
-			      int network_mode,
+extern char* hostRRdGraphLink(HostTraffic *el, int network_mode,
 			      u_char is_subnet_host, 
 			      char *tmpStr, int tmpStrLen);
 
@@ -263,14 +262,6 @@ extern void edit_prefs(int postLen, char *key, char *value);
 #define SORT_DATA_IP                    10
 #define SORT_DATA_THPT                  11
 #define SORT_DATA_HOST_TRAFFIC          12
-#define SORT_FC_DATA                    13
-#define SORT_FC_THPT                    14
-#define SORT_FC_ACTIVITY                15
-
-#define DISPLAY_FC_FCID                 0
-#define DISPLAY_FC_WWN                  1
-#define DISPLAY_FC_ALIAS                2
-#define DISPLAY_FC_DEFAULT              DISPLAY_FC_ALIAS
 
 /* webInterface.c */
 extern void *handleWebConnections(void* notUsed);

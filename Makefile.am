@@ -78,6 +78,11 @@ NTOPHTML = html html/*.js html/*.html  html/*.gif html/*.jpg html/*.ico html/*.p
 	   html/jqplot/plugins/*.js \
 	   html/img_inquisitor \
 	   html/img_inquisitor/*gif \
+	   html/jqplot \
+	   html/jqplot/*js \
+	   html/jqplot/*css \
+	   html/jqplot/plugins \
+	   html/jqplot/plugins/*js \
 	   html/jscalendar \
 	   html/jscalendar/*js \
 	   html/jscalendar/lang \

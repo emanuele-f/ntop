@@ -765,6 +765,80 @@ static PyObject* python_receiveThpt(PyObject *self, PyObject *args) {
 
 /* **************************************** */
 
+static PyObject* python_dumpHostRawFlows(PyObject *self, PyObject *args) {
+  PyObject *ret = PyList_New(0);
+  int found = 0, idx;
+  HostTraffic *el = NULL;
+  char buf[LEN_GENERAL_WORK_BUFFER/2], *host;
+
+  /* ****************************** */
+
+  if(!PyArg_ParseTuple(args, "s", &host)) return(ret);
+
+  if(host == NULL) return(ret);
+
+  for(el = getFirstHost(myGlobals.actualReportDeviceId); 
+      el != NULL; el = getNextHost(myGlobals.actualReportDeviceId, el)) {
+      if(strcmp(el->hostNumIpAddress, host) == 0) {
+	found = 1;
+	break;
+      }
+    } /* for */
+
+  if(!found) return(ret);
+
+  for(idx=0; idx<MAX_TOT_NUM_SESSIONS; idx++) {
+    int mutex_idx;
+
+    mutex_idx = idx % NUM_SESSION_MUTEXES;
+    accessMutex(&myGlobals.sessionsMutex[mutex_idx], "dumpHostFlowsRaw");
+
+    if(myGlobals.device[myGlobals.actualReportDeviceId].sessions[idx] != NULL) {
+      IPSession *session = myGlobals.device[myGlobals.actualReportDeviceId].sessions[idx];
+
+      while(session != NULL) {
+	if((session->initiator->magic != CONST_MAGIC_NUMBER)
+	   || (session->remotePeer->magic != CONST_MAGIC_NUMBER)) {
+	  traceEvent(CONST_TRACE_WARNING, "Session with expired peer (%d/%d)",
+		     session->initiator->magic, session->remotePeer->magic);
+	  session = session->next;
+	  continue;
+	}
+
+#ifndef PARM_PRINT_ALL_SESSIONS
+	if(session->sessionState != FLAG_STATE_ACTIVE) {
+	  session = session->next;
+	  continue;
+	}
+#endif
+
+	if(el && (session->initiator != el) && (session->remotePeer != el)) {
+	  session = session->next;
+	  continue;
+	}
+
+	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
+		      "%s|%s|%u|%u|%s|%s\n",
+		      (session->initiator->hostResolvedName[0] != '\0') ? session->initiator->hostResolvedName :session->initiator->hostNumIpAddress, 
+		      (session->remotePeer->hostNumIpAddress[0] != '\0') ? session->remotePeer->hostResolvedName : session->remotePeer->hostNumIpAddress,
+		      session->bytesSent.value, session->bytesRcvd.value,
+		      proto2name(session->proto),
+		      getProtoName(session->proto, session->l7.major_proto));
+
+	PyList_Append(ret, PyString_FromString(buf));
+
+	session = session->next;
+      }
+    }
+
+    releaseMutex(&myGlobals.sessionsMutex[mutex_idx]);
+  }
+
+  return(ret);
+}
+
+/* **************************************** */
+
 #ifdef HAVE_FASTBIT
 static PyObject* python_fastbit_query(PyObject *self, PyObject *args) {
   PyObject *obj = NULL;
@@ -1192,6 +1266,7 @@ static PyMethodDef interface_methods[] = {
   { "securityPkts", python_interface_securityPkts, METH_VARARGS, "Get information about security packets" },
   { "netflowStats", python_interface_netflowStats, METH_VARARGS, "Get NetFlow interface information" },
   { "sflowStats", python_interface_sflowStats, METH_VARARGS, "Get sFlow interface information" },
+  { "dumpHostRawFlows", python_dumpHostRawFlows, METH_VARARGS, "Get Raw Flows from host" },
   { NULL, NULL, 0, NULL }
 };
 

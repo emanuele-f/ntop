@@ -1981,7 +1981,6 @@ int printPacketStats(HostTraffic *el, int actualDeviceId) {
 
 void hostReport(int idx, char *hostName, int vlanId, int sortedColumn) {
   HostTraffic *el;
-  int i;
 
   urlFixupFromRFC1945Inplace(hostName);
 
@@ -2257,7 +2256,7 @@ static void printUnknownProto(UnknownProto proto) {
 void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
   Counter totalSent, totalRcvd;
   Counter actTotalSent, actTotalRcvd;
-  char buf[LEN_GENERAL_WORK_BUFFER], vlanStr[32];
+  char buf[LEN_GENERAL_WORK_BUFFER];
   char linkName[LEN_GENERAL_WORK_BUFFER/2];
   int i, idx;
   ProtocolsList *protoList;

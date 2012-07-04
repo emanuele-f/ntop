@@ -1218,7 +1218,12 @@ void sendJSLibraries(int graph_mode) {
   sendString("<!--[if lt IE 9]><script language=\"javascript\" type=\"text/javascript\" src=\"/jqplot/excanvas.min.js\"></script><![endif]-->\n");
 
     /* JQuery */
-    sendString("<script type=\"text/javascript\" src=\"/jquery-1.7.min.js\"></script>\n");
+    sendString("<script type=\"text/javascript\" src=\"/jquery-1.7.2.min.js\"></script>\n");
+
+    /* http://www.d3js.org */
+    sendString("<script type=\"text/javascript\" src=\"/d3.js\"></script>\n");
+    sendString("<script type=\"text/javascript\" src=\"/sankey.js\"></script>\n");
+
     /* www.jqplot.com */
     sendString("<script type=\"text/javascript\" src=\"/jqplot/jquery.jqplot.min.js\"></script>\n");
     sendString("<script type=\"text/javascript\" src=\"/jqplot/plugins/jqplot.pieRenderer.min.js\"></script>\n");
@@ -1227,6 +1232,9 @@ void sendJSLibraries(int graph_mode) {
     sendString("<script type=\"text/javascript\" src=\"/jqplot/plugins/jqplot.categoryAxisRenderer.min.js\"></script>\n");
     sendString("<script type=\"text/javascript\" src=\"/jqplot/plugins/jqplot.pointLabels.min.js\"></script>\n");
     sendString("<link rel=\"stylesheet\" type=\"text/css\" href=\"/jqplot/jquery.jqplot.css\" />\n");
+
+    /* Sankey */
+    sendString("<link rel=\"stylesheet\" type=\"text/css\" href=\"/sankey.css\" />\n");
     //  } else {
     sendString("<script type=\"text/javascript\" src=\"/reflection.js\"></script>\n");
     sendString("<script TYPE=\"text/javascript\" src=\"/functions.js\"></script>\n");
@@ -1234,7 +1242,6 @@ void sendJSLibraries(int graph_mode) {
     sendString("<script type=\"text/javascript\" src=\"/domTT.js\"></script>\n");
     sendString("<script type=\"text/javascript\">var domTT_styleClass = 'niceTitle';</script>\n");
     /* JQuery */
-    //sendString("<script type=\"text/javascript\" src=\"/jquery-1.7.min.js\"></script>\n");
     sendString("<link rel=\"stylesheet\" href=\"jquery-ui-1.8.16.custom.css\">\n");
     /* JQuery UI */
     sendString("<script type=\"text/javascript\" src=\"/jquery-ui-1.8.16.custom.min.js\"></script>\n");    
@@ -2176,7 +2183,7 @@ static int returnHTTPPage(char* pageName,
   int errorCode = 0, pageNum = 0, found = 0, portNr = 0, mode = 0;
   struct stat statbuf;
   FILE *fd = NULL;
-  char tmpStr[512], *domainNameParm = NULL, *communityNameParm = NULL, *minus, *host = NULL;
+  char tmpStr[512], *domainNameParm = NULL, *communityNameParm = NULL, *host = NULL;
   char *db_key = NULL, *db_val = NULL;
   int revertOrder=0, vlanId=NO_VLAN, ifId=NO_INTERFACE, subnetId = ALL_SUBNET_IDS, showL2Only = 0;
   struct tm t;
@@ -2937,11 +2944,6 @@ static int returnHTTPPage(char* pageName,
 	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
 	interfaceTrafficPie();
 	printTrailer=0;
-      } else if(strncasecmp(pageName, CONST_BAR_ALLPROTO_DIST,
-			    strlen(CONST_BAR_ALLPROTO_DIST)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
-	drawGlobalProtoDistribution();
-	printTrailer=0;
       } else if(strncasecmp(pageName, CONST_HOST_SERVICE_DISTR_HTML,
 			    strlen(CONST_HOST_SERVICE_DISTR_HTML)) == 0) {
 	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
@@ -2958,11 +2960,6 @@ static int returnHTTPPage(char* pageName,
 			    strlen(CONST_BAR_IPPROTO_DIST)) == 0) {
 	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
 	drawGlobalIpProtoDistribution();
-	printTrailer=0;
-      } else if(strncasecmp(pageName, CONST_BAR_HOST_DISTANCE,
-			    strlen(CONST_BAR_HOST_DISTANCE)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
-	drawHostsDistanceGraph(0);
 	printTrailer=0;
       } else if(strcasecmp(pageName, CONST_CREDITS_HTML) == 0) {
 	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);

@@ -25,7 +25,7 @@
 	MA  02110-1301, USA.
 '''
 import json, cgi
-import sys, time
+import sys, time, socket
 from operator import itemgetter, attrgetter
 # ntop interface
 import interface
@@ -43,8 +43,7 @@ class Flow:
 		self.maxhost = int(self.form.getvalue('maxhost', default=16))	# Massimo numero di host da vis...
 		self.source = self.form.getvalue('source')			#
 		self.target = self.form.getvalue('target')			#
-		self.hostselected = self.form.getvalue('hostselected[]')	#
-		self.hostname = self.form.getvalue('hostname')
+		self.hostselected = self.form.getvalue('hostselected[]')
 
 		# Performance tweaks
 		archi = self.archi
@@ -57,12 +56,16 @@ class Flow:
 		l4selected = self.l4selected
 		l7selected = self.l7selected
 
-		flows = interface.dumpHostRawFlows(self.hostname)
+		if sourceip and targetip:
+			flows = interface.dumpHostRawFlows(sourceip)
+		else:
+			flows = interface.dumpHostRawFlows(hostselected)
 
-		if(flows == None):
+		if not flows:
+#			print >> sys.stderr, "flows is null"
 			return
 
-		for line in flows:
+		for line in flows:			
 			dati = line.strip('\n').split("|")
 			source = dati[0]
 			target = dati[1]
@@ -72,7 +75,6 @@ class Flow:
 			protocol7 = dati[5]
 
 			# Creo la lista di tutti gli host
-
 			try:
 				host[source] += outBytes+inBytes
 			except KeyError:
@@ -85,13 +87,12 @@ class Flow:
 
 			# Un ulteriore filtro su i dati d'ingresso puo' essere effettuato
 			# se si e' definita una sorgente/destinazione di un flusso
-
 			if sourceip and targetip:
 				if ((not (sourceip == source and targetip == target)) and
 					 (not (sourceip == target and targetip == source))):
 					continue
 
-			# Una volta definito il sottoinsieme di protocolli layer4/layer 5 
+			# Una volta definito il sottoinsieme di protocolli layer 4 / layer 5 
 			# che si vuole visualizzare si scartera' in fase di creazione della
 			# struttura dati i protocolli che non ci interessa valutare.
 

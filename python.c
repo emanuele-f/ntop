@@ -773,17 +773,19 @@ static PyObject* python_dumpHostRawFlows(PyObject *self, PyObject *args) {
 
   /* ****************************** */
 
-  if(!PyArg_ParseTuple(args, "s", &host)) return(ret);
+  if( (!PyArg_ParseTuple(args, "s", &host)) && 
+		(!PyArg_ParseTuple(args, "i", &host)) ) return(ret);
 
   if(host == NULL) return(ret);
 
   for(el = getFirstHost(myGlobals.actualReportDeviceId); 
       el != NULL; el = getNextHost(myGlobals.actualReportDeviceId, el)) {
-      if(strcmp(el->hostNumIpAddress, host) == 0) {
-	found = 1;
-	break;
-      }
-    } /* for */
+		if ((strcmp(el->hostNumIpAddress, host) == 0) ||
+			 (strcmp(el->hostResolvedName, host) == 0)) {
+				found = 1;
+				break;
+		}
+	} /* for */
 
   if(!found) return(ret);
 

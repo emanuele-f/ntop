@@ -3156,10 +3156,15 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
   u_int8_t search_mac = isMacAddress(host), showServices, have_sessions;
   Counter fragments;
 
-  if((tok = strchr(host, '-')) != NULL) {
-    vlanId = atoi(&tok[1]);
-    *tok = '\0';
-  }
+  /* Skip symbolic host names and handle only numeric ones */
+  if(isdigit(host[0]) && (strchr(host, '.') == NULL)) {
+      if((tok = strchr(host, '-')) != NULL) {
+	vlanId = atoi(&tok[1]);
+	*tok = '\0';
+      }
+    }
+
+  // traceEvent(CONST_TRACE_WARNING, "%s(%s)", __FUNCTION__, host);
 
   /* ****************************** */
 
@@ -3169,7 +3174,9 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
 
     if(
        (((!search_mac) && (strcmp(el->hostNumIpAddress, host) == 0))
-	|| (search_mac && el->l2Host && (strcmp(el->ethAddressString, host) == 0)))
+	|| (search_mac && el->l2Host && (strcmp(el->ethAddressString, host) == 0))
+	|| (strstr(el->hostResolvedName, host) != NULL)
+	)
        && ((vlanId == NO_VLAN) || ((el->vlanId <= 0) || (el->vlanId == vlanId)))) {
       found = 1;
       break;
@@ -3240,7 +3247,7 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
     custom_host_name[0] = '\0';
 
   if((el->hostResolvedName[0] != '\0') && (strcmp(el->hostResolvedName, el->hostNumIpAddress))) {
-    char httpSiteIconBuf[128] = { 0 };
+    char httpSiteIconBuf[512] = { 0 };
 
     if(isHTTPhost(el))
       httpSiteIcon((custom_host_name[0] != '\0') ? custom_host_name : el->hostResolvedName,
@@ -3368,7 +3375,11 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
 	if(token) {
 	  token[0] = '\0';
 	  sendString(line);
-	  sendString(host);
+	  if(el->hostResolvedName[0] != '\0')
+	    sendString(el->hostResolvedName);
+	  else
+	    sendString(el->hostNumIpAddress);
+	  //sendString(host);
 	  sendString(&token[6]);
 	} else
 	  sendString(line);
@@ -3655,13 +3666,6 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
     printActiveSessions(actualDeviceId, 0, el);
     sendString("\n</div>\n");
   }
-
-#if 0
-  sendString("\n\n<!------ DIV ------>\n");
-  sendString("\n\n<div id=\"tabs-11\">\n");
-  createHostMap(el);
-  sendString("\n</div>\n");
-#endif
 
   sendString("\n<!------ END ------>\n</div>\n");
 }

@@ -230,7 +230,7 @@ static void copyShortHostName(char* buf, u_int buf_len, char *name) {
 char* makeHostLink(HostTraffic *el, short mode,
 		   short cutName, short addCountryFlag, char *buf, int bufLen) {
   char symIp[256], linkName[256], flag[256], colorSpec[64], vlanStr[8], mapStr[1024];
-  char osBuf[128], titleBuf[256], noteBuf[256], noteBufAppend[64], tooltip[256], httpFavico[256];
+  char osBuf[128], titleBuf[256], noteBuf[256], noteBufAppend[64], tooltip[256], httpFavico[512];
   char *dhcpBootpStr, *p2pStr, *multihomedStr, *multivlanedStr, *gwStr, *brStr, *dnsStr, *printStr,
     *smtpStr, *healthStr, *userStr, *httpStr, *ntpStr, *voipHostStr, custom_host_name[128];
   short usedEthAddress=0;

@@ -2763,14 +2763,14 @@ static int returnHTTPPage(char* pageName,
 	  /* Close inherited sockets */
 #ifdef HAVE_OPENSSL
 	  if(myGlobals.sslInitialized) {
-		closeNwSocket(&myGlobals.sock_ssl);
-		shutdown(myGlobals.sock_ssl, SHUT_RDWR);
-		}
+	    closeNwSocket(&myGlobals.sock_ssl);
+	    shutdown(myGlobals.sock_ssl, SHUT_RDWR);
+	  }
 #endif /* HAVE_OPENSSL */
 	  if(myGlobals.runningPref.webPort > 0) {
-		closeNwSocket(&myGlobals.sock);
-		shutdown(myGlobals.sock, SHUT_RDWR);
-		}
+	    closeNwSocket(&myGlobals.sock);
+	    shutdown(myGlobals.sock, SHUT_RDWR);
+	  }
 
 #if defined(HAVE_ALARM) && defined(PARM_FORK_CHILD_PROCESS) && (!defined(WIN32))
 	  signal(SIGALRM, quitNow);
@@ -2956,131 +2956,191 @@ static int returnHTTPPage(char* pageName,
 	makeDot();
 	printTrailer=1;
 #endif
-      } else if(strncasecmp(pageName, CONST_BAR_IPPROTO_DIST,
-			    strlen(CONST_BAR_IPPROTO_DIST)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
-	drawGlobalIpProtoDistribution();
-	printTrailer=0;
-      } else if(strcasecmp(pageName, CONST_CREDITS_HTML) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
-	printHTMLheader("Credits", NULL, BITFLAG_HTML_NO_REFRESH);
-	sendString("<hr><br>");
-	sendString("<p><b>ntop</b> was been created by ");
-	sendString("<a class=external href=\"http://luca.ntop.org/\" class=tooltip title=\"Luca's home page\">");
-	sendString("Luca Deri</a> while studying how to model network traffic. He was unsatisfied");
-	sendString("by the many network traffic analysis tools he had access to, and decided to ");
-	sendString("write a new application able to report network traffic information in a way");
-	sendString("similar to the popular Unix top command. At that point in time (it was June ");
-	sendString("1998) <b>ntop</b> was born.</p>");
-	sendString("<p>The current release is very different from the initial one as it includes");
-	sendString("many features and much additional media support.</p>");
-	sendString("<p><b>ntop</b> has definitively more than one author:</p>");
-	/*
-	 * Addresses are blinded to prevent easy spam harvest -
-	 *   see http://www.wbwip.com/wbw/emailencoder.html
-	 */
-	sendString("<ul><li>" CONST_MAILTO_STEFANO " has contributed several ideas and comments</li>");
-	sendString("<li>" CONST_MAILTO_ABDELKADER " and " CONST_MAILTO_OLIVIER " provided IPv6 support</li>");
-	sendString("<li>" CONST_MAILTO_DINESH " for SCSI & FiberChannel support</li>");
-	sendString("<li>" CONST_MAILTO_BURTON " contributed to ntop in early 2000's.</li>");
-	sendString("<li>" CONST_MAILTO_MEDICI " implemented RRD Alarm and Region Map.</li></ul>");
-	sendString("<p>In addition, many other people downloaded this program, tested it,");
-	sendString("joined the <a class=external href=\"http://lists.ntop.org/mailman/listinfo/ntop\"");
-	sendString(" class=tooltip title=\"ntop mailing list signup page\">ntop</a> ");
-	sendString("and <a class=external href=\"http://lists.ntop.org/mailman/listinfo/ntop-dev\"");
-	sendString(" class=tooltip title=\"ntop-dev mailing list signup page\">ntop-dev</a> mailing lists,");
-	sendString("reported problems, changed it and improved significantly. This is because");
-	sendString("they have realised that <b>ntop</b> doesn't belong uniquely to its author,");
-	sendString("but to the whole Internet community. Their names are throught the <b>ntop</b> code.</p>");
-	sendString("<p>The author would like to thank all these people who contributed to <b>ntop</b>");
-	sendString(" and turned it into a first class network monitoring tool. Many thanks guys!</p>");
-      } else if(strncasecmp(pageName, CONST_INFO_NTOP_HTML, strlen(CONST_INFO_NTOP_HTML)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
-	printNtopConfigInfo(FALSE, &myGlobals.runningPref);
-      } else if(strncasecmp(pageName, CONST_TEXT_INFO_NTOP_HTML, strlen(CONST_TEXT_INFO_NTOP_HTML)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
-	printNtopConfigInfo(TRUE, &myGlobals.runningPref);
-	printTrailer = 0;
-      } else if(strncasecmp(pageName, CONST_PROBLEMRPT_HTML, strlen(CONST_PROBLEMRPT_HTML)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
-	printNtopProblemReport();
-	printTrailer = 0;
-      } else if(strncasecmp(pageName, CONST_VIEW_LOG_HTML, strlen(CONST_VIEW_LOG_HTML)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
-	printNtopLogReport(FALSE);
-	printTrailer = 0;
-      } else if(strncasecmp(pageName, CONST_DUMP_DATA_HTML, strlen(CONST_DUMP_DATA_HTML)) == 0) {
-	if(questionMark && strstr(questionMark, "json"))
-	  sendHTTPHeader(FLAG_HTTP_TYPE_JSON, 0, 1);
-	else
-	  sendHTTPHeader(FLAG_HTTP_TYPE_TEXT, 0, 1);
-	
-	if((questionMark == NULL) || (questionMark[0] == '\0')) {
-	  dumpNtopHashes(NULL, NULL, myGlobals.actualReportDeviceId);
-	} else {
-	  dumpNtopHashes(NULL, &questionMark[1], myGlobals.actualReportDeviceId);
-	}
-	printTrailer = 0;
-      } else if(strncasecmp(pageName, CONST_DUMP_HOSTS_INDEXES_HTML,
-			    strlen(CONST_DUMP_HOSTS_INDEXES_HTML)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_TEXT, 0, 1);
-	if((questionMark == NULL) || (questionMark[0] == '\0'))
-	  dumpNtopHashIndexes(NULL, NULL, myGlobals.actualReportDeviceId);
-	else
-	  dumpNtopHashIndexes(NULL, &questionMark[1], myGlobals.actualReportDeviceId);
-	printTrailer = 0;
-      } else if(strncasecmp(pageName, CONST_DUMP_NTOP_FLOWS_HTML,
-			    strlen(CONST_DUMP_NTOP_FLOWS_HTML)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_TEXT, 0, 1);
-	if((questionMark == NULL) || (questionMark[0] == '\0'))
-	  dumpNtopFlows(NULL, NULL, myGlobals.actualReportDeviceId);
-	else
-	  dumpNtopFlows(NULL, &questionMark[1], myGlobals.actualReportDeviceId);
-	printTrailer = 0;
-      } else if(strncasecmp(pageName, CONST_DUMP_TRAFFIC_DATA_HTML,
-			    strlen(CONST_DUMP_TRAFFIC_DATA_HTML)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_TEXT, 0, 1);
-	if((questionMark == NULL) || (questionMark[0] == '\0'))
-	  dumpNtopTrafficInfo(NULL, NULL);
-	else
-	  dumpNtopTrafficInfo(NULL, &questionMark[1]);
-	printTrailer = 0;
-      } else if(strncasecmp(pageName, CONST_PURGE_HOST, strlen(CONST_PURGE_HOST)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
-	purgeHost((HostSerialIndex)atoi(db_key));
-      } else if(strncasecmp(pageName, CONST_HOST_MAP, strlen(CONST_HOST_MAP)) == 0) {
-	sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
-	printHTMLheader("Hosts World Map", NULL, 0);
-	createAllHostsMap();
-	printTrailer = 1;
-      } else if(strlen(pageName) > 5) {
-	char hostName[32];
+      } else if(strncasecmp(pageName, CONST_HOST_IP_MAP_HTML,
+			    strlen(CONST_HOST_IP_MAP_HTML)) == 0) {
+      char hostName[47], *theHost = "";
+      
+      idx = 5;
+      theHost = &pageName[strlen(CONST_HOST_IP_MAP_HTML)+1];
+  
+      if(strlen(theHost) <= strlen(CHART_FORMAT)) {
+	printNoDataYet();
+      } else {
+	HostTraffic *el=NULL;
+	char *minus;
 
-	for(i=strlen(pageName); i>0; i--)
-	  if(pageName[i] == '?') {
-	    pageName[i] = '\0';
+	if(strlen(theHost) >= 47) theHost[47] = 0;
+	for(i=strlen(theHost); i>0; i--)
+	  if(theHost[i] == '?') {
+	    theHost[i] = '\0';
 	    break;
 	  }
 
-	pageName[strlen(pageName)-5] = '\0';
-	if(strlen(pageName) >= 31) pageName[31] = 0;
-	urlFixupFromRFC1945Inplace(pageName);
+	memset(hostName, 0, sizeof(hostName));
+	strncpy(hostName, theHost, strlen(theHost)-strlen(CHART_FORMAT));
 
-	strncpy(hostName, pageName, sizeof(hostName));
-	if(sortedColumn == 0) {
-	  sortedColumn = 1;
+	if((minus = strchr(hostName, '-')) != NULL) {
+	  minus[0] = '\0';
+	  vlanId  = atoi(&minus[1]);
 	}
 
+	urlFixupFromRFC1945Inplace(hostName);
+
 #ifdef URL_DEBUG
-	  traceEvent(CONST_TRACE_INFO, "Searching hostname: '%s'", hostName);
+	traceEvent(CONST_TRACE_INFO, "Searching hostname: '%s'", hostName);
 #endif
 
-	  printAllSessionsHTML(hostName, myGlobals.actualReportDeviceId,
-			       sortedColumn, revertOrder, pageNum, pageName);
-      } else {
+	for(el=getFirstHost(myGlobals.actualReportDeviceId);
+	    el != NULL; el = getNextHost(myGlobals.actualReportDeviceId, el)) {
+
+	  if((el != myGlobals.broadcastEntry)
+	     && (el->hostNumIpAddress != NULL)
+	     && ((el->vlanId <= 0) || (el->vlanId == vlanId))
+	     && ((strcmp(el->hostNumIpAddress, hostName) == 0)
+		 || (strcmp(el->ethAddressString, hostName) == 0)
+		 )) {
+	    break;
+	  }
+	} /* for */
+
+	if(el == NULL) {
+	  returnHTTPpageNotFound(NULL);
+	} else {
+	  if(el->community && (!isAllowedCommunity(el->community))) {
+	    returnHTTPpageBadCommunity();
+	  } else {
+	    sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 0);
+	    createHostMap(el);
+	  }
+	}
+
 	printTrailer = 0;
-	errorCode = FLAG_HTTP_INVALID_PAGE;
       }
+    } else if(strncasecmp(pageName, CONST_BAR_IPPROTO_DIST,
+			  strlen(CONST_BAR_IPPROTO_DIST)) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
+      drawGlobalIpProtoDistribution();
+      printTrailer=0;
+    } else if(strcasecmp(pageName, CONST_CREDITS_HTML) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
+      printHTMLheader("Credits", NULL, BITFLAG_HTML_NO_REFRESH);
+      sendString("<hr><br>");
+      sendString("<p><b>ntop</b> was been created by ");
+      sendString("<a class=external href=\"http://luca.ntop.org/\" class=tooltip title=\"Luca's home page\">");
+      sendString("Luca Deri</a> while studying how to model network traffic. He was unsatisfied");
+      sendString("by the many network traffic analysis tools he had access to, and decided to ");
+      sendString("write a new application able to report network traffic information in a way");
+      sendString("similar to the popular Unix top command. At that point in time (it was June ");
+      sendString("1998) <b>ntop</b> was born.</p>");
+      sendString("<p>The current release is very different from the initial one as it includes");
+      sendString("many features and much additional media support.</p>");
+      sendString("<p><b>ntop</b> has definitively more than one author:</p>");
+      /*
+       * Addresses are blinded to prevent easy spam harvest -
+       *   see http://www.wbwip.com/wbw/emailencoder.html
+       */
+      sendString("<ul><li>" CONST_MAILTO_STEFANO " has contributed several ideas and comments</li>");
+      sendString("<li>" CONST_MAILTO_ABDELKADER " and " CONST_MAILTO_OLIVIER " provided IPv6 support</li>");
+      sendString("<li>" CONST_MAILTO_DINESH " for SCSI & FiberChannel support</li>");
+      sendString("<li>" CONST_MAILTO_BURTON " contributed to ntop in early 2000's.</li>");
+      sendString("<li>" CONST_MAILTO_MEDICI " implemented RRD Alarm and Region Map.</li></ul>");
+      sendString("<p>In addition, many other people downloaded this program, tested it,");
+      sendString("joined the <a class=external href=\"http://lists.ntop.org/mailman/listinfo/ntop\"");
+      sendString(" class=tooltip title=\"ntop mailing list signup page\">ntop</a> ");
+      sendString("and <a class=external href=\"http://lists.ntop.org/mailman/listinfo/ntop-dev\"");
+      sendString(" class=tooltip title=\"ntop-dev mailing list signup page\">ntop-dev</a> mailing lists,");
+      sendString("reported problems, changed it and improved significantly. This is because");
+      sendString("they have realised that <b>ntop</b> doesn't belong uniquely to its author,");
+      sendString("but to the whole Internet community. Their names are throught the <b>ntop</b> code.</p>");
+      sendString("<p>The author would like to thank all these people who contributed to <b>ntop</b>");
+      sendString(" and turned it into a first class network monitoring tool. Many thanks guys!</p>");
+    } else if(strncasecmp(pageName, CONST_INFO_NTOP_HTML, strlen(CONST_INFO_NTOP_HTML)) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
+      printNtopConfigInfo(FALSE, &myGlobals.runningPref);
+    } else if(strncasecmp(pageName, CONST_TEXT_INFO_NTOP_HTML, strlen(CONST_TEXT_INFO_NTOP_HTML)) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
+      printNtopConfigInfo(TRUE, &myGlobals.runningPref);
+      printTrailer = 0;
+    } else if(strncasecmp(pageName, CONST_PROBLEMRPT_HTML, strlen(CONST_PROBLEMRPT_HTML)) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
+      printNtopProblemReport();
+      printTrailer = 0;
+    } else if(strncasecmp(pageName, CONST_VIEW_LOG_HTML, strlen(CONST_VIEW_LOG_HTML)) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
+      printNtopLogReport(FALSE);
+      printTrailer = 0;
+    } else if(strncasecmp(pageName, CONST_DUMP_DATA_HTML, strlen(CONST_DUMP_DATA_HTML)) == 0) {
+      if(questionMark && strstr(questionMark, "json"))
+	sendHTTPHeader(FLAG_HTTP_TYPE_JSON, 0, 1);
+      else
+	sendHTTPHeader(FLAG_HTTP_TYPE_TEXT, 0, 1);
+	
+      if((questionMark == NULL) || (questionMark[0] == '\0')) {
+	dumpNtopHashes(NULL, NULL, myGlobals.actualReportDeviceId);
+      } else {
+	dumpNtopHashes(NULL, &questionMark[1], myGlobals.actualReportDeviceId);
+      }
+      printTrailer = 0;
+    } else if(strncasecmp(pageName, CONST_DUMP_HOSTS_INDEXES_HTML,
+			  strlen(CONST_DUMP_HOSTS_INDEXES_HTML)) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_TEXT, 0, 1);
+      if((questionMark == NULL) || (questionMark[0] == '\0'))
+	dumpNtopHashIndexes(NULL, NULL, myGlobals.actualReportDeviceId);
+      else
+	dumpNtopHashIndexes(NULL, &questionMark[1], myGlobals.actualReportDeviceId);
+      printTrailer = 0;
+    } else if(strncasecmp(pageName, CONST_DUMP_NTOP_FLOWS_HTML,
+			  strlen(CONST_DUMP_NTOP_FLOWS_HTML)) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_TEXT, 0, 1);
+      if((questionMark == NULL) || (questionMark[0] == '\0'))
+	dumpNtopFlows(NULL, NULL, myGlobals.actualReportDeviceId);
+      else
+	dumpNtopFlows(NULL, &questionMark[1], myGlobals.actualReportDeviceId);
+      printTrailer = 0;
+    } else if(strncasecmp(pageName, CONST_DUMP_TRAFFIC_DATA_HTML,
+			  strlen(CONST_DUMP_TRAFFIC_DATA_HTML)) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_TEXT, 0, 1);
+      if((questionMark == NULL) || (questionMark[0] == '\0'))
+	dumpNtopTrafficInfo(NULL, NULL);
+      else
+	dumpNtopTrafficInfo(NULL, &questionMark[1]);
+      printTrailer = 0;
+    } else if(strncasecmp(pageName, CONST_PURGE_HOST, strlen(CONST_PURGE_HOST)) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
+      purgeHost((HostSerialIndex)atoi(db_key));
+    } else if(strncasecmp(pageName, CONST_HOST_MAP, strlen(CONST_HOST_MAP)) == 0) {
+      sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
+      printHTMLheader("Hosts World Map", NULL, 0);
+      createAllHostsMap();
+      printTrailer = 1;
+    } else if(strlen(pageName) > 5) {
+      char hostName[32];
+
+      for(i=strlen(pageName); i>0; i--)
+	if(pageName[i] == '?') {
+	  pageName[i] = '\0';
+	  break;
+	}
+
+      pageName[strlen(pageName)-5] = '\0';
+      if(strlen(pageName) >= 31) pageName[31] = 0;
+
+      urlFixupFromRFC1945Inplace(pageName);
+
+      strncpy(hostName, pageName, sizeof(hostName));
+      if(sortedColumn == 0)
+	sortedColumn = 1;	
+
+#ifdef URL_DEBUG
+      traceEvent(CONST_TRACE_NORMAL, "Searching hostname: '%s'", hostName);
+#endif
+
+      printAllSessionsHTML(hostName, myGlobals.actualReportDeviceId,
+			   sortedColumn, revertOrder, pageNum, pageName);
+    } else {
+      printTrailer = 0;
+      errorCode = FLAG_HTTP_INVALID_PAGE;
+    }
   }
 
   if(domainNameParm != NULL) free(domainNameParm);

@@ -4,7 +4,6 @@ body {
 
 }
 
-
 /* loading data overlay */
 
 .loader {
@@ -40,11 +39,6 @@ form {
 input[type="submit"] {
 	font: 11px sans-serif, "Helvetica Neue", Helvetica;
 	margin: 1em 0em 0em 0em;
-	color: #005000;
-}
-
-input[type="submit"][disabled] {
-	color: gray;
 }
 
 input[type="reset"] {
@@ -58,11 +52,6 @@ input[type="text"] {
 }
 
 input[type="button"] {
-	font: 11px sans-serif, "Helvetica Neue", Helvetica;
-	margin: 1em 0em 0em 0em;
-}
-
-input#back {
 	font: 11px sans-serif, "Helvetica Neue", Helvetica;
 	margin: 1em 0em 0em 0em;
 }

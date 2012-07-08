@@ -4,7 +4,6 @@
 		<td id="chart"></td>
 		<td>
 			<form action="/python/sankey.py" autocomplete="off" method=post id="update-graph">
-				<input type="hidden" name="hostname" value="@HOST@"/>
 				<input type="hidden" name="zoom" value="0"/>
 				<fieldset id="tophost">
 					<legend>Top Host</legend>
@@ -13,9 +12,8 @@
 				</fieldset>
 				<fieldset id="host">
 					<legend>Search by host address</legend>
-					<input type="text" name="source" id="searchip" value="" onkeyup="searchSel()"/>
+					<input type="text" name="source" id="searchip" value="" onkeyup="searchSel()"/><br/>
 					<select id="hostselect">
-						<option name="" value="">Show all host</option>
 					</select>
 				</fieldset>
 				<fieldset id="layer4">
@@ -36,8 +34,7 @@
 				</fieldset>
 				<fieldset>
 					<input type="submit" value="Redraw Graph" />
-					<input id="back" type="button" value="Back" />
-					<input type="reset" value="Reset" />
+					<input type="reset" value="Back" />
 				</fieldset>
 			</form>
 		</td>
@@ -51,10 +48,13 @@
 		width = 700 - margin.left - margin.right,
 		height = 600 - margin.top - margin.bottom;
 
-	var maxhostdef = 16
-	var layer7selectall = true
+	var maxhostdef = 16;
+	var refresh_time = 300000; /* 5 minuti */
+	var stop_timer = false;
+	var auto_refresh = setInterval(function (){ $('#update-graph').trigger('submit'); }, refresh_time);
+	var hoststart = "@HOST@";
 
-	var direction = function(d){if (d == 0) return " → "; else return " ← "; }
+	var direction = function(d){if (d == 0) return " <- "; else return " -> "; }
 
 	var formatNumber = d3.format(",.0f"),
 		format = function(d, unit) { return formatNumber(d) + " " + unit; }
@@ -80,9 +80,6 @@
 	var zoom = form.find('input[name="zoom"]').val();
 	var source, target
 
-	/* auto refresh every 5 minutes */
-	var auto_refresh = setInterval(function (){ $('#update-graph').trigger('submit'); }, 300*1000);
-
 	function isNumberPositive(n){
 		return !isNaN(parseFloat(n)) && isFinite(n) && n>0;
 	}
@@ -92,10 +89,9 @@
 		form.find('input[name="maxhost"]').val(maxhostdef);
 	}
 
-	getdata({ "maxhost":maxhost, "zoom":0, "hostname": "@HOST@" });
+	getdata({ "maxhost":maxhost, "zoom":0, "hostselected[]": hoststart });
 
-	$("#update-graph")
-		.submit(function(event){
+	form.submit(function(event){
 			$('.loader').show();
 			var data
 
@@ -132,14 +128,13 @@
 				$('fieldset#host').show();
 				$('fieldset#layer4').show();
 				$('ul#layer7').height("12em");
-				$("input[type=submit]").removeAttr("disabled");
-				getdata({ "maxhost":maxhostdef, "zoom":0 })
+				getdata({ "maxhost":maxhostdef, "zoom":0, "hostselected[]": hoststart })
 			 }
 		);
 
 	function getdata(formdata){
 		$.post(url, formdata, function(flows){ draw(flows); doform(flows.metadata); }, "json")
-			.error(function() { alert("Error on retriving json data."); })
+			.error(function() { /* alert("Error on retriving json data.") */; })
 	}
 
 	/* (ri)disegna il grafico */
@@ -163,7 +158,7 @@
 
 		var colorlink = function(d){
 			if (flows.metadata.zoom==0)
-				if (d.direction == 0) return color(d.source.name);
+				if (d.direction == 1) return color(d.source.name);
 				else return color(d.target.name);
 			else
 				return color(d.layer7);
@@ -172,7 +167,7 @@
 		var link = svg.append("g").attr("class", "links").selectAll(".link")
 				.data(flows.links)
 			.enter().append("path")
-				.on("dblclick", dblclicklink)
+				.on("click", clicklink)
 				.attr("class", "link")
 				.attr("d", path)
 				.style("stroke-width", function(d) { return Math.max(1, d.dy); })
@@ -199,9 +194,14 @@
 				.origin(function(d) { return d; })
 				.on("dragstart", function(){ this.parentNode.appendChild(this); })
 				.on("drag", dragmove))
-				.on("dblclick", dblclickhost);
+				.on("click", function(d){
+					if ((flows.metadata.zoom == 1) && (d.name != flows.metadata.source) && (d.name != flows.metadata.target))
+						return
+					else		
+						return  clickhost(d);
+				});
 
-		/* Rettengolo dei nodi */
+		/* Rettengolo dei nodi (host) */
 		node.append("rect")
 				.attr("height", function(d) { return d.dy; })
 				.attr("width", sankey.nodeWidth())
@@ -209,6 +209,30 @@
 				.style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
 			.append("title")
 				.text(function(d) { return d.name + "\n" + format(d.value, flows.metadata.unit); });
+
+		/* Questo rettangolo serve solo per poter cliccare sugli indirizzi ip */
+		node.append("rect")
+				.attr("x", -4 -100)
+				.attr("y", function(d) { return (d.dy/2)-7; })
+				.attr("height", 12)
+				.attr("width", 100)
+				.style("opacity", "0")
+				.on("click", function(d){
+					if ((flows.metadata.zoom == 1) && (d.name != flows.metadata.source) && (d.name != flows.metadata.target))
+						return
+					else		
+						return clickip(d);
+				})
+				.attr("transform", null)
+			.filter(function(d) { return d.x < width / 2; })
+				.attr("x", 4 + sankey.nodeWidth())
+			.append("title")
+				.text(function(d) {
+					if ((flows.metadata.zoom == 1) && (d.name != flows.metadata.source) && (d.name != flows.metadata.target))
+						return
+					else
+						return "Show info on "+d.name
+			});
 
 		node.append("text")
 				.attr("x", -6)
@@ -228,11 +252,11 @@
 			link.attr("d", path);
 		}
 
-		function dblclickip(d){
-			console.log(d);
+		function clickip(d){
+			window.location.href = "/"+d.name+".html";			
 		}
 
-		function dblclicklink(d){
+		function clicklink(d){
 			$('.loader').show();
 			var data
 
@@ -250,18 +274,12 @@
 				$('fieldset#host').hide();
 				$('fieldset#tophost').hide();
 				$('ul#layer7').height("42.6em");
+				getdata(data);
 			}
-			else {
-				data = { "maxhost":maxhost, "zoom":0 }
-				$('ul#layer7').height("12em");
-				$('fieldset#tophost').show();
-				$('fieldset#host').show();
-				$('fieldset#layer4').show();
-			}
-			getdata(data);
+			else $('#update-graph').trigger('reset');
 		}
 
-		function dblclickhost(d){
+		function clickhost(d){
 			$('.loader').show();
 			var data
 
@@ -277,22 +295,14 @@
 				data = { "maxhost":maxhost, "zoom":0, "layer4": [], "layer7": [], "hostselected[]": d.name }
 				$('li.checkl4 input:checked').each(function(){ data['layer4'].push($(this).val()); });
 				$('li.checkl7 input:checked').each(function(){ data['layer7'].push($(this).val()); });
-				$("#hostselect").val(d.name);
 			}
 			else{
-
-				if ((d.name == flows.metadata.source) || (d.name == flows.metadata.target)){
-					data = { "maxhost":maxhost, "zoom":0, "hostselected[]": d.name }
-					$("#hostselect").val(d.name);
-				}
-				else{
-					data = { "maxhost":maxhost, "zoom":0 }
-					alert('Il protocollo '+d.name+' non è un host.');
-				}
+				data = { "maxhost":maxhost, "zoom":0, "hostselected[]": d.name }
 				$('ul#layer7').height("12em");
 				$('fieldset#tophost').show();
 				$('fieldset#host').show();
 			}
+			$("#hostselect").val(d.name);
 			getdata(data);
 		}
 	}
@@ -359,6 +369,22 @@
 			if (metadata.hostselected) $("#hostselect").val(metadata.hostselected);
 		}
 
+		$("li.checkl4 input:checkbox").change(function(){
+			var checked = $("li.checkl4 input:checked").length > 0;
+			if (checked && stop_timer){
+				auto_refresh = setInterval(function (){ $('#update-graph').trigger('submit'); }, refresh_time);
+				stop_timer = false
+			}
+		});
+
+		$("li.checkl7 input:checkbox").change(function(){
+			var checked = $("li.checkl7 input:checked").length > 0;
+			if (checked && stop_timer){
+				auto_refresh = setInterval(function (){ $('#update-graph').trigger('submit'); }, refresh_time);
+				stop_timer = false
+			}
+		});
+
 		$('.loader').hide();
 	}
 
@@ -393,18 +419,33 @@
 	$('input[name="maxhost"]').change(function(){
 		maxhost = form.find('input[name="maxhost"]').val();
 		if (!isNumberPositive(maxhost)){
-			if (maxhost=="n") alert("We are the nBorg.\nResistance is futile");
 			maxhost = maxhostdef;
 			form.find('input[name="maxhost"]').val(maxhostdef);
 		}
 	});
 
-	function layer_4_off(){$('li.checkl4 input:checked').each(function(i, obj){ $(this).attr('checked', false); });}
+	function layer_4_off(){
+		$('li.checkl4 input:checked').attr('checked', false);
+		clearTimeout(auto_refresh);
+		stop_timer = true;
+	}
 
-	function layer_4_on(){$('li.checkl4 input').each(function(i, obj){ $(this).attr('checked', true); });}
+	function layer_4_on(){
+		$('li.checkl4 input').attr('checked', true);
+		auto_refresh = setInterval(function (){ $('#update-graph').trigger('submit'); }, refresh_time);
+		stop_timer = false
+	}
 
-	function layer_7_off(){$('li.checkl7 input:checked').each(function(i, obj){ $(this).attr('checked', false); });}
+	function layer_7_off(){
+		$('li.checkl7 input:checked').attr('checked', false);
+		clearTimeout(auto_refresh);
+		stop_timer = true;
+	}
 
-	function layer_7_on(){$('li.checkl7 input').each(function(i, obj){ $(this).attr('checked', true); });}
+	function layer_7_on(){
+		$('li.checkl7 input').attr('checked', true);
+		auto_refresh = setInterval(function (){ $('#update-graph').trigger('submit'); }, refresh_time);
+		stop_timer = false	
+	}
 </script>
 

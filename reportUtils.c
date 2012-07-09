@@ -2298,11 +2298,13 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
     sendString("\n</div>\n");
   }
 
-  sendString("\n\n<!------ DIV ------>\n");  
-  sendString("\n\n<div id=\"tabs-22\">\n");
-  if(printPacketStats(el, actualDeviceId) == 0)
-    sendString("\n<i>"CONST_NO_DATA_YET"</i>");
-  sendString("\n</div>\n");
+  if(el->secHostPkts || el->nonIPTraffic) {
+    sendString("\n\n<!------ DIV ------>\n");  
+    sendString("\n\n<div id=\"tabs-22\">\n");
+    if(printPacketStats(el, actualDeviceId) == 0)
+      sendString("\n<i>"CONST_NO_DATA_YET"</i>");
+    sendString("\n</div>\n");
+  }
 
   /*
   if((totalSent == 0) && (totalRcvd == 0))

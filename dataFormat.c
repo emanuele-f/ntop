@@ -142,7 +142,7 @@ char* formatSeconds(unsigned long sec, char* outStr, int outStrLen) {
       yearStr[0] = '\0';
 
     safe_snprintf(__FILE__, __LINE__, outStr, outStrLen, "%s%u day%s %u:%02u:%02lu", 
-		yearStr, days, (days>1)?"s":"", hour, min, sec);
+		  yearStr, days, (days>1)?"s":"", hour, min, sec);
   } else if(hour > 0) {
     safe_snprintf(__FILE__, __LINE__, outStr, outStrLen, "%u:%02u:%02lu", hour, min, sec);
   } else if(min > 0) {
@@ -287,6 +287,7 @@ char* _formatTime(time_t *theTime, char* outStr, int outStrLen, char* file, int 
   struct tm *locTime;
   struct tm myLocTime;
 
+  *theTime &= 0xFFFFFFFF;
   locTime = localtime_r(theTime, &myLocTime);
   if(strftime(outStr, outStrLen, CONST_LOCALE_TIMESPEC, locTime) == 0)
     traceEvent(CONST_TRACE_ERROR, "Buffer too short @ %s:%d for formatTime() [%s]",

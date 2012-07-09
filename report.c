@@ -3351,12 +3351,12 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
   } else
     vlanStr[0] = '\0';
 
-  safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		"<li><a href=\"/%s-%s%s%s\"><span>Contacts Map</span></a></li>\n",
-		CONST_HOST_IP_MAP_HTML, linkName, vlanStr, CHART_FORMAT);
-
-  //sendString("<li><a href=\"#tabs-11\">Contacts Map</a></li>\n");
-  sendString(buf);
+  if(el->hostNumIpAddress[0] != '\0') {
+    safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
+		  "<li><a href=\"/%s-%s%s%s\"><span>Contacts Map</span></a></li>\n",
+		  CONST_HOST_IP_MAP_HTML, linkName, vlanStr, CHART_FORMAT);
+    sendString(buf);
+  }
 
   sendString("</ul>\n");
 
@@ -4576,21 +4576,6 @@ void printThptStats(int sortedColumn _UNUSED_) {
     return;
   }
 
-  sendString("<script>\n"
-	     "   $(function() {\n"
-	     "	 $( \"#tabs\" ).tabs();\n"
-	     "     });\n\n"
-	     "</script>\n"
-	     "<center>\n"
-	     "<div id=\"tabs\" style=\"width: 80%; \">\n"
-	     "    <ul>\n"
-	     "    <li><a href=\"#tabs-1\">Last 10 Mins</a></li>\n"
-	     "    <li><a href=\"#tabs-2\">Last Hour</a></li>\n"
-	     "    <li><a href=\"#tabs-3\">Last Day</a></li>\n"
-	     "    <li><a href=\"#tabs-4\">Last Month</a></li>\n"
-	     "</ul>\n"
-	     );
-
   /* Do NOT add a '/' at the end of the path because Win32 will complain about it */
 #ifdef WIN32
   {
@@ -4614,6 +4599,21 @@ void printThptStats(int sortedColumn _UNUSED_) {
     rrdNotOperational();
     return;
   }
+
+  sendString("<script>\n"
+	     "   $(function() {\n"
+	     "	 $( \"#tabs\" ).tabs();\n"
+	     "     });\n\n"
+	     "</script>\n"
+	     "<center>\n"
+	     "<div id=\"tabs\" style=\"width: 80%; \">\n"
+	     "    <ul>\n"
+	     "    <li><a href=\"#tabs-1\">Last 10 Mins</a></li>\n"
+	     "    <li><a href=\"#tabs-2\">Last Hour</a></li>\n"
+	     "    <li><a href=\"#tabs-3\">Last Day</a></li>\n"
+	     "    <li><a href=\"#tabs-4\">Last Month</a></li>\n"
+	     "</ul>\n"
+	     );
 
   sendString("<div id=\"tabs-1\">\n<table border=0>\n");
 

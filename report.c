@@ -4131,7 +4131,7 @@ void printActiveSessions(int actualDeviceId, int pageNum, HostTraffic *el) {
 		      ,
 		      formatBytes(dataSent, 1, formatBuf, sizeof(formatBuf)),
 		      formatBytes(dataRcvd, 1, formatBuf1, sizeof(formatBuf1)),
-		      formatTime(&(session->firstSeen), formatBuf2, sizeof(formatBuf2)),
+		      formatTime(&session->firstSeen, formatBuf2, sizeof(formatBuf2)),
 		      formatSeconds(session->lastSeen-session->firstSeen, formatBuf4, sizeof(formatBuf4)),
 		      formatSeconds(myGlobals.actTime-session->lastSeen, formatBuf5, sizeof(formatBuf5)),
 		      formatLatency(session->clientNwDelay, session->sessionState, formatBuf6, sizeof(formatBuf6)),
@@ -4327,10 +4327,16 @@ void printBar(char *buf, int bufLen,
     }
   } else {
     /* Could happen because of rounding */
-    if((percentageS+percentageR) > maxPercentage)
-      percentageR--;
-    if((percentageS+percentageR) > maxPercentage)
-      percentageS--;
+
+    while(percentageR > maxPercentage) {
+      if((percentageS+percentageR) > maxPercentage)
+	percentageR--;
+    }
+
+    while(percentageS > maxPercentage) {
+      if((percentageS+percentageR) > maxPercentage)
+	percentageS--;
+    }
 
     switch(percentageS+percentageR) {
     case 0:

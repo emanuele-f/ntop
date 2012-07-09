@@ -283,15 +283,19 @@ char* formatPkts(Counter pktNr, char* outStr, int outStrLen) {
 
 /* ************************************ */
 
-char* _formatTime(time_t *theTime, char* outStr, int outStrLen, char* file, int line) {
+char* _formatTime(ntop_time_t *theTime, char* outStr, int outStrLen, char* file, int line) {
   struct tm *locTime;
   struct tm myLocTime;
+  time_t t = *theTime;
 
-  *theTime &= 0xFFFFFFFF;
-  locTime = localtime_r(theTime, &myLocTime);
-  if(strftime(outStr, outStrLen, CONST_LOCALE_TIMESPEC, locTime) == 0)
-    traceEvent(CONST_TRACE_ERROR, "Buffer too short @ %s:%d for formatTime() [%s]",
-	       file, line, outStr);
+  if((locTime = localtime_r(&t, &myLocTime)) == NULL) {
+    traceEvent(CONST_TRACE_WARNING, "localtime_r failed:  [%d/%s]", errno, strerror(errno));
+    outStr[0] = '\0';
+  } else {
+    if(strftime(outStr, outStrLen, CONST_LOCALE_TIMESPEC, locTime) == 0)
+      traceEvent(CONST_TRACE_ERROR, "Buffer too short @ %s:%d for formatTime() [%s]",
+		 file, line, outStr);
+  }
 
   return(outStr);
 }

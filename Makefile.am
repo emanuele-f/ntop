@@ -362,7 +362,7 @@ install-data-local: ntop.txt ntop.html faq.html
           fi; \
         done
 	@$(top_srcdir)/mkinstalldirs $(DESTDIR)$(datadir)/ntop/python
-	tar --exclude='.svn' -c -f - python/* | (cd $(DESTDIR)$(datadir)/ntop/python ; tar xfp -)
+	tar --exclude='.svn' -c -f - python/* | (cd $(DESTDIR)$(datadir)/ntop ; tar xfp -)
 
 # build the IPX SAP table
 #sapt: saptable.h

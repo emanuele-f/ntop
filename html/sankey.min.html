@@ -197,7 +197,7 @@
 				.on("click", function(d){
 					if ((flows.metadata.zoom == 1) && (d.name != flows.metadata.source) && (d.name != flows.metadata.target))
 						return
-					else		
+					else
 						return  clickhost(d);
 				});
 
@@ -220,7 +220,7 @@
 				.on("click", function(d){
 					if ((flows.metadata.zoom == 1) && (d.name != flows.metadata.source) && (d.name != flows.metadata.target))
 						return
-					else		
+					else
 						return clickip(d);
 				})
 				.attr("transform", null)
@@ -253,7 +253,7 @@
 		}
 
 		function clickip(d){
-			window.location.href = "/"+d.name+".html";			
+			window.location.href = "/"+escape(d.name+".html");
 		}
 
 		function clicklink(d){
@@ -445,7 +445,7 @@
 	function layer_7_on(){
 		$('li.checkl7 input').attr('checked', true);
 		auto_refresh = setInterval(function (){ $('#update-graph').trigger('submit'); }, refresh_time);
-		stop_timer = false	
+		stop_timer = false
 	}
 </script>
 

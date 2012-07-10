@@ -1829,7 +1829,6 @@ static int checkURLsecurity(char *url) {
   }
 
   if(strstr(url, "%") != NULL) {
-
     /* Convert encoding (%nn) to their base characters -
      * we also handle the special case of %3A (:)
      * which we convert to _ (not :)
@@ -1941,11 +1940,38 @@ static int checkURLsecurity(char *url) {
 
   /* Prohibited characters? */
   if((len = strcspn(workURL, CONST_URL_PROHIBITED_CHARACTERS)) < strlen(workURL)) {
-    traceEvent(CONST_TRACE_NOISY,
-               "URL security(4): Prohibited character(s) at %d [%c] in URL... rejecting request [%s]",
-               len, workURL[len], workURL);
-    free(workURL);
-    return(4);
+    /* Before complaining we need to check if this is a host name */
+    char hostname[48];
+    int l, found = 0;
+    HostTraffic *el;
+
+    safe_snprintf(__FILE__, __LINE__, hostname, sizeof(hostname), "%s", &workURL[1]);
+    l = strlen(hostname);
+    
+    if(l > 5) l -= 5;
+    hostname[l] = '\0';
+
+    for(el=getFirstHost(myGlobals.actualReportDeviceId);
+	el != NULL; el = getNextHost(myGlobals.actualReportDeviceId, el)) {
+
+#if 0
+      traceEvent(CONST_TRACE_WARNING, "[%s][%s][%s]", 
+		 el->ethAddressString, el->hostNumIpAddress, el->hostResolvedName);
+#endif 
+      if((el != myGlobals.broadcastEntry) 
+	 && (strstr(el->hostResolvedName, hostname))) {
+	  found = 1;
+	  break;
+	}
+    } /* for */
+
+    if(!found) {
+      traceEvent(CONST_TRACE_NOISY,
+		 "URL security(4): Prohibited character(s) at %d [%c] in URL... rejecting request [%s]",
+		 len, workURL[len], workURL);
+      free(workURL);
+      return(4);
+    }
   }
 
   /* So far, so go - check the extension */
@@ -2998,6 +3024,7 @@ static int returnHTTPPage(char* pageName,
 	     && ((el->vlanId <= 0) || (el->vlanId == vlanId))
 	     && ((strcmp(el->hostNumIpAddress, hostName) == 0)
 		 || (strcmp(el->ethAddressString, hostName) == 0)
+		 || (strcmp(el->hostResolvedName, hostName) == 0)
 		 )) {
 	    break;
 	  }

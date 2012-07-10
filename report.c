@@ -2520,8 +2520,10 @@ void printHostsInfo(int sortedColumn, int revertOrder, int pageNum, int showByte
       el != NULL; el = getNextHost(myGlobals.actualReportDeviceId, el)) {
     unsigned short actUsage, actUsageS, actUsageR;
 
+#if 0
     traceEvent(CONST_TRACE_WARNING, "[%s][%s][%s]", 
 	       el->ethAddressString, el->hostNumIpAddress, el->hostResolvedName);
+#endif
 
     if(showL2Only) {
       if(!el->l2Host) 
@@ -3172,6 +3174,8 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
       }
     }
 
+  unescape(buf, sizeof(buf), host);
+
   // traceEvent(CONST_TRACE_WARNING, "%s(%s)", __FUNCTION__, host);
 
   /* ****************************** */
@@ -3181,9 +3185,9 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
     if(el->community && (!isAllowedCommunity(el->community))) continue;
 
     if(
-       (((!search_mac) && (strcmp(el->hostNumIpAddress, host) == 0))
-	|| (search_mac && el->l2Host && (strcmp(el->ethAddressString, host) == 0))
-	|| (strstr(el->hostResolvedName, host) != NULL)
+       (((!search_mac) && (strcmp(el->hostNumIpAddress, buf) == 0))
+	|| (search_mac && el->l2Host && (strcmp(el->ethAddressString, buf) == 0))
+	|| (strstr(el->hostResolvedName, buf) != NULL)
 	)
        && ((vlanId == NO_VLAN) || ((el->vlanId <= 0) || (el->vlanId == vlanId)))) {
       found = 1;

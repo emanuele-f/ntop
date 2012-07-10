@@ -2520,10 +2520,15 @@ void printHostsInfo(int sortedColumn, int revertOrder, int pageNum, int showByte
       el != NULL; el = getNextHost(myGlobals.actualReportDeviceId, el)) {
     unsigned short actUsage, actUsageS, actUsageR;
 
+    traceEvent(CONST_TRACE_WARNING, "[%s][%s][%s]", 
+	       el->ethAddressString, el->hostNumIpAddress, el->hostResolvedName);
+
     if(showL2Only) {
-      if(!el->l2Host) continue;
+      if(!el->l2Host) 
+	continue;
     } else {
-      if(el->l2Host) continue;
+      if(el->l2Host)
+	continue;
     }
 
     if(broadcastHost(el)) continue;
@@ -2978,6 +2983,9 @@ void printHostsInfo(int sortedColumn, int revertOrder, int pageNum, int showByte
 			formatLatency(el->maxLatency, FLAG_STATE_ACTIVE));
 	  sendString(buf);
 #endif
+
+	  if(el->lastSeen  > myGlobals.actTime) el->lastSeen = myGlobals.actTime;
+	  if(el->firstSeen > myGlobals.actTime) el->firstSeen = myGlobals.actTime;	    
 
 	  safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<td "TD_BG" align=\"right\" nowrap>%s</td>",
 			formatSeconds(el->lastSeen - el->firstSeen, formatBuf, sizeof(formatBuf)));

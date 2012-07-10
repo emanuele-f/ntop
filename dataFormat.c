@@ -283,12 +283,11 @@ char* formatPkts(Counter pktNr, char* outStr, int outStrLen) {
 
 /* ************************************ */
 
-char* _formatTime(ntop_time_t *theTime, char* outStr, int outStrLen, char* file, int line) {
+char* _formatTime(time_t *theTime, char* outStr, int outStrLen, char* file, int line) {
   struct tm *locTime;
   struct tm myLocTime;
-  time_t t = *theTime;
 
-  if((locTime = localtime_r(&t, &myLocTime)) == NULL) {
+  if((locTime = localtime_r(theTime, &myLocTime)) == NULL) {
     traceEvent(CONST_TRACE_WARNING, "localtime_r failed:  [%d/%s]", errno, strerror(errno));
     outStr[0] = '\0';
   } else {

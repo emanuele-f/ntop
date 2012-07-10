@@ -126,10 +126,10 @@ void updatePacketCount(HostTraffic *srcHost, HostTraffic *dstHost,
   thisTime = localtime_r(&myGlobals.actTime, &t);
 
   if(thisTime == NULL) {
-        myGlobals.actTime = time(NULL);
-        thisTime = localtime_r(&myGlobals.actTime, &t);
-        }
-
+    myGlobals.actTime = time(NULL);
+    thisTime = localtime_r(&myGlobals.actTime, &t);
+  }
+  
   hourId = thisTime->tm_hour % 24 /* just in case... */;;
 
   if(lastHourId != hourId) {

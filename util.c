@@ -73,7 +73,7 @@ static HostTraffic* __getFirstHost(u_int actualDeviceId, u_int beginIdx, char *f
 	  return(NULL);
 	}
 
-	if(!is_host_ready_to_purge(actualDeviceId, el, time(NULL))) {
+	if(!is_host_ready_to_purge(actualDeviceId, el, myGlobals.actTime)) {
 	  /* Do not return hosts that will soon be purged off memory */
 	  releaseMutex(&myGlobals.hostsHashLockMutex);
 	  return(el);

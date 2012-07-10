@@ -120,8 +120,6 @@ typedef char int8_t;
 #define bool u_int8_t
 #endif
 
-#define ntop_time_t u_int32_t
-
 typedef struct ether80211q {
   u_int16_t vlanId;
   u_int16_t protoType;
@@ -702,7 +700,7 @@ typedef struct hostTraffic {
   u_int16_t        ifId;            /* Interface Id [e.g. for NetFlow] (-1 if not set) */
   u_int16_t        hostAS;          /* AS to which the host belongs to */
   char             *hostASDescr;    /* Description of the host AS */
-  ntop_time_t      firstSeen, lastSeen; /* time when this host has sent/rcvd some data  */
+  time_t           firstSeen, lastSeen; /* time when this host has sent/rcvd some data  */
   u_char           ethAddress[LEN_ETHERNET_ADDRESS];
   u_char           lastEthAddress[LEN_ETHERNET_ADDRESS]; /* used for remote addresses */
   char             ethAddressString[LEN_ETHERNET_ADDRESS_DISPLAY];
@@ -802,7 +800,7 @@ typedef struct ipFragment {
   u_int totalDataLength, expectedDataLength;
   u_int totalPacketLength;
   u_short sport, dport;
-  ntop_time_t firstSeen;
+  time_t firstSeen;
   struct ipFragment *prev, *next;
 } IpFragment;
 
@@ -837,8 +835,8 @@ typedef struct ipSession {
   HostAddr remotePeerRealIp;        /* Real IP address (if masqueraded and known) */
   char *virtualPeerName;            /* Name of a virtual host (e.g. HTTP virtual host) */
   u_short dport;                    /* remote peer address (port)               */
-  ntop_time_t firstSeen;            /* time when the session has been initiated */
-  ntop_time_t lastSeen;             /* time when the session has been closed    */
+  time_t firstSeen;            /* time when the session has been initiated */
+  time_t lastSeen;             /* time when the session has been closed    */
   u_long pktSent, pktRcvd;
   TrafficCounter bytesSent;         /* # bytes sent (initiator -> peer) [IP]    */
   TrafficCounter bytesRcvd;         /* # bytes rcvd (peer -> initiator)[IP]     */
@@ -1463,7 +1461,7 @@ typedef struct ntopInterface {
 typedef struct processInfo {
   char marker; /* internal use only */
   char *command, *user;
-  ntop_time_t firstSeen, lastSeen;
+  time_t firstSeen, lastSeen;
   int pid;
   TrafficCounter bytesSent, bytesRcvd;
   /* peers that talked with this process */

@@ -4021,7 +4021,7 @@ void printActiveSessions(int actualDeviceId, int pageNum, HostTraffic *el) {
       IPSession *session = myGlobals.device[myGlobals.actualReportDeviceId].sessions[idx];
 
       while(session != NULL) {
-	if((el == NULL) && (printedSessions >= myGlobals.runningPref.maxNumLines)) break;
+	if(printedSessions >= myGlobals.runningPref.maxNumLines) break;
 
 	if((session->initiator->magic != CONST_MAGIC_NUMBER)
 	   || (session->remotePeer->magic != CONST_MAGIC_NUMBER)) {
@@ -4109,20 +4109,30 @@ void printActiveSessions(int actualDeviceId, int pageNum, HostTraffic *el) {
 	else
 	  voipStr = "";
 
-	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s>"
+	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
+		      "<TR "TR_ON" %s>"
 		      "<TD "TD_BG" ALIGN=CENTER NOWRAP>%s</TD>"
-		      "<TD "TD_BG" ALIGN=RIGHT NOWRAP>%s:%s%s%s</TD>"
-		      "<TD "TD_BG" ALIGN=RIGHT NOWRAP>%s:%s</TD>",
-		      getRowColor(),
-		      proto2name(session->proto),
-		      makeHostLink(session->initiator, FLAG_HOSTLINK_TEXT_FORMAT,
-				   0, 0, hostLinkBuf, sizeof(hostLinkBuf)),
+		      "<TD "TD_BG" ALIGN=RIGHT NOWRAP>",
+		      getRowColor(), proto2name(session->proto));
+	sendString(buf);
+
+	sendString(makeHostLink(session->initiator, FLAG_HOSTLINK_TEXT_FORMAT,
+				0, 0, hostLinkBuf, sizeof(hostLinkBuf)));
+		   
+	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		      ":%s%s%s</TD>"
+		      "<TD "TD_BG" ALIGN=RIGHT NOWRAP>",
 		      sport, session->isP2P == 1 ? "&nbsp&lt;P2P&gt;" : "",
-		      voipStr, makeHostLink(session->remotePeer,
-					    FLAG_HOSTLINK_TEXT_FORMAT,
-					    0, 0, hostLinkBuf1,
-					    sizeof(hostLinkBuf1)),
-		      dport);
+		      voipStr);
+	sendString(buf);
+
+	sendString(makeHostLink(session->remotePeer,
+				FLAG_HOSTLINK_TEXT_FORMAT,
+				0, 0, hostLinkBuf1,
+				sizeof(hostLinkBuf1)));
+
+	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
+		      ":%s</TD>", dport);
 	sendString(buf);
 
 	/* Sanitize */
@@ -4176,6 +4186,13 @@ void printActiveSessions(int actualDeviceId, int pageNum, HostTraffic *el) {
   if(printedSessions > 0) {
     sendString("</TABLE>"TABLE_OFF"<P>\n");
     sendString("</CENTER>\n");
+
+    if(el && (printedSessions >= myGlobals.runningPref.maxNumLines)) {
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+		    "<b>Too many host sessions: Output limited to %d sessions</b><p>",
+		    myGlobals.runningPref.maxNumLines);
+      sendString(buf);
+    }
 
     if(el == NULL)
       addPageIndicator(CONST_ACTIVE_SESSIONS_HTML, pageNum,

@@ -3376,8 +3376,20 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
   sendString("\n\n<!------ DIV ------>\n");
   sendString("\n\n<div id=\"tabs-0\">\n");
   {
-    FILE *fd = fopen("./html/sankey.min.html", "r");
+    FILE *fd  = NULL;
+    int idx;
+    char path[256];
 
+    for(idx=0; myGlobals.dataFileDirs[idx] != NULL; idx++) {
+      safe_snprintf(__FILE__, __LINE__, path, sizeof(path),
+		    "%s/html/sankey.min.html",
+		    myGlobals.dataFileDirs[idx]);
+
+      revertSlashIfWIN32(path, 0);
+      if((fd = fopen(path, "r")) != NULL)
+	break;
+    }
+      
     if(fd) {
       char line[LINE_MAX];
 

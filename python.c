@@ -773,10 +773,14 @@ static PyObject* python_dumpHostRawFlows(PyObject *self, PyObject *args) {
 
   /* ****************************** */
 
+  traceEvent(CONST_TRACE_WARNING, "python_dumpHostRawFlows(%d)", 0);
+
   if( (!PyArg_ParseTuple(args, "s", &host)) && 
 		(!PyArg_ParseTuple(args, "i", &host)) ) return(ret);
 
   if(host == NULL) return(ret);
+
+  traceEvent(CONST_TRACE_WARNING, "python_dumpHostRawFlows(%s) [%d]", host, 1);
 
   for(el = getFirstHost(myGlobals.actualReportDeviceId); 
       el != NULL; el = getNextHost(myGlobals.actualReportDeviceId, el)) {
@@ -788,6 +792,8 @@ static PyObject* python_dumpHostRawFlows(PyObject *self, PyObject *args) {
 	} /* for */
 
   if(!found) return(ret);
+
+  traceEvent(CONST_TRACE_WARNING, "python_dumpHostRawFlows(%s) [%d]", host, 2);
 
   for(idx=0; idx<MAX_TOT_NUM_SESSIONS; idx++) {
     int mutex_idx;
@@ -827,6 +833,7 @@ static PyObject* python_dumpHostRawFlows(PyObject *self, PyObject *args) {
 		      proto2name(session->proto),
 		      getProtoName(session->proto, session->l7.major_proto));
 
+	traceEvent(CONST_TRACE_WARNING, "python_dumpHostRawFlows(%s) [%s]", host, buf);
 	PyList_Append(ret, PyString_FromString(buf));
 
 	session = session->next;
@@ -1530,7 +1537,8 @@ int handlePythonHTTPRequest(char *url, u_int postLen) {
 #ifndef WIN32
     /* if(myGlobals.runningPref.debugMode) */ /* -K */
     {
-      traceEvent(CONST_TRACE_INFO, "[PYTHON] Redirecting file descriptors");
+      /* Note that myGlobals.newSock is negative when HTTPS is used */
+      traceEvent(CONST_TRACE_INFO, "[PYTHON] Redirecting file descriptors [%d]", myGlobals.newSock);
 
       old_stdin = dup(STDIN_FILENO), old_stdout = dup(STDOUT_FILENO);
 
@@ -1539,11 +1547,11 @@ int handlePythonHTTPRequest(char *url, u_int postLen) {
 	 http://tangentsoft.net/wskfaq/articles/bsd-compatibility.html
 	 http://stackoverflow.com/questions/7664/windows-c-how-can-i-redirect-stderr-for-calls-to-fprintf
       */
-      if(dup2(myGlobals.newSock, STDOUT_FILENO) == -1)
-	traceEvent(CONST_TRACE_WARNING, "Failed to redirect stdout");
+      if(dup2(abs(myGlobals.newSock), STDOUT_FILENO) == -1)
+	traceEvent(CONST_TRACE_WARNING, "Failed to redirect stdout [%d][%s]", errno, strerror(errno));
 
-      if(dup2(myGlobals.newSock, STDIN_FILENO) == -1)
-	traceEvent(CONST_TRACE_WARNING, "Failed to redirect stdin");
+	 if(dup2(abs(myGlobals.newSock), STDIN_FILENO) == -1)
+	traceEvent(CONST_TRACE_WARNING, "Failed to redirect stdin [%d][%s]",errno, strerror(errno));
     }
 #endif
 

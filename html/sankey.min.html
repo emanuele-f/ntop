@@ -89,7 +89,7 @@
 		form.find('input[name="maxhost"]').val(maxhostdef);
 	}
 
-	getdata({ "maxhost":maxhost, "zoom":0, "hostselected[]": hoststart });
+	getdata({ "maxhost":maxhost, "zoom":0, "hostselected[]": escape(hoststart) });
 
 	form.submit(function(event){
 			$('.loader').show();
@@ -128,7 +128,7 @@
 				$('fieldset#host').show();
 				$('fieldset#layer4').show();
 				$('ul#layer7').height("12em");
-				getdata({ "maxhost":maxhostdef, "zoom":0, "hostselected[]": hoststart })
+				getdata({ "maxhost":maxhostdef, "zoom":0, "hostselected[]": escape(hoststart) })
 			 }
 		);
 
@@ -292,12 +292,12 @@
 			if (flows.metadata.zoom == 0){
 				if (!validatel4()){ $('.loader').hide(); return; }
 				if (!validatel7()){ $('.loader').hide(); return; }
-				data = { "maxhost":maxhost, "zoom":0, "layer4": [], "layer7": [], "hostselected[]": d.name }
+				data = { "maxhost":maxhost, "zoom":0, "layer4": [], "layer7": [], "hostselected[]": escape(d.name) }
 				$('li.checkl4 input:checked').each(function(){ data['layer4'].push($(this).val()); });
 				$('li.checkl7 input:checked').each(function(){ data['layer7'].push($(this).val()); });
 			}
 			else{
-				data = { "maxhost":maxhost, "zoom":0, "hostselected[]": d.name }
+				data = { "maxhost":maxhost, "zoom":0, "hostselected[]": escape(d.name) }
 				$('ul#layer7').height("12em");
 				$('fieldset#tophost').show();
 				$('fieldset#host').show();

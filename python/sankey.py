@@ -27,6 +27,8 @@
 import json, cgi
 import sys, time, socket
 from operator import itemgetter, attrgetter
+import urllib2
+
 # ntop interface
 import interface
 import ntop
@@ -44,7 +46,7 @@ class Flow:
 		self.maxhost = int(self.form.getvalue('maxhost', default=16))	# Massimo numero di host da vis...
 		self.source = self.form.getvalue('source')			#
 		self.target = self.form.getvalue('target')			#
-		self.hostselected = self.form.getvalue('hostselected[]')
+		self.hostselected = urllib2.unquote(self.form.getvalue('hostselected[]'))
 
 		# Performance tweaks
 		archi = self.archi

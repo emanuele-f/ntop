@@ -1887,6 +1887,7 @@ static int checkURLsecurity(char *url) {
 #endif
   }
 
+#if 0
   /* Still got a % - maybe it's Unicode?  Somethings fishy... */
   if(strstr(url, "%") != NULL) {
     traceEvent(CONST_TRACE_INFO,
@@ -1901,6 +1902,7 @@ static int checkURLsecurity(char *url) {
     httpRequestedURL[8] = '\0';
     return(1);
   }
+#endif
 
   /* a double slash? */
   if(strstr(url, "//") > 0) {
@@ -1966,14 +1968,15 @@ static int checkURLsecurity(char *url) {
     } /* for */
 
     if(!found) {
-      
+      char c = workURL[len];
+
       if(workURL[len] != ' ')
 	traceEvent(CONST_TRACE_NOISY,
 		   "URL security(4): Prohibited character(s) at %d [%c] in URL... rejecting request [%s]",
 		   len, workURL[len], workURL);
       free(workURL);
 
-      return((workURL[len] == ' ') ? -4 : 4);
+      return((c == ' ') ? -4 : 4);
     }
   }
 
@@ -1981,6 +1984,7 @@ static int checkURLsecurity(char *url) {
 
   /* BMS - allow cvs2html/diff/diff... */
   if (strncmp(url, "cvs2html/diff/diff", strlen("cvs2html/diff/diff")) == 0) {
+    free(workURL);
     return(0);
   }
 

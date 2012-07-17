@@ -4236,6 +4236,11 @@ void escape(char *dest, int destLen, char *src) {
     case ' ':
       dest[destIdx++] = '+';
       break;
+    case '\'':
+      dest[destIdx++] = '%';
+      dest[destIdx++] = '2';
+      dest[destIdx++] = '7';
+      break;
     default:
       dest[destIdx++] = src[srcIdx];
     }

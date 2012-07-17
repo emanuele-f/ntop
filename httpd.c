@@ -2684,7 +2684,7 @@ static int returnHTTPPage(char* pageName,
     char buf[64];
 
     sendHTTPHeader(FLAG_HTTP_TYPE_JSON, 0, 1);
-    printTrailer=0;
+    printTrailer = 0;
     unescape(buf, sizeof(buf), db_key);
     findHost(buf);
   } else if(strncasecmp(pageName, CONST_EDIT_PREFS, strlen(CONST_EDIT_PREFS)) == 0) {

@@ -1414,7 +1414,7 @@ void term_python(void) {
 
 int handlePythonHTTPRequest(char *url, u_int postLen) {
   int idx, found = 0;
-  char python_path[256], *document_root = strdup("."), buf[2048];
+  char python_path[256], *document_root = strdup("."), buf[2048], new_query_string[2048];
   struct stat statbuf;
 #ifdef WIN32
   PyObject *fd; 
@@ -1424,13 +1424,11 @@ int handlePythonHTTPRequest(char *url, u_int postLen) {
 
   char *question_mark = strchr(url, '?');
 
-
   if(myGlobals.runningPref.disablePython) {
     returnHTTPpageNotFound(NULL);
     free(document_root);
     return(1);
   }
-
 
   // traceEvent(CONST_TRACE_INFO, "Calling python... [%s]", url);
 
@@ -1497,21 +1495,25 @@ int handlePythonHTTPRequest(char *url, u_int postLen) {
 
     if(postLen == 0) {
       /* HTTP GET */
+      escape(new_query_string, sizeof(new_query_string), query_string);
+
       safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
 		    "import os\nos.environ['DOCUMENT_ROOT']='%s'\n"
 		    "os.environ['REQUEST_METHOD']='GET'\n"
 		    "os.environ['QUERY_STRING']='%s'\n",
-		    document_root, query_string);
+		    document_root, new_query_string);
     } else {
       /* HTTP POST */
 #if defined(WIN32)
       if((idx = readHTTPpostData(postLen, query_string, sizeof(query_string)-1)) >= 0) {
+	escape(new_query_string, sizeof(new_query_string), query_string);
+
 	/* Emulate a POST with a GET on Windows */
 	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
 		      "import os\nos.environ['DOCUMENT_ROOT']='%s'\n"
 		      "os.environ['REQUEST_METHOD']='GET'\n"
 		      "os.environ['QUERY_STRING']='%s'\n",
-		      document_root, query_string);
+		      document_root, new_query_string);
       }
 #else
       safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),

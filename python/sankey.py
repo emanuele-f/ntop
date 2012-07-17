@@ -46,9 +46,9 @@ class Flow:
 		self.maxhost = int(self.form.getvalue('maxhost', default=16))	# Massimo numero di host da vis...
 		self.source = self.form.getvalue('source')			#
 		self.target = self.form.getvalue('target')			#
-		self.hostselected = urllib2.unquote(self.form.getvalue('hostselected[]'))
+		self.hostselected = self.form.getvalue('hostselected[]')
 
-		if(not(self.hostselected == "")):
+		if(not((self.hostselected == "") or (self.hostselected == None))):
 			self.hostselected = urllib2.unquote(self.hostselected)
 		
 		# Performance tweaks
@@ -237,7 +237,7 @@ class Flow:
 					'layer7':[el for el in l7],
 					'layer7selected':[el for el in l7selected],
 					'hostlist':[el[0] for el in hostordinati[0:self.maxhost]],
-					'hostselected':self.hostselected}
+					'hostselected': urllib2.quote(self.hostselected) }
 
 		return self.json(nodes, links, metadata)
 

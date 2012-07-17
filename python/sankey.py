@@ -48,6 +48,9 @@ class Flow:
 		self.target = self.form.getvalue('target')			#
 		self.hostselected = urllib2.unquote(self.form.getvalue('hostselected[]'))
 
+		if(not(self.hostselected == "")):
+			self.hostselected = urllib2.unquote(self.hostselected)
+		
 		# Performance tweaks
 		archi = self.archi
 		sourceip = self.source

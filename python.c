@@ -1534,7 +1534,8 @@ int handlePythonHTTPRequest(char *url, u_int postLen) {
     /* if(myGlobals.runningPref.debugMode) */ /* -K */
     {
       /* Note that myGlobals.newSock is negative when HTTPS is used */
-      traceEvent(CONST_TRACE_INFO, "[PYTHON] Redirecting file descriptors");
+      if(myGlobals.runningPref.debugMode) 
+	traceEvent(CONST_TRACE_INFO, "[PYTHON] Redirecting file descriptors");
 
       old_stdin = dup(STDIN_FILENO), old_stdout = dup(STDOUT_FILENO);
 
@@ -1568,7 +1569,8 @@ int handlePythonHTTPRequest(char *url, u_int postLen) {
       if(dup2(old_stdout, STDIN_FILENO) == -1)
 	traceEvent(CONST_TRACE_WARNING, "Failed to restore stdout");
       
-      traceEvent(CONST_TRACE_INFO, "[PYTHON] Succesfully restored file descriptors");
+      if(myGlobals.runningPref.debugMode) 
+	traceEvent(CONST_TRACE_INFO, "[PYTHON] Succesfully restored file descriptors");
     }
 #endif
 

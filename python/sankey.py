@@ -29,6 +29,7 @@ import sys, time, socket
 from operator import itemgetter, attrgetter
 # ntop interface
 import interface
+import ntop
 
 class Flow:
 	def __init__(self):
@@ -311,10 +312,10 @@ class Flow:
 
 flows = Flow()
 
-print "HTTP/1.1 200 OK"
-print "Content-type: application/json; charset=UTF-8"
-print										# End of headers
-print flows.getjsondata()
+ntop.sendString("HTTP/1.1 200 OK\r\n")
+ntop.sendString("Content-type: application/json; charset=UTF-8\r\n")
+ntop.sendString("\r\n");
+ntop.sendString(flows.getjsondata());
 
 '''_____________________________________________________________________________________________________
 

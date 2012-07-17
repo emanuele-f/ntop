@@ -3,7 +3,7 @@
 	<tr>
 		<td id="chart"></td>
 		<td>
-			<form action="/python/sankey.py" autocomplete="off" method=post id="update-graph">
+			<form action="/python/sankey.py" autocomplete="off" method=get id="update-graph">
 				<input type="hidden" name="zoom" value="0"/>
 				<fieldset id="tophost">
 					<legend>Top Host</legend>
@@ -133,7 +133,7 @@
 		);
 
 	function getdata(formdata){
-		$.post(url, formdata, function(flows){ draw(flows); doform(flows.metadata); }, "json")
+		$.get(url, formdata, function(flows){ draw(flows); doform(flows.metadata); }, "json")
 			.error(function() { /* alert("Error on retriving json data.") */; })
 	}
 

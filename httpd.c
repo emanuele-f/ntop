@@ -1966,11 +1966,14 @@ static int checkURLsecurity(char *url) {
     } /* for */
 
     if(!found) {
-      traceEvent(CONST_TRACE_NOISY,
-		 "URL security(4): Prohibited character(s) at %d [%c] in URL... rejecting request [%s]",
-		 len, workURL[len], workURL);
+      
+      if(workURL[len] != ' ')
+	traceEvent(CONST_TRACE_NOISY,
+		   "URL security(4): Prohibited character(s) at %d [%c] in URL... rejecting request [%s]",
+		   len, workURL[len], workURL);
       free(workURL);
-      return(4);
+
+      return((workURL[len] == ' ') ? -4 : 4);
     }
   }
 
@@ -3550,7 +3553,7 @@ void handleHTTPrequest(HostAddr from) {
 
   requestedURLCopy = strdup(requestedURL);
 
-  if((rc = checkURLsecurity(requestedURLCopy)) != 0) {
+  if((rc = checkURLsecurity(requestedURLCopy)) > 0) {
     traceEvent(CONST_TRACE_ERROR, "URL security: '%s' rejected (code=%d)(client=%s)",
 	       requestedURL, rc, _addrtostr(&from, tmpStr, sizeof(tmpStr)));
 

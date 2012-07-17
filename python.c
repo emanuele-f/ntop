@@ -773,27 +773,21 @@ static PyObject* python_dumpHostRawFlows(PyObject *self, PyObject *args) {
 
   /* ****************************** */
 
-  traceEvent(CONST_TRACE_WARNING, "python_dumpHostRawFlows(%d)", 0);
-
   if( (!PyArg_ParseTuple(args, "s", &host)) && 
-		(!PyArg_ParseTuple(args, "i", &host)) ) return(ret);
+      (!PyArg_ParseTuple(args, "i", &host)) ) return(ret);
 
   if(host == NULL) return(ret);
 
-  traceEvent(CONST_TRACE_WARNING, "python_dumpHostRawFlows(%s) [%d]", host, 1);
-
   for(el = getFirstHost(myGlobals.actualReportDeviceId); 
       el != NULL; el = getNextHost(myGlobals.actualReportDeviceId, el)) {
-		if ((strcmp(el->hostNumIpAddress, host) == 0) ||
-			 (strcmp(el->hostResolvedName, host) == 0)) {
-				found = 1;
-				break;
-		}
-	} /* for */
+    if ((strcmp(el->hostNumIpAddress, host) == 0) ||
+	(strcmp(el->hostResolvedName, host) == 0)) {
+      found = 1;
+      break;
+    }
+  } /* for */
 
   if(!found) return(ret);
-
-  traceEvent(CONST_TRACE_WARNING, "python_dumpHostRawFlows(%s) [%d]", host, 2);
 
   for(idx=0; idx<MAX_TOT_NUM_SESSIONS; idx++) {
     int mutex_idx;
@@ -807,8 +801,10 @@ static PyObject* python_dumpHostRawFlows(PyObject *self, PyObject *args) {
       while(session != NULL) {
 	if((session->initiator->magic != CONST_MAGIC_NUMBER)
 	   || (session->remotePeer->magic != CONST_MAGIC_NUMBER)) {
+#if 0
 	  traceEvent(CONST_TRACE_WARNING, "Session with expired peer (%d/%d)",
 		     session->initiator->magic, session->remotePeer->magic);
+#endif
 	  session = session->next;
 	  continue;
 	}
@@ -833,7 +829,6 @@ static PyObject* python_dumpHostRawFlows(PyObject *self, PyObject *args) {
 		      proto2name(session->proto),
 		      getProtoName(session->proto, session->l7.major_proto));
 
-	traceEvent(CONST_TRACE_WARNING, "python_dumpHostRawFlows(%s) [%s]", host, buf);
 	PyList_Append(ret, PyString_FromString(buf));
 
 	session = session->next;
@@ -1531,14 +1526,14 @@ int handlePythonHTTPRequest(char *url, u_int postLen) {
     /* See http://bugs.python.org/issue1159 */
     PyRun_SimpleString(buf);
 
-    /* traceEvent(CONST_TRACE_INFO, "[PYTHON] Executing %s", buf); */
+    traceEvent(CONST_TRACE_INFO, "[PYTHON] Executing %s", buf);
     /* sys.stdin <=> myGlobals.newSock */
 
 #ifndef WIN32
     /* if(myGlobals.runningPref.debugMode) */ /* -K */
     {
       /* Note that myGlobals.newSock is negative when HTTPS is used */
-      traceEvent(CONST_TRACE_INFO, "[PYTHON] Redirecting file descriptors [%d]", myGlobals.newSock);
+      traceEvent(CONST_TRACE_INFO, "[PYTHON] Redirecting file descriptors");
 
       old_stdin = dup(STDIN_FILENO), old_stdout = dup(STDOUT_FILENO);
 
@@ -1550,7 +1545,7 @@ int handlePythonHTTPRequest(char *url, u_int postLen) {
       if(dup2(abs(myGlobals.newSock), STDOUT_FILENO) == -1)
 	traceEvent(CONST_TRACE_WARNING, "Failed to redirect stdout [%d][%s]", errno, strerror(errno));
 
-	 if(dup2(abs(myGlobals.newSock), STDIN_FILENO) == -1)
+      if(dup2(abs(myGlobals.newSock), STDIN_FILENO) == -1)
 	traceEvent(CONST_TRACE_WARNING, "Failed to redirect stdin [%d][%s]",errno, strerror(errno));
     }
 #endif

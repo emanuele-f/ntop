@@ -37,6 +37,9 @@
 #endif
 
 
+#ifndef LINE_MAX
+#define LINE_MAX 256
+#endif
 
 /* Used for HTML tables */
 #define BASE_PROTOS_IDX  30

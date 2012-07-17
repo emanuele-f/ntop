@@ -297,7 +297,7 @@ static PyObject* python_rrd_fetch(PyObject *self, PyObject *args) {
     unsigned long i, j, row;
     rrd_value_t dv;
 
-    row = (end - start) / step;
+    row = (unsigned long)((end - start) / step);
 
     r = PyTuple_New(3);
     range_tup = PyTuple_New(3);
@@ -799,6 +799,8 @@ static PyObject* python_dumpHostRawFlows(PyObject *self, PyObject *args) {
       IPSession *session = myGlobals.device[myGlobals.actualReportDeviceId].sessions[idx];
 
       while(session != NULL) {
+	char *symProto, *l7Proto;
+	
 	if((session->initiator->magic != CONST_MAGIC_NUMBER)
 	   || (session->remotePeer->magic != CONST_MAGIC_NUMBER)) {
 #if 0
@@ -821,13 +823,14 @@ static PyObject* python_dumpHostRawFlows(PyObject *self, PyObject *args) {
 	  continue;
 	}
 
+	symProto = proto2name(session->proto);
+	l7Proto = getProtoName(session->proto, session->l7.major_proto);
+
 	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		      "%s|%s|%u|%u|%s|%s\n",
+		      "%s|%s|%llu|%llu|%s|%s\n",
 		      (session->initiator->hostResolvedName[0] != '\0') ? session->initiator->hostResolvedName :session->initiator->hostNumIpAddress, 
 		      (session->remotePeer->hostNumIpAddress[0] != '\0') ? session->remotePeer->hostResolvedName : session->remotePeer->hostNumIpAddress,
-		      session->bytesSent.value, session->bytesRcvd.value,
-		      proto2name(session->proto),
-		      getProtoName(session->proto, session->l7.major_proto));
+		      session->bytesSent.value, session->bytesRcvd.value, symProto, l7Proto);
 
 	PyList_Append(ret, PyString_FromString(buf));
 
@@ -1003,7 +1006,9 @@ static PyObject* python_interface_numHosts(PyObject *self, PyObject *args) {
 
 static PyObject* python_interface_ipv6Address(PyObject *self, PyObject *args) {
   u_int interfaceId;
+#ifdef INET6
   char buf[64];
+#endif
 
   if(!PyArg_ParseTuple(args, "i", &interfaceId)) return NULL;
   if(interfaceId >= myGlobals.numDevices) return NULL;

@@ -23,15 +23,15 @@
 
 #define MAX_NUM_MAP_HOSTS 5120
 
-
-const char *map_head = "<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?sensor=false";
-const char *map_head2 = "\"></script>\n    <script type=\"text/javascript\"><!--\n\n    function load_map() { \n";
+/* style=\"width: 800px; height: 600px\" */
+const char *map_head = "<style type=\"text/css\">\n#map {\n  width: 600px;\n  height: 500px;\n  margin: 2em auto;\n}\n</style>\n\n<div id=\"map\" ></div>\n\n";
+const char *map_head2 = "<script type=\"text/javascript\">\n\n    function load_map() { \n";
 const char *map_head3 = " addReflections();\n";
 const char *map_head4 = " \n function createMarker(point,html) { \n var infowindow = new google.maps.InfoWindow({ \n content: html \n }); \n var marker = new google.maps.Marker({ \n position: point \n }); \n google.maps.event.addListener(marker, \"click\", function() { \n infowindow.open(map,marker); \n }); \n marker.setMap(map); \n } \n \n var myOptions = { \n zoom: 2, \n center: new google.maps.LatLng(43.72, 10.40), \n panControl: true, \n zoomControl: true, \n scaleControl: true, \n mapTypeId: google.maps.MapTypeId.ROADMAP \n };\n \n var map = new google.maps.Map(document.getElementById(\"map\"),myOptions); \n";
 
-const char *map_tail = "\n      }\n\n        --></script>\n  </head>\n  <body onload=\"load_map()\">\n    <center><div id=\"map\" style=\"width: 800px; height: 600px\"></div></center>\n\n";
+const char *map_tail = "\n      }\n\n        </script>\n  </head>\n  <body onload=\"load_map()\">\n \n\n";
 
-const char *map_tail2 = "\n      }\n\n        --></script>\n <div id=\"map\" style=\"width: 800px; height: 600px\"></div>\n<script type=\"text/javascript\">\nload_map();\n</script>\n";
+const char *map_tail2 = "\n      }\n\n        </script>\n<script type=\"text/javascript\">\nload_map();\n</script>\n";
 
 /* ******************************************** */
 

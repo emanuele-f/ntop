@@ -230,7 +230,7 @@ void printTableEntryPercentage(char *buf, int bufLen,
   switch(int_perc) {
   case 0:
     if(total == -1) {
-      safe_snprintf(__FILE__, __LINE__, buf, bufLen, 
+      safe_snprintf(__FILE__, __LINE__, buf, bufLen,
 		    "\n<TR %s><TH "TH_BG" ALIGN=LEFT "DARK_BG">%s</TH>"
 		    "<TD "TD_BG">\n<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=\"100%%\">"
 		    "\n<TR>"
@@ -242,7 +242,7 @@ void printTableEntryPercentage(char *buf, int bufLen,
 		    getRowColor(), label, CONST_COLOR_1, flowBuf, /* label_1, */
 		    CONST_COLOR_2, CONST_COLOR_2, label_2);
     } else {
-      safe_snprintf(__FILE__, __LINE__, buf, bufLen, 
+      safe_snprintf(__FILE__, __LINE__, buf, bufLen,
 		    "\n<TR %s><TH "TH_BG" ALIGN=LEFT "DARK_BG">%s</TH>"
 		    "<TD "TD_BG" ALIGN=RIGHT>%s %s</TD>"
 		    "<TD "TD_BG">\n<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=\"100%%\">"
@@ -595,7 +595,7 @@ void printHeader(int reportType, int revertOrder, u_int column,
     sendString(buf);
     sendString("</TD></TR>\n</TABLE></CENTER><p>");
   }
-  
+
   switch(reportType) {
   case SORT_DATA_RECEIVED_PROTOS:
   case SORT_DATA_SENT_PROTOS:
@@ -649,12 +649,12 @@ void printHeader(int reportType, int revertOrder, u_int column,
 	arrow[BASE_PROTOS_IDX+idx] = "";
 	theAnchor[BASE_PROTOS_IDX+idx] = htmlAnchor1;
       }
-      
+
       safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TH "TH_BG">%s%d\">%s%s</A></TH>",
 		    theAnchor[BASE_PROTOS_IDX+idx], BASE_PROTOS_IDX+idx,
 		    protoList->protocolName, arrow[BASE_PROTOS_IDX+idx]);
       sendString(buf);
-      
+
       idx++, protoList = protoList->next;
     }
 
@@ -682,7 +682,7 @@ void printHeader(int reportType, int revertOrder, u_int column,
       arrow[0] = "";
       theAnchor[0] = htmlAnchor1;
     }
-   
+
 
     for(i=0; i<myGlobals.l7.numSupportedProtocols; i++) {
       if(myGlobals.device[myGlobals.actualReportDeviceId].l7.protoTraffic[i] > 0) {
@@ -1059,7 +1059,7 @@ int cmpFctn(const void *_a, const void *_b) {
   Counter a_=0, b_=0;
   float fa_=0, fb_=0;
   short floatCompare = 0, columnProtoId;
-  
+
   if((a == NULL) && (b != NULL)) {
     traceEvent(CONST_TRACE_WARNING, "cmpFctn() error (1)");
     return(1);
@@ -1180,7 +1180,7 @@ int cmpFctn(const void *_a, const void *_b) {
 	a_ = b_ = 0;
       } else {
 	a_ = (*a)->l7.traffic[columnProtoId-1].bytesRcvd;
-	b_ = (*b)->l7.traffic[columnProtoId-1].bytesRcvd;	
+	b_ = (*b)->l7.traffic[columnProtoId-1].bytesRcvd;
       }
     } else {
       a_ = (*a)->ipv4BytesRcvd.value, b_ = (*b)->ipv4BytesRcvd.value;
@@ -1693,14 +1693,14 @@ int printPacketStats(HostTraffic *el, int actualDeviceId) {
 	+el->secHostPkts->finPushUrgPktsSent.value.value+el->secHostPkts->finPushUrgPktsRcvd.value.value
 	+el->secHostPkts->nullPktsSent.value.value+el->secHostPkts->nullPktsRcvd.value.value) > 0) {
 
-      if(!headerSent) { 
-	sendString(tableHeader); 
-	headerSent = 1; 
+      if(!headerSent) {
+	sendString(tableHeader);
+	headerSent = 1;
 
 	sendString("<CENTER>\n"TABLE_ON"<TABLE BORDER=1 "TABLE_DEFAULTS" WIDTH=100%>");
 	sendString("<TR "TR_ON" "DARK_BG"><TH "TH_BG">TCP Flags</TH>"
 		   "<TH "TH_BG" COLSPAN=2>Pkts&nbsp;Sent</TH>"
-		   "<TH "TH_BG" COLSPAN=2>Pkts&nbsp;Rcvd</TH></TR>\n\n");	
+		   "<TH "TH_BG" COLSPAN=2>Pkts&nbsp;Rcvd</TH></TR>\n\n");
       }
 
       if((el->secHostPkts->synPktsSent.value.value+el->secHostPkts->synPktsRcvd.value.value) > 0) {
@@ -1786,9 +1786,9 @@ int printPacketStats(HostTraffic *el, int actualDeviceId) {
 	 ) > 0)) {
 
       if(!headerSent) {
-	sendString(tableHeader); 
-	headerSent = 1; 
-	
+	sendString(tableHeader);
+	headerSent = 1;
+
 	sendString("<CENTER>\n"TABLE_ON"<TABLE BORDER=1 "TABLE_DEFAULTS" WIDTH=100%>");
 	sendString("<TR "TR_ON" "DARK_BG"><TH "TH_BG">Anomaly</TH>"
 		   "<TH "TH_BG" COLSPAN=2>Pkts&nbsp;Sent&nbsp;to</TH>"
@@ -1928,10 +1928,10 @@ int printPacketStats(HostTraffic *el, int actualDeviceId) {
     }
   }
 
-  if(headerSent) { 
+  if(headerSent) {
     sendString("</TABLE>"TABLE_OFF"<P>\n");
     sendString("</CENTER>\n");
-    sendString("</TD></TR>\n</TABLE>"TABLE_OFF"</CENTER>"); 
+    sendString("</TD></TR>\n</TABLE>"TABLE_OFF"</CENTER>");
     rc = 1;
   }
 
@@ -1946,16 +1946,16 @@ int printPacketStats(HostTraffic *el, int actualDeviceId) {
 	sendString("<TR "TR_ON" "DARK_BG">"
 		   "<TH "TH_BG">ARP</TH>"
 		   "<TH "TH_BG">Packets</TH>"
-		   "</TR>\n\n");       
+		   "</TR>\n\n");
 
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
 		    "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT>Request Sent</TH>"
 		    "<TD "TD_BG" ALIGN=RIGHT>%s</TD></TR>\n",
 		    getRowColor(),
 		    formatPkts(el->nonIPTraffic->arpReqPktsSent.value, formatBuf, sizeof(formatBuf)));
       sendString(buf);
 
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
 		    "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT>Reply Rcvd</TH>"
 		    "<TD "TD_BG" ALIGN=RIGHT>%s (%.1f %%)</TD></TR>\n",
 		    getRowColor(),
@@ -1994,7 +1994,7 @@ void hostReport(int idx, char *hostName, int vlanId, int sortedColumn) {
     if((el != myGlobals.broadcastEntry)
        && (el->hostNumIpAddress != NULL)
        && ((el->vlanId <= 0) || (el->vlanId == vlanId))
-       && ((strcmp(el->hostNumIpAddress, hostName) == 0)		   
+       && ((strcmp(el->hostNumIpAddress, hostName) == 0)
 	   || (strcmp(el->ethAddressString, hostName) == 0))) {
       break;
     }
@@ -2027,7 +2027,7 @@ void hostReport(int idx, char *hostName, int vlanId, int sortedColumn) {
 	createHostMap(el);
 	break;
       }
-    }       
+    }
   }
 }
 
@@ -2299,7 +2299,7 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
   }
 
   if(el->secHostPkts || el->nonIPTraffic) {
-    sendString("\n\n<!------ DIV ------>\n");  
+    sendString("\n\n<!------ DIV ------>\n");
     sendString("\n\n<div id=\"tabs-22\">\n");
     if(printPacketStats(el, actualDeviceId) == 0)
       sendString("\n<i>"CONST_NO_DATA_YET"</i>");
@@ -2311,7 +2311,7 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
     return;
   */
 
-  sendString("\n\n<!------ DIV ------>\n");  
+  sendString("\n\n<!------ DIV ------>\n");
   sendString("\n\n<div id=\"tabs-23\">\n");
 
   sendString("<CENTER>\n"
@@ -2431,7 +2431,7 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
       Counter sent, rcvd;
       int headerAlreadySent;
 
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), 
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
 		    "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT "DARK_BG">Protocol Distribution</TH>",
 		    getRowColor());
       sendString(buf);
@@ -2461,7 +2461,7 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
       }
 
       sendString("</TD></TR>\n");
-      
+
       sent = rcvd = 0;
       headerAlreadySent = 0;
 
@@ -2478,8 +2478,8 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
 	    headerAlreadySent = 1;
 	  }
 
-	  printTableDoubleEntry(buf, sizeof(buf), 
-				getProtoName(0, i), CONST_COLOR_1, 
+	  printTableDoubleEntry(buf, sizeof(buf),
+				getProtoName(0, i), CONST_COLOR_1,
 				(float)el->l7.traffic[i].bytesSent/1024,
 				100*((float)SD(el->l7.traffic[i].bytesSent, sent)),
 				(float)el->l7.traffic[i].bytesRcvd/1024,
@@ -2507,7 +2507,7 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
 	} else
 	  sendString("<TD "TD_BG" COLSPAN=2 WIDTH=250>&nbsp;</TD>");
 
-	sendString("</TR>\n");	
+	sendString("</TR>\n");
       }
     }
   }
@@ -3584,6 +3584,32 @@ void printHostDetailedInfo(HostTraffic *el, int actualDeviceId) {
 		  myGlobals.separator /* it avoids empty cells not to be rendered */);
       sendString(buf);
     }
+
+    {
+      char linkName[256], vlanStr[32];
+
+      if(el->hostNumIpAddress[0] != '\0') {
+	strncpy(linkName, el->hostNumIpAddress, sizeof(linkName));
+      } else {
+	strncpy(linkName, el->ethAddressString, sizeof(linkName));
+      }
+    
+      /* For Ethernet and IPv6 addresses */
+      urlFixupToRFC1945Inplace(linkName);
+    
+      if(el->vlanId > 0) {
+	safe_snprintf(__FILE__, __LINE__, vlanStr, sizeof(vlanStr), "-%d", el->vlanId);
+      } else
+	vlanStr[0] = '\0';
+
+      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT "DARK_BG">%s</TH><TD "TD_BG" ALIGN=RIGHT><A href=\"#\" onclick=\"window.open(\'/%s-%s%s%s',"
+		    " \'Contacts Map\', \'height=530, width=750,toolbar=nodirectories=no,status=no,menubar=no,scrollbars=no,resizable=no\'); return false;\">Map <IMG SRC=\"/Google_Maps_Marker.png\" BORDER=0></A>",
+		    getRowColor(), "Contacts&nbsp;Map",
+		    CONST_HOST_IP_MAP_HTML, linkName, vlanStr, CHART_FORMAT);
+      sendString(buf);
+    }
+
+    sendString("</TD></TR>\n\n");
   }
 
   if((as = getHostAS(el)) != 0) {
@@ -4103,9 +4129,9 @@ void printTableEntry(char *buf, int bufLen,
 
   if(showRRD && (rrdBuf[0] != '\0')) {
     int_perc = 0; /* Trick for avoid showing the bar */
-  } 
+  }
 
-  
+
   switch(int_perc) {
   case 0:
     safe_snprintf(__FILE__, __LINE__, buf, bufLen, "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT WIDTH=150 "DARK_BG">%s</TH>"
@@ -4131,11 +4157,11 @@ void printTableEntry(char *buf, int bufLen,
 		  flowBuf, percentage,
 		  percentage, (260*int_perc)/100, rrdBuf,
 		  (260*(100-int_perc))/100, getActualRowColor());
-  }  
+  }
 
   sendString(buf);
 }
- 
+
 /* *********************************** */
 
 void printHostHourlyTrafficEntry(HostTraffic *el, int i,
@@ -4143,7 +4169,7 @@ void printHostHourlyTrafficEntry(HostTraffic *el, int i,
   float pctg;
   char buf[LEN_GENERAL_WORK_BUFFER], formatBuf[32];
 
-  if(el->trafficDistribution == NULL) 
+  if(el->trafficDistribution == NULL)
     return;
 
   safe_snprintf(__FILE__, __LINE__, buf, LEN_GENERAL_WORK_BUFFER, "<TD "TD_BG" ALIGN=RIGHT>%s</TD>",

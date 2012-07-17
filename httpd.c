@@ -291,10 +291,12 @@ static int readHTTPheader(char* theRequestedURL,
 	}
 	numLine++;
 	lineStr[idxChar] = '\0';
+
 #ifdef URL_DEBUG
 	traceEvent(CONST_TRACE_INFO, "URL_DEBUG: read HTTP %s line: %s [%d]",
 	           (numLine>1) ? "header" : "request", lineStr, idxChar);
 #endif
+
 	if(errorCode != 0) {
 	  ;  /* skip parsing after an error was detected */
 	} else if(numLine == 1) {
@@ -1247,7 +1249,7 @@ void sendJSLibraries(int graph_mode) {
     sendString("<script type=\"text/javascript\" src=\"/jquery-ui-1.8.16.custom.min.js\"></script>\n");    
     //  }
 
-  sendString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?sensor=false\"></script>\n");
+  sendString("<script type=\"text/javascript\" src=\"http://maps.google.com/maps/api/js?sensor=false\"></script>\n");
 }
 
 /* ************************* */
@@ -3043,7 +3045,12 @@ static int returnHTTPPage(char* pageName,
 	  if(el->community && (!isAllowedCommunity(el->community))) {
 	    returnHTTPpageBadCommunity();
 	  } else {
-	    sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 0);
+	    sendHTTPHeader(FLAG_HTTP_TYPE_HTML, 0, 1);
+
+	    safe_snprintf (__FILE__, __LINE__, tmpStr, sizeof (tmpStr),
+			   "Contacts Map for Host %s", hostName);
+
+	    printHTMLheader(tmpStr, NULL, BITFLAG_HTML_NO_BODY);
 	    createHostMap(el);
 	  }
 	}

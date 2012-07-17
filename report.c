@@ -3363,13 +3363,6 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
   } else
     vlanStr[0] = '\0';
 
-  if(el->hostNumIpAddress[0] != '\0') {
-    safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		  "<li><a href=\"/%s-%s%s%s\"><span>Contacts Map</span></a></li>\n",
-		  CONST_HOST_IP_MAP_HTML, linkName, vlanStr, CHART_FORMAT);
-    sendString(buf);
-  }
-
   sendString("</ul>\n");
 
   if(have_sessions) {

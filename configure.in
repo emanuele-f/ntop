@@ -509,7 +509,11 @@ AC_TRY_COMPILE( ,
 dnl> add pic flag in any case this makes sure all our code is relocatable
 case "${target}:${CC}" in
     *-*-darwin*:* )
-        CFLAGS="$CFLAGS "`grep pic_flag= /usr/bin/glibtool | head -n1 | sed -e 's/.*pic_flag=//' -e 's/"//g'`
+        if test -f /usr/bin/glibtool; then
+	        CFLAGS="$CFLAGS "`grep pic_flag= /usr/bin/glibtool | head -n1 | sed -e 's/.*pic_flag=//' -e 's/"//g'`
+	else
+	        CFLAGS="$CFLAGS "`grep pic_flag= /usr/bin/libtool | head -n1 | sed -e 's/.*pic_flag=//' -e 's/"//g'`
+	fi
         ;;
     * )
         CFLAGS="$CFLAGS "`grep pic_flag= libtool | head -n1 | sed -e 's/.*pic_flag=//' -e 's/"//g'`
@@ -1987,11 +1991,17 @@ echo "#endif /* MEMORY_DEBUG */" >> version.c
 
 case "${host}" in
     *darwin* )
-        echo
-	echo "Copying patched versions of some configure-related files for Mac OS X"
-        cp packages/MacOSX/lt* .
-	rm -f libtool
-	ln -s  /usr/bin/glibtool libtool
+	if test -f /usr/bin/glibtool; then
+		ln -s  /usr/bin/glibtool libtool
+		echo
+		echo "Copying patched versions of some configure-related files for Mac OS X"
+        	cp packages/MacOSX/lt* .
+		rm -f libtool
+	else
+		if test -f /usr/bin/libtool; then
+			ln -s  /usr/bin/libtool libtool
+		fi 		
+	fi
         echo
         ;;
 	*)
@@ -2001,6 +2011,12 @@ case "${host}" in
 	   ln -s ${LIBTOOL_PATH} libtool
 	fi
 esac
+
+cat acinclude.m4.ntop >acinclude.m4
+
+if test -f libtool.m4.in; then
+   cat libtool.m4.in >> acinclude.m4
+fi
 
 echo
 echo "==================================================================="

@@ -687,15 +687,6 @@ if test ".${ac_cv_header_gdbm_h}" != ".yes" ||
     AC_MSG_ERROR(Unable to continue... aborting ./configure)
 fi
 
-dnl> FastBit
-AC_CHECK_HEADERS([capi.h])
- if test "x$ac_cv_header_capi_h" = "xyes"; then
-  AC_CHECK_LIB([fastbit], [fastbit_init])
-  if test "x$ac_cv_lib_fastbit_fastbit_init" = "xyes"; then
-    AC_DEFINE_UNQUOTED(HAVE_FASTBIT, 1, [use fastbit])
- fi
-fi
-
 dnl> nDPI based on OpenDPI (https://code.google.com/p/opendpi/)
 NDPI_LIB=./nDPI/src/lib/.libs/libndpi.a
 NDPI_INC=./nDPI/src/include/

@@ -167,7 +167,7 @@ void initNtopGlobals(int argc, char * argv[], int argc_started, char *argv_start
   myGlobals.checkVersionStatusAgain = 1;
 
   /* Other flags (to be set via command line options one day) */
-  myGlobals.enableFragmentHandling = 1;
+  myGlobals.enableFragmentHandling = 0;
 
   /* Search paths */
   myGlobals.dataFileDirs    = _dataFileDirs;

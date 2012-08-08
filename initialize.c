@@ -92,7 +92,7 @@ static void setDomainName(void) {
   while((len > 0) && (myGlobals.runningPref.domainName[len] != '.'))
     len--;
 
-  if((len > 0) 
+  if((len > 0)
      && ((len+1) <  strlen(myGlobals.runningPref.domainName)))
     myGlobals.shortDomainName = strdup(&myGlobals.runningPref.domainName[len+1]);
   else
@@ -305,12 +305,12 @@ void resetDevice(int devIdx, short fullReset) {
     if(myGlobals.device[devIdx].netflowGlobals != NULL)
       free(myGlobals.device[devIdx].netflowGlobals);
     myGlobals.device[devIdx].netflowGlobals = NULL;
-    
+
     if(myGlobals.device[devIdx].sflowGlobals != NULL)
       free(myGlobals.device[devIdx].sflowGlobals);
     myGlobals.device[devIdx].sflowGlobals = NULL;
   }
-  
+
   len = (int)(myGlobals.numIpProtosToMonitor*sizeof(SimpleProtoTrafficInfo));
 
   if(myGlobals.device[devIdx].ipProtosList != NULL) {
@@ -355,18 +355,16 @@ void initCounters(void) {
     if(myGlobals.runningPref.enableSessionHandling) {
       myGlobals.device[i].sessions = (IPSession**)calloc(sizeof(IPSession*), MAX_TOT_NUM_SESSIONS);
     } else
-      myGlobals.device[i].sessions = NULL;    
-
-    myGlobals.device[i].fragmentList = NULL;
+      myGlobals.device[i].sessions = NULL;
   }
 
   myGlobals.hashCollisionsLookup = 0;
 
   if(myGlobals.pcap_file_list == NULL)
-    myGlobals.initialSniffTime = myGlobals.lastRefreshTime = time(NULL);  
+    myGlobals.initialSniffTime = myGlobals.lastRefreshTime = time(NULL);
   else
     myGlobals.initialSniffTime = 0; /* We set the start when first pkt is
-                                       * read */  
+                                       * read */
 
 /* TODO why here AND in globals-core.c? */
   myGlobals.numHandledSIGPIPEerrors = 0;
@@ -413,7 +411,7 @@ void resetStats(int deviceId) {
 	freeHostInfo(el, deviceId);
 	if(elNext) lockExclusiveHostsHashMutex(elNext, "resetStats");
       } else {
-	if(!elNext) 
+	if(!elNext)
 	  unlockExclusiveHostsHashMutex(el);
       }
 
@@ -432,7 +430,7 @@ void resetStats(int deviceId) {
 	myGlobals.device[deviceId].sessions[j] = NULL;
       }
   }
-  
+
   myGlobals.device[deviceId].hosts.hash_hostTraffic[BROADCAST_HOSTS_ENTRY] = myGlobals.broadcastEntry;
   myGlobals.broadcastEntry->hostSerial.serialType = SERIAL_IPV4;
   myGlobals.broadcastEntry->hostSerial.value.ipSerial.ipAddress.Ip4Address.s_addr = -1;
@@ -463,11 +461,11 @@ void initSingleGdbm(GDBM_FILE *database,
 
   /* Courtesy of Andreas Pfaller <apfaller@yahoo.com.au>. */
   memset(&tmpBuf, 0, sizeof(tmpBuf));
- 
+
 #ifdef WIN32
   {
     unsigned long driveSerial;
-  
+
     get_serial(&driveSerial);
 
     safe_snprintf(__FILE__, __LINE__, tmpBuf, sizeof(tmpBuf), "%s/%u",
@@ -618,7 +616,7 @@ void initThreads(void) {
 
   if(myGlobals.runningPref.numericFlag != noDnsResolution) {
     createMutex(&myGlobals.addressResolutionMutex);
- 
+
 #if defined(HAVE_GETHOSTBYADDR_R)
     myGlobals.numDequeueAddressThreads = MAX_NUM_DEQUEUE_ADDRESS_THREADS;
 #else
@@ -626,10 +624,10 @@ void initThreads(void) {
 #endif
 
     initAddressResolution();
-   
+
     /*
      * Create the thread (5) - DNSAR - DNS Address Resolution - optional
-     */  
+     */
     for(i=0; i<myGlobals.numDequeueAddressThreads; i++) {
       createThread(&myGlobals.dequeueAddressThreadId[i], dequeueAddress, (char*)((long)i));
       traceEvent(CONST_TRACE_INFO, "THREADMGMT[t%lu]: DNSAR(%d): Started thread for DNS address resolution",
@@ -651,12 +649,12 @@ void initApps(void) {
 void initDeviceSemaphores(int deviceId) {
   traceEvent(CONST_TRACE_INFO, "Initializing device %s (%d)",
 	     myGlobals.device[deviceId].name, deviceId);
-    
+
   createMutex(&myGlobals.device[deviceId].counterMutex);
   createMutex(&myGlobals.device[deviceId].asMutex);
   createMutex(&myGlobals.device[deviceId].packetProcessMutex);
   createMutex(&myGlobals.device[deviceId].packetQueueMutex);
-  if(myGlobals.device[deviceId].packetQueue) 
+  if(myGlobals.device[deviceId].packetQueue)
     memset(myGlobals.device[deviceId].packetQueue, 0,
 	   sizeof(PacketInformation) * (CONST_PACKET_QUEUE_LENGTH+1));
   myGlobals.device[deviceId].packetQueueLen           = 0;
@@ -671,11 +669,11 @@ void initDeviceSemaphores(int deviceId) {
 
 void allocDeviceMemory(int deviceId) {
   if(!myGlobals.device[deviceId].ipPorts)
-    myGlobals.device[deviceId].ipPorts = 
+    myGlobals.device[deviceId].ipPorts =
       (PortCounter**)calloc(sizeof(PortCounter*), MAX_IP_PORT);
-  
+
   if(!myGlobals.device[deviceId].packetQueue)
-    myGlobals.device[deviceId].packetQueue = 
+    myGlobals.device[deviceId].packetQueue =
       (PacketInformation*)calloc(sizeof(PacketInformation), (CONST_PACKET_QUEUE_LENGTH+1));
 
   initL7DeviceDiscovery(deviceId);
@@ -792,12 +790,12 @@ void addDevice(char* deviceName, char* deviceDescr) {
     }
 #endif
 
-    
+
     myGlobals.device[deviceId].pcapPtr =
       pcap_open_live(myGlobals.device[deviceId].name,
 		     MAX_PACKET_LEN,
 		     myGlobals.runningPref.disablePromiscuousMode == 1 ? 0 : 1,
-		     1000 /* ms */, ebuf);    
+		     1000 /* ms */, ebuf);
 
       if(myGlobals.device[deviceId].pcapPtr == NULL) {
 	traceEvent(CONST_TRACE_ERROR, "pcap_open_live(): '%s'", ebuf);
@@ -919,12 +917,12 @@ void addDevice(char* deviceName, char* deviceDescr) {
   #ifdef INET6
   if(!(myGlobals.device[deviceId].dummyDevice || myGlobals.device[deviceId].virtualDevice)) {
     u_int8_t netmask_v6;
-    
+
     getLocalHostAddress(&myGlobals.device[deviceId].ifAddr, &netmask_v6, myGlobals.device[deviceId].name);
     myGlobals.device[deviceId].v6Addrs = getLocalHostAddressv6(myGlobals.device[deviceId].v6Addrs, myGlobals.device[deviceId].name);
 	if(myGlobals.device[deviceId].network.s_addr == 0) {
 		myGlobals.device[deviceId].netmask.s_addr = 0xFFFFFF00;/* /24 */
-		myGlobals.device[deviceId].network.s_addr = myGlobals.device[deviceId].ifAddr.s_addr 
+		myGlobals.device[deviceId].network.s_addr = myGlobals.device[deviceId].ifAddr.s_addr
 		  & myGlobals.device[deviceId].netmask.s_addr;
 	}
   }
@@ -945,8 +943,8 @@ void addDevice(char* deviceName, char* deviceDescr) {
     if(myGlobals.device[i].name != NULL) {
       int len = (int)strlen(workDevices);
 
-      safe_snprintf(__FILE__, __LINE__, 
-		    &workDevices[len], mallocLen-len, 
+      safe_snprintf(__FILE__, __LINE__,
+		    &workDevices[len], mallocLen-len,
 		    "%s%s", (i > 0) ? ", " : "",
 		    myGlobals.device[i].name);
     }
@@ -972,7 +970,7 @@ void addDevice(char* deviceName, char* deviceDescr) {
       traceEvent(CONST_TRACE_INFO, "Checking %s for additional devices", myGlobals.device[deviceId].name);
       for(k=0; k<=MAX_NUM_DEVICES_VIRTUAL; k++) {
 	u_int8_t netmask_v6;
-	
+
 	safe_snprintf(__FILE__, __LINE__, tmpDeviceName, sizeof(tmpDeviceName), "%s:%d", myGlobals.device[deviceId].name, k);
 
 	traceEvent(CONST_TRACE_NOISY, "Checking %s", tmpDeviceName);
@@ -1002,20 +1000,20 @@ void addDevice(char* deviceName, char* deviceDescr) {
   initDeviceDatalink(deviceId);
 
   if((myGlobals.actualReportDeviceId == 0) && myGlobals.device[0].dummyDevice)
-    myGlobals.actualReportDeviceId = deviceId;  
+    myGlobals.actualReportDeviceId = deviceId;
 }
 
 /* ******************************* */
 
 int validInterface(char *name) {
-  if(name && 
+  if(name &&
      (strstr(name, "PPP") /* Avoid to use the PPP interface */
       || strstr(name, "dialup")  /* Avoid to use the dialup interface */
       || strstr(name, "ICSHARE")  /* Avoid to use the internet sharing interface */
       || strstr(name, "NdisWan"))) { /* Avoid to use the internet sharing interface */
     return(0);
   }
-  
+
   return(1);
 }
 
@@ -1145,7 +1143,7 @@ void initDevices(char* devices) {
 
       traceEvent(CONST_TRACE_NOISY, "Checking requested device '%s'", tmpDev);
 
-      if(((nwInterface = strchr(tmpDev, ':')) != NULL) 
+      if(((nwInterface = strchr(tmpDev, ':')) != NULL)
 	 && (!strstr(tmpDev, "dag")) /* Endace DAG cards are valid (e.g. dag0:0) */
 	 )
 	{
@@ -1191,7 +1189,7 @@ void initDevices(char* devices) {
 	  tmpDescr = intDescr[atoi(tmpDev)];
 	  tmpDev   = intNames[atoi(tmpDev)];
 	} else {
-	  traceEvent(CONST_TRACE_ERROR, "Interface index '%d' is out of range [0..%d]", 
+	  traceEvent(CONST_TRACE_ERROR, "Interface index '%d' is out of range [0..%d]",
 		  atoi(tmpDev), ifIdx > 0 ? (ifIdx -1) : 0);
 	  return;
 	}
@@ -1406,7 +1404,7 @@ u_int createDummyInterface(char *ifName) {
   myGlobals.device[deviceId].virtualDevice = 0;
   myGlobals.device[deviceId].activeDevice  = 0;
   myGlobals.device[deviceId].samplingRate =  myGlobals.runningPref.samplingRate;
-  calculateUniqueInterfaceName(deviceId); 
+  calculateUniqueInterfaceName(deviceId);
 
   myGlobals.device[deviceId].l7.protoTraffic = (Counter*)calloc(myGlobals.l7.numSupportedProtocols, sizeof(Counter));
 

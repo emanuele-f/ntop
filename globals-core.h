@@ -400,8 +400,6 @@ extern void processIpPkt(const u_char *bp,
 			 u_char *ether_dst,
 			 int actualDeviceId,
 			 int vlanId);
-extern void deleteFragment(IpFragment *fragment, int actualDeviceId);
-extern void purgeOldFragmentEntries(int actualDeviceId);
 
 /* pbuf.c */
 extern void allocateSecurityHostPkts(HostTraffic *srcHost);

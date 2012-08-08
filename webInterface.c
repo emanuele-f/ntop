@@ -6228,8 +6228,6 @@ static void printNtopConfigInfoData(int textPrintFlag, UserPref *pref) {
 
   printFeatureConfigInfo(textPrintFlag, "Protocol Decoders",
 			 pref->enablePacketDecoding == 1 ? "Enabled" : "Disabled");
-  printFeatureConfigInfo(textPrintFlag, "Fragment Handling",
-			 myGlobals.enableFragmentHandling == 1 ? "Enabled" : "Disabled");
   printFeatureConfigInfo(textPrintFlag, "Tracking only local hosts",
 			 pref->trackOnlyLocalHosts == 1 ? "Yes" : "No");
   safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "%d",
@@ -6747,10 +6745,6 @@ static void printNtopConfigInfoData(int textPrintFlag, UserPref *pref) {
   }
 
   /* **** */
-
-  printInfoSectionTitle(textPrintFlag, "Fragments Handling");
-  safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "%u", myGlobals.num_queued_fragments);
-  printFeatureConfigInfo(textPrintFlag, "Queued Fragments", buf);
 
   printInfoSectionTitle(textPrintFlag, "----- Address Resolution -----");
 

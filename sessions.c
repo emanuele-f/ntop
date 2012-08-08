@@ -1948,7 +1948,7 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
 
       if(rc != -1) {
 	/* We have found a protocol defined thus we map the protocol */
-	theSession->l7.major_proto = IPOQUE_MAX_SUPPORTED_PROTOCOLS + rc;
+	theSession->l7.major_proto = rc;
       } else {
 	if(myGlobals.device[actualDeviceId].l7.l7handler != NULL) {
 	  static u_int8_t once = 0;

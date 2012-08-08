@@ -2036,7 +2036,7 @@ void hostReport(int idx, char *hostName, int vlanId, int sortedColumn) {
 void printHostFragmentStats(HostTraffic *el, int actualDeviceId) {
   Counter totalSent, totalRcvd;
   char buf[LEN_GENERAL_WORK_BUFFER];
-  char linkName[LEN_GENERAL_WORK_BUFFER/2], vlanStr[32];
+  char linkName[LEN_GENERAL_WORK_BUFFER/2];
 
   totalSent = el->tcpFragmentsSent.value + el->udpFragmentsSent.value + el->icmpFragmentsSent.value;
   totalRcvd = el->tcpFragmentsRcvd.value + el->udpFragmentsRcvd.value + el->icmpFragmentsRcvd.value;
@@ -2045,11 +2045,13 @@ void printHostFragmentStats(HostTraffic *el, int actualDeviceId) {
     return;
 
   sendString("<CENTER>\n"
-	     ""TABLE_ON"<TABLE BORDER=1 "TABLE_DEFAULTS"><TR "DARK_BG"><TH "TH_BG" WIDTH=100>Protocol</TH>"
+	     ""TABLE_ON"<TABLE BORDER=1 "TABLE_DEFAULTS">"
+	     "<TR "DARK_BG"><TH "TH_BG" WIDTH=100>Protocol</TH>"
 	     "<TH "TH_BG" WIDTH=200 COLSPAN=2>Data&nbsp;Sent</TH>"
 	     "<TH "TH_BG" WIDTH=200 COLSPAN=2>Data&nbsp;Rcvd</TH></TR>\n\n");
 
-  printTableDoubleEntry(buf, sizeof(buf), "TCP", CONST_COLOR_1, (float)el->tcpFragmentsSent.value/1024,
+  printTableDoubleEntry(buf, sizeof(buf), "TCP", CONST_COLOR_1, 
+			(float)el->tcpFragmentsSent.value/1024,
 			100*((float)SD(el->tcpFragmentsSent.value, totalSent)),
 			(float)el->tcpFragmentsRcvd.value/1024,
 			100*((float)SD(el->tcpFragmentsRcvd.value, totalRcvd)));
@@ -2064,72 +2066,73 @@ void printHostFragmentStats(HostTraffic *el, int actualDeviceId) {
 			(float)el->icmpFragmentsRcvd.value/1024,
 			100*((float)SD(el->icmpFragmentsRcvd.value, totalRcvd)));
 
-  {
-    if((totalSent > 0) || (totalRcvd > 0)) {
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
+  if((totalSent > 0) || (totalRcvd > 0)) {
+    int vlanId;
+
+    safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
 		  "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT>Fragment Distribution</TH>",
 		  getRowColor());
-      sendString(buf);
+    sendString(buf);
 
-      if(el->hostNumIpAddress[0] != '\0') {
-        strncpy(linkName, el->hostNumIpAddress, sizeof(linkName));
-      } else {
-        strncpy(linkName, el->ethAddressString, sizeof(linkName));
-      }
-
-      /* For Ethernet and IPv6 addresses */
-      urlFixupToRFC1945Inplace(linkName);
-
-      if(el->vlanId > 0) {
-	safe_snprintf(__FILE__, __LINE__, vlanStr, sizeof(vlanStr), "-%d", el->vlanId);
-      } else
-	vlanStr[0] = '\0';
-
-     if(totalSent > 0) {
-	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
-	hostReport(1, linkName, vlanStr, 1);
-	sendString("</TD>");
-      } else {
-	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
-      }
-
-      if(totalRcvd > 0) {
-	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
-	hostReport(1, linkName, vlanStr, 1);
-	sendString("</TD>");
-      } else {
-	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
-      }
-
-      sendString("</TD></TR>\n");
-
-      /* ***************************************** */
-
-      safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
-		  "<TR "TR_ON" %s><TH "TH_BG" ALIGN=LEFT>IP Fragment Distribution</TH>",
-		  getRowColor());
-      sendString(buf);
-
-      if(totalSent > 0) {
-	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
-	hostReport(2, linkName, vlanStr, 1);
-	sendString("</TD>");
-      } else {
-	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
-      }
-
-      if(totalRcvd > 0) {
-	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
-	hostReport(2, linkName, vlanStr, 0);
-	sendString("</TD>");
-      } else {
-	sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
-      }
-
-      sendString("</TD></TR>\n");
+    if(el->hostNumIpAddress[0] != '\0') {
+      strncpy(linkName, el->hostNumIpAddress, sizeof(linkName));
+    } else {
+      strncpy(linkName, el->ethAddressString, sizeof(linkName));
     }
-  }
 
+    /* For Ethernet and IPv6 addresses */
+    urlFixupToRFC1945Inplace(linkName);
+
+    if(el->vlanId > 0) {
+      vlanId = -el->vlanId;
+    } else
+      vlanId = 0;
+
+    if(totalSent > 0) {
+      sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+      hostReport(1, linkName, vlanId, 1);
+      sendString("</TD>");
+    } else {
+      sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
+    }
+
+    if(totalRcvd > 0) {
+      sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+      hostReport(1, linkName, vlanId, 1);
+      sendString("</TD>");
+    } else {
+      sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
+    }
+
+    sendString("</TD></TR>\n");
+
+    /* ***************************************** */
+
+    safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
+		  "<TR "TR_ON" %s>"
+		  "<TH "TH_BG" ALIGN=LEFT>IP Fragment Distribution</TH>",
+		  getRowColor());
+    sendString(buf);
+
+    if(totalSent > 0) {
+      sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+      hostReport(2, linkName, vlanId, 1);
+      sendString("</TD>");
+    } else {
+      sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
+    }
+
+    if(totalRcvd > 0) {
+      sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2 BGCOLOR=white>");
+      hostReport(2, linkName, vlanId, 0);
+      sendString("</TD>");
+    } else {
+      sendString("<TD "TD_BG" ALIGN=RIGHT COLSPAN=2>&nbsp;</TD>");
+    }
+
+    sendString("</TD></TR>\n");
+  }
+  
   sendString("</TABLE>"TABLE_OFF"<P>\n");
   sendString("</CENTER>\n");
 }

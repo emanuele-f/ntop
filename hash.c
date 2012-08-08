@@ -396,8 +396,6 @@ int purgeIdleHosts(int actDevice) {
   myGlobals.piMem = (u_int)(maxHosts*sizeof(HostTraffic*));
   theFlaggedHosts = (HostTraffic**)calloc(1, myGlobals.piMem);
 
-  purgeOldFragmentEntries(actDevice); /* let's do this too */
-
 #ifdef IDLE_PURGE_DEBUG
   traceEvent(CONST_TRACE_INFO, "IDLE_PURGE_DEBUG: accessMutex(purgeMutex)...calling");
 #endif

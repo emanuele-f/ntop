@@ -1030,12 +1030,6 @@ RETSIGTYPE cleanup(int signo) {
   for(i=0; i<myGlobals.numDevices; i++) {
     freeHostInstances(i);
     freeDeviceSessions(i);
-
-    while(myGlobals.device[i].fragmentList != NULL) {
-      IpFragment *fragment = myGlobals.device[i].fragmentList->next;
-      free(myGlobals.device[i].fragmentList);
-      myGlobals.device[i].fragmentList = fragment;
-    }
   }
 
   freeHostInfo(myGlobals.broadcastEntry, 0); myGlobals.broadcastEntry = NULL;

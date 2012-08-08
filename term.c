@@ -76,9 +76,6 @@ void termIPSessions(void) {
     }
 
     myGlobals.device[j].numSessions = 0;
-    
-    while(myGlobals.device[j].fragmentList != NULL)
-      deleteFragment(myGlobals.device[j].fragmentList, j);
   }
 }
 

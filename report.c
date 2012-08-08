@@ -3370,7 +3370,6 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
   sendString("\n\n<div id=\"tabs-0\">\n");
   {
     FILE *fd  = NULL;
-    int idx;
     char path[256];
 
     for(idx=0; myGlobals.dataFileDirs[idx] != NULL; idx++) {

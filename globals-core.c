@@ -166,9 +166,6 @@ void initNtopGlobals(int argc, char * argv[], int argc_started, char *argv_start
   myGlobals.checkVersionStatus = FLAG_CHECKVERSION_NOTCHECKED;
   myGlobals.checkVersionStatusAgain = 1;
 
-  /* Other flags (to be set via command line options one day) */
-  myGlobals.enableFragmentHandling = 0;
-
   /* Search paths */
   myGlobals.dataFileDirs    = _dataFileDirs;
   myGlobals.pluginDirs      = _pluginDirs;
@@ -214,7 +211,6 @@ void initNtopGlobals(int argc, char * argv[], int argc_started, char *argv_start
   myGlobals.runningPref.sslPort = 0; /* Disabled by default: enabled via -W */
 #endif
 
-  myGlobals.num_queued_fragments = 0;
   myGlobals.dnsSniffCount = 0;
   myGlobals.dnsSniffRequestCount = 0;
   myGlobals.dnsSniffFailedCount = 0;
@@ -297,7 +293,6 @@ void initNtopGlobals(int argc, char * argv[], int argc_started, char *argv_start
   createMutex(&myGlobals.purgeMutex);       /* synchronize purging */
   createMutex(&myGlobals.securityItemsMutex);
   createMutex(&myGlobals.hostsHashLockMutex);
-  createMutex(&myGlobals.fragmentMutex);
 
   createMutex(&myGlobals.serialLockMutex);  /* Serial host locking */
 

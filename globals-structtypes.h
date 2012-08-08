@@ -1438,7 +1438,6 @@ typedef struct ntopInterface {
 
   /* ************************** */
 
-  IpFragment *fragmentList;
   IPSession **sessions;
   u_int numSessions, maxNumSessions;
 
@@ -1911,7 +1910,6 @@ typedef struct ntopGlobals {
   char *spoolPath;              /* 'Q' */
   struct fileList *pcap_file_list; /* --pcap-file-list */
   /* Other flags (these could set via command line options one day) */
-  bool enableFragmentHandling;
 
   HostsDisplayPolicy hostsDisplayPolicy;
   LocalityDisplayPolicy localityDisplayPolicy;
@@ -1958,10 +1956,6 @@ typedef struct ntopGlobals {
    * HTS - Hash Purge
    */
   PthreadMutex purgeMutex;
-
-  /* Fragments */
-  u_int num_queued_fragments;
-  PthreadMutex fragmentMutex;
 
   /*
    * HTS - Host Traffic Statistics

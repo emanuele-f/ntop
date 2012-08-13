@@ -50,7 +50,7 @@ AC_INIT([ntop],[5.0.1])
 dnl> The prereq is really 2.53, i.e. automake 1.6, but Darwin uses 2.52...
 AC_PREREQ([2.52])
 
-SCRIPTVER="v5.0-17-07-2012"
+SCRIPTVER="v5.0.1-13-08-2012"
 
 dnl>
 dnl> generate the config header

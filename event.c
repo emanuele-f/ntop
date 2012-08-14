@@ -459,8 +459,10 @@ void notifyEvent(EventType evt, HostTraffic *el, IPSession *session, int eventVa
 void init_events(void) {
   char buf[64], *key;
 
+#ifdef HAVE_REDIS
   if(myGlobals.redis.host && myGlobals.redis.port)
     connectToCache(myGlobals.redis.host, myGlobals.redis.port); 
+#endif
 
   key = EVENTS_MASK;
   if(fetchPrefsValue(key, buf, sizeof(buf)) != -1) {
@@ -478,9 +480,11 @@ void init_events(void) {
     storePrefsValue(key, "");
   }
 
+#ifdef HAVE_REDIS
   if(myGlobals.redis.context)
     myGlobals.event_mask = hostCreation | hostDeletion | sessionCreation | sessionDeletion;
-  
+#endif
+
   traceEvent(CONST_TRACE_INFO, "Initialized events [mask: %d][path: %s]",
 	     myGlobals.event_mask,  myGlobals.event_log ?  myGlobals.event_log : "<none>");
 }

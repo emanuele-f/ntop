@@ -29,6 +29,8 @@ ntop \- display top network users
 .RB [ -m | --local-subnets
 .IR <addresses> ]
 .RB [ -n | --numeric-ip-addresses ]
+.RB [ -o | --redis
+.IR <host:port> ]
 .RB [ -p | --protocols
 .IR <list> ]
 .RB [ -q | --create-suspicious-packets ]
@@ -368,6 +370,14 @@ This parameter causes
 to skip DNS resolution, showing only numeric IP addresses instead of the symbolic
 names.
 This option can useful when the DNS is not present or quite slow.
+
+.It2 -o --redis
+This parameter is used to instruct
+.B ntop
+to dump host information/stats onto the specified redis database so that you can use 
+.B ntop
+in a web-less interface mode. For more information about redis, please refer 
+to http://redis.io/.
 
 .It2 -p --protocols
 This parameter is used to specify the TCP/UDP protocols that

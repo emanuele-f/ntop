@@ -3233,7 +3233,6 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
   else
     have_sessions = 0;
     
-
   fragments = el->tcpFragmentsSent.value
     + el->udpFragmentsSent.value
     + el->icmpFragmentsSent.value
@@ -3306,7 +3305,7 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
 	     "<div id=\"tabs\" style=\"width: 100%; \">\n"
 	     "    <ul>\n");
 
-  if(have_sessions)
+  if(have_sessions && (myGlobals.runningPref.disablePython != TRUE))
     sendString("    <li><a href=\"#tabs-0\">Overview</a></li>\n");
   
 
@@ -3366,46 +3365,46 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
 
   sendString("</ul>\n");
 
-  if(have_sessions) {
-  sendString("\n\n<!------ DIV ------>\n");
-  sendString("\n\n<div id=\"tabs-0\">\n");
-  {
-    FILE *fd  = NULL;
-    char path[256];
+  if(have_sessions && (myGlobals.runningPref.disablePython != TRUE)) {
+    sendString("\n\n<!------ DIV ------>\n");
+    sendString("\n\n<div id=\"tabs-0\">\n");
+    {
+      FILE *fd  = NULL;
+      char path[256];
 
-    for(idx=0; myGlobals.dataFileDirs[idx] != NULL; idx++) {
-      safe_snprintf(__FILE__, __LINE__, path, sizeof(path),
-		    "%s/html/sankey.min.html",
-		    myGlobals.dataFileDirs[idx]);
+      for(idx=0; myGlobals.dataFileDirs[idx] != NULL; idx++) {
+	safe_snprintf(__FILE__, __LINE__, path, sizeof(path),
+		      "%s/html/sankey.min.html",
+		      myGlobals.dataFileDirs[idx]);
 
-      revertSlashIfWIN32(path, 0);
-      if((fd = fopen(path, "r")) != NULL)
-	break;
-    }
-      
-    if(fd) {
-      char line[LINE_MAX];
-
-      while(fgets(line, LINE_MAX, fd) != NULL) {
-	char *token = strstr(line, "@HOST@");
-	
-	if(token) {
-	  token[0] = '\0';
-	  sendString(line);
-	  if(el->hostResolvedName[0] != '\0')
-	    sendString(el->hostResolvedName);
-	  else
-	    sendString(el->hostNumIpAddress);
-	  //sendString(host);
-	  sendString(&token[6]);
-	} else
-	  sendString(line);
+	revertSlashIfWIN32(path, 0);
+	if((fd = fopen(path, "r")) != NULL)
+	  break;
       }
       
-      fclose(fd);
+      if(fd) {
+	char line[LINE_MAX];
+
+	while(fgets(line, LINE_MAX, fd) != NULL) {
+	  char *token = strstr(line, "@HOST@");
+	
+	  if(token) {
+	    token[0] = '\0';
+	    sendString(line);
+	    if(el->hostResolvedName[0] != '\0')
+	      sendString(el->hostResolvedName);
+	    else
+	      sendString(el->hostNumIpAddress);
+	    //sendString(host);
+	    sendString(&token[6]);
+	  } else
+	    sendString(line);
+	}
+      
+	fclose(fd);
+      }
     }
-  }
-  sendString("\n</div>\n");
+    sendString("\n</div>\n");
   }
 
   sendString("\n\n<!------ DIV ------>\n");

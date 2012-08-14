@@ -865,6 +865,46 @@ extern char *getProtoName(u_int8_t proto, u_short protoId);
 /* event.c */
 extern void notifyEvent(EventType evt, HostTraffic *el, IPSession *session, int eventValue);
 extern void init_events(void);
+extern void updateCacheHostCounters(HostTraffic *el);
+extern void setCacheKeyValueString(char *element, char *key, char *value);
+extern void setCacheKeyValueNumber(char *element, char *key, u_int64_t value);
+extern void deleteCacheKey(char *key);
+extern void setCacheKeyValueStringSentRcvd(char *element,
+					   char *key, char *value_s, char *value_r);
+extern void setCacheKeyValueNumberSentRcvd(char *element,
+					   char *key, u_int64_t value_s, u_int64_t value_r);
+extern void setCacheKeyValueStringTwin(char *element,
+				       char *key, char *value,
+				       char *key1, char *value1);
+extern void setCacheKeyValueNumberTwin(char *element,
+				       char *key, u_int64_t value,
+				       char *key1, u_int64_t value1);
+extern void setCacheKeyValueStringTwinSentRcvd(char *element,
+					       char *key, char *value_s, char *value_r,
+					       char *key1, char *value1_s, char *value1_r);
+extern void setCacheKeyValueNumberTwinSentRcvd(char *element,
+					       char *key, u_int64_t value_s, u_int64_t value_r,
+					       char *key1, u_int64_t value1_s, u_int64_t value1_r);
+extern void setCacheKeyValueStringQuad(char *element,
+				       char *key, char *value,
+				       char *key1, char *value1,
+				       char *key2, char *value2,
+				       char *key3, char *value3);
+extern void setCacheKeyValueNumberQuad(char *element,
+				       char *key, u_int64_t value,
+				       char *key1, u_int64_t value1,
+				       char *key2, u_int64_t value2,
+				       char *key3, u_int64_t value3);
+extern void setCacheKeyValueStringQuadSentRcvd(char *element,
+					       char *key, char *value_s, char *value_r,
+					       char *key1, char *value1_s, char *value1_r,
+					       char *key2, char *value2_s, char *value2_r,
+					       char *key3, char *value3_s, char *value3_r);
+extern void setCacheKeyValueNumberQuadSentRcvd(char *element,
+					       char *key, u_int64_t value_s, u_int64_t value_r,
+					       char *key1, u_int64_t value1_s, u_int64_t value1_r,
+					       char *key2, u_int64_t value2_s, u_int64_t value2_r,
+					       char *key3, u_int64_t value3_s, u_int64_t value3_r);
 
 /* Pseudo-functions.
  *   We use these as if they were real functions, but they expand to

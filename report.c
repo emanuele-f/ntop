@@ -1541,8 +1541,8 @@ void printHostsTraffic(int reportTypeReq,
 
       for(idx=0; idx<numEntries; idx++) {
 	if(tmpTable[idx] != NULL) {
-	  totIpBytesSent += tmpTable[idx]->ipv4BytesSent.value;
-	  totIpBytesRcvd += tmpTable[idx]->ipv4BytesRcvd.value;
+	  totIpBytesSent += tmpTable[idx]->ipBytesSent.value;
+	  totIpBytesRcvd += tmpTable[idx]->ipBytesRcvd.value;
 	}
       }
 
@@ -1555,8 +1555,8 @@ void printHostsTraffic(int reportTypeReq,
 
       for(idx=0; idx<numEntries; idx++) {
 	if(tmpTable[idx] != NULL) {
-	  totIpBytes += tmpTable[idx]->ipv4BytesSent.value +
-	    tmpTable[idx]->ipv4BytesRcvd.value;
+	  totIpBytes += tmpTable[idx]->ipBytesSent.value +
+	    tmpTable[idx]->ipBytesRcvd.value;
 	}
       }
 
@@ -1591,11 +1591,11 @@ void printHostsTraffic(int reportTypeReq,
 	  break;
 	case SORT_DATA_RECEIVED_IP:
 	case SORT_DATA_SENT_IP:
-	  sentPercent = (100*(float)el->ipv4BytesSent.value)/totIpBytesSent;
-	  rcvdPercent = (100*(float)el->ipv4BytesRcvd.value)/totIpBytesRcvd;
+	  sentPercent = (100*(float)el->ipBytesSent.value)/totIpBytesSent;
+	  rcvdPercent = (100*(float)el->ipBytesRcvd.value)/totIpBytesRcvd;
 	  break;
 	case SORT_DATA_IP:
-	  totPercent = (100*(float) (el->ipv4BytesSent.value + el->ipv4BytesRcvd.value) )/totIpBytes;
+	  totPercent = (100*(float) (el->ipBytesSent.value + el->ipBytesRcvd.value) )/totIpBytes;
 	  break;
 	case SORT_DATA_RECEIVED_THPT:
 	case SORT_DATA_RCVD_HOST_TRAFFIC:
@@ -1632,7 +1632,8 @@ void printHostsTraffic(int reportTypeReq,
 			formatBytes(el->icmpRcvd.value, 1, formatBuf3, sizeof(formatBuf3)),
 			formatBytes(el->icmp6Rcvd.value, 1, formatBuf4, sizeof(formatBuf4)),
 			formatBytes(el->ipsecRcvd.value, 1, formatBuf7, sizeof(formatBuf7)),
-			formatBytes(el->nonIPTraffic == NULL ? 0 : el->nonIPTraffic->arp_rarpRcvd.value, 1, formatBuf8, sizeof(formatBuf8))
+			formatBytes(el->nonIPTraffic == NULL ? 0 : el->nonIPTraffic->arp_rarpRcvd.value, 1,
+				    formatBuf8, sizeof(formatBuf8))
 			);
 	  sendString(buf);
 
@@ -1643,7 +1644,7 @@ void printHostsTraffic(int reportTypeReq,
 			"<TD "TD_BG" ALIGN=RIGHT>%s</TD>",
 			formatBytes(el->nonIPTraffic == NULL ? 0 : el->nonIPTraffic->netbiosRcvd.value, 1, formatBuf1, sizeof(formatBuf1)),
 			formatBytes(el->greRcvd.value, 1, formatBuf2, sizeof(formatBuf2)),
-			formatBytes(el->ipv6BytesRcvd.value, 1, formatBuf3, sizeof(formatBuf3)),
+			formatBytes(el->ipBytesRcvd.value, 1, formatBuf3, sizeof(formatBuf3)),
 			formatBytes(el->nonIPTraffic == NULL ? 0 : el->nonIPTraffic->stpRcvd.value, 1, formatBuf4, sizeof(formatBuf4)));
 	  sendString(buf);
 
@@ -1689,7 +1690,7 @@ void printHostsTraffic(int reportTypeReq,
 			"<TD "TD_BG" ALIGN=RIGHT>%s</TD>",
 			formatBytes(el->nonIPTraffic == NULL ? 0 : el->nonIPTraffic->netbiosSent.value, 1, formatBuf, sizeof(formatBuf)),
 			formatBytes(el->greSent.value, 1, formatBuf1, sizeof(formatBuf1)),
-			formatBytes(el->ipv6BytesSent.value, 1, formatBuf2, sizeof(formatBuf2)),
+			formatBytes(el->ipBytesSent.value, 1, formatBuf2, sizeof(formatBuf2)),
 			formatBytes(el->nonIPTraffic == NULL ? 0 : el->nonIPTraffic->stpSent.value, 1, formatBuf3, sizeof(formatBuf3)));
 	  sendString(buf);
 
@@ -1743,7 +1744,7 @@ void printHostsTraffic(int reportTypeReq,
 			formatBytes(el->nonIPTraffic == NULL ? 0 : el->nonIPTraffic->netbiosSent.value+el->nonIPTraffic->netbiosRcvd.value,
 				    1, formatBuf, sizeof(formatBuf)),
 			formatBytes(el->greSent.value+el->greRcvd.value, 1, formatBuf1, sizeof(formatBuf1)),
-			formatBytes(el->ipv6BytesSent.value+el->ipv6BytesRcvd.value, 1, formatBuf2, sizeof(formatBuf2)),
+			formatBytes(el->ipBytesSent.value+el->ipBytesRcvd.value, 1, formatBuf2, sizeof(formatBuf2)),
 			formatBytes(el->nonIPTraffic == NULL ? 0 : el->nonIPTraffic->stpSent.value+el->nonIPTraffic->stpRcvd.value,
 				    1, formatBuf3, sizeof(formatBuf3)));
 	  sendString(buf);
@@ -1777,7 +1778,7 @@ void printHostsTraffic(int reportTypeReq,
 	    safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s>%s"
 			  "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%.1f%s%%</TD>",
 			  getRowColor(), webHostName,
-			  formatBytes(el->ipv4BytesRcvd.value, 1, formatBuf, sizeof(formatBuf)),
+			  formatBytes(el->ipBytesRcvd.value, 1, formatBuf, sizeof(formatBuf)),
 			  rcvdPercent, myGlobals.separator);
 	    sendString(buf);
 
@@ -1800,7 +1801,7 @@ void printHostsTraffic(int reportTypeReq,
 	    safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s>%s"
 			  "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%.1f%s%%</TD>",
 			  getRowColor(), webHostName,
-			  formatBytes(el->ipv4BytesSent.value, 1, formatBuf, sizeof(formatBuf)),
+			  formatBytes(el->ipBytesSent.value, 1, formatBuf, sizeof(formatBuf)),
 			  sentPercent, myGlobals.separator);
 	    sendString(buf);
 
@@ -1823,7 +1824,7 @@ void printHostsTraffic(int reportTypeReq,
 	    safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf), "<TR "TR_ON" %s>%s"
 			  "<TD "TD_BG" ALIGN=RIGHT>%s</TD><TD "TD_BG" ALIGN=RIGHT>%.1f%s%%</TD>",
 			  getRowColor(), webHostName,
-			  formatBytes(el->ipv4BytesSent.value+el->ipv4BytesRcvd.value, 1, formatBuf, sizeof(formatBuf)),
+			  formatBytes(el->ipBytesSent.value+el->ipBytesRcvd.value, 1, formatBuf, sizeof(formatBuf)),
 			  totPercent, myGlobals.separator);
 	    sendString(buf);
 
@@ -4462,7 +4463,7 @@ void printProtoTraffic(int printGraph) {
     printTableEntry(buf, sizeof(buf), "ICMPv6", CONST_COLOR_1,
 		    (float)myGlobals.device[myGlobals.actualReportDeviceId].icmp6Bytes.value/1024,
 		    100*((float)myGlobals.device[myGlobals.actualReportDeviceId].icmp6Bytes.value/
-			 myGlobals.device[myGlobals.actualReportDeviceId].ipv4Bytes.value), 0, 0, 0);
+			 myGlobals.device[myGlobals.actualReportDeviceId].ipv6Bytes.value), 0, 0, 0);
 
     if(myGlobals.device[myGlobals.actualReportDeviceId].ipProtosList) {
       ProtocolsList *protoList = myGlobals.ipProtosList;

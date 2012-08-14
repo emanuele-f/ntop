@@ -134,7 +134,7 @@ void hostTrafficDistrib(HostTraffic *theHost, short dataSent) {
   if(dataSent) {
     totTraffic.value = theHost->tcpSentLoc.value+theHost->tcpSentRem.value+
       theHost->udpSentLoc.value+theHost->udpSentRem.value+
-      theHost->icmpSent.value+theHost->ipv6BytesSent.value+
+      theHost->icmpSent.value+theHost->ipBytesSent.value+
       theHost->greSent.value+theHost->ipsecSent.value;
 
     if(theHost->nonIPTraffic != NULL)
@@ -152,7 +152,7 @@ void hostTrafficDistrib(HostTraffic *theHost, short dataSent) {
   } else {
     totTraffic.value = theHost->tcpRcvdLoc.value+theHost->tcpRcvdFromRem.value+
       theHost->udpRcvdLoc.value+theHost->udpRcvdFromRem.value+
-      theHost->icmpRcvd.value+theHost->ipv6BytesRcvd.value+
+      theHost->icmpRcvd.value+theHost->ipBytesRcvd.value+
       theHost->greRcvd.value+theHost->ipsecRcvd.value;
 
     if(theHost->nonIPTraffic != NULL)
@@ -188,9 +188,9 @@ void hostTrafficDistrib(HostTraffic *theHost, short dataSent) {
 	if(p[num] > MIN_SLICE_PERCENTAGE) lbl[num++] = "ICMP";
       }
 
-      if(theHost->ipv6BytesSent.value > 0) {
-	p[num] = (float)((100*theHost->ipv6BytesSent.value)/totTraffic.value);
-	if(p[num] > MIN_SLICE_PERCENTAGE) lbl[num++] = "IPv6";
+      if(theHost->ipBytesSent.value > 0) {
+	p[num] = (float)((100*theHost->ipBytesSent.value)/totTraffic.value);
+	if(p[num] > MIN_SLICE_PERCENTAGE) lbl[num++] = "IPv4/v6";
       }
 
 	if(theHost->greSent.value > 0) {
@@ -242,9 +242,9 @@ void hostTrafficDistrib(HostTraffic *theHost, short dataSent) {
 	if(p[num] > MIN_SLICE_PERCENTAGE) lbl[num++] = "ICMP";
       }
 
-      if(theHost->ipv6BytesRcvd.value > 0) {
-	p[num] = (float)((100*theHost->ipv6BytesRcvd.value)/totTraffic.value);
-	if(p[num] > MIN_SLICE_PERCENTAGE) lbl[num++] = "IPv6";
+      if(theHost->ipBytesRcvd.value > 0) {
+	p[num] = (float)((100*theHost->ipBytesRcvd.value)/totTraffic.value);
+	if(p[num] > MIN_SLICE_PERCENTAGE) lbl[num++] = "IPv4/v6";
       }
 
       if(theHost->greRcvd.value > 0) {
@@ -522,11 +522,11 @@ void hostTotalFragmentDistrib(HostTraffic *theHost, short dataSent) {
   TrafficCounter totFragmentedTraffic, totTraffic;
 
   if(dataSent) {
-    totTraffic.value = theHost->ipv4BytesSent.value;
+    totTraffic.value = theHost->ipBytesSent.value;
     totFragmentedTraffic.value = theHost->tcpFragmentsSent.value+theHost->udpFragmentsSent.value
       +theHost->icmpFragmentsSent.value;
   } else {
-    totTraffic.value = theHost->ipv4BytesRcvd.value;
+    totTraffic.value = theHost->ipBytesRcvd.value;
     totFragmentedTraffic.value = theHost->tcpFragmentsRcvd.value+theHost->udpFragmentsRcvd.value
       +theHost->icmpFragmentsRcvd.value;
   }

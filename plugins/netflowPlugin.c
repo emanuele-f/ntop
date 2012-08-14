@@ -773,14 +773,8 @@ if(myGlobals.runningPref.debugMode) {
   /* [NOTE: this has to be repeated for the reverse direction ]
      srcHost->bytesSent.value   += len,     dstHost->bytesRcvd.value   += len;
   */
-  if (addr2.hostFamily==AF_INET6) {
-    srcHost->ipv6BytesSent.value += record->sentOctets, dstHost->ipv6BytesRcvd.value += record->sentOctets;
-    dstHost->ipv6BytesSent.value += record->rcvdOctets, srcHost->ipv6BytesRcvd.value += record->rcvdOctets;
-  }
-  else {
-    srcHost->ipv4BytesSent.value += record->sentOctets, dstHost->ipv4BytesRcvd.value += record->sentOctets;
-    dstHost->ipv4BytesSent.value += record->rcvdOctets, srcHost->ipv4BytesRcvd.value += record->rcvdOctets;
-  }
+  srcHost->ipBytesSent.value += record->sentOctets, dstHost->ipBytesRcvd.value += record->sentOctets;
+  dstHost->ipBytesSent.value += record->rcvdOctets, srcHost->ipBytesRcvd.value += record->rcvdOctets;
 
 
   if(srcAS != 0) srcHost->hostAS = srcAS;

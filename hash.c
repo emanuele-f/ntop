@@ -369,7 +369,7 @@ int purgeIdleHosts(int actDevice) {
   static time_t lastPurgeTime[MAX_NUM_DEVICES];
   static char firstRun = 1;
   HostTraffic **theFlaggedHosts = NULL;
-  u_int maxHosts, scannedHosts=0;
+  u_int maxHosts, scannedHosts=0, max_reached = 0;
   float hiresDeltaTime;
   struct timeval hiresTimeStart, hiresTimeEnd;
   HostTraffic *el, *prev, *next;
@@ -418,7 +418,8 @@ int purgeIdleHosts(int actDevice) {
       prev = NULL;
 
       while(el) {
-	if(is_host_ready_to_purge(actDevice, el, now)) {
+	if((!max_reached) 
+	   && is_host_ready_to_purge(actDevice, el, now)) {
 	  if(!el->to_be_deleted) {
 	    el->to_be_deleted = 1; /* Delete it at the next run */
 
@@ -426,36 +427,47 @@ int purgeIdleHosts(int actDevice) {
 	    prev = el;
 	    el = el->next;
 	  } else {
-	  /* Host selected for deletion */
-	  theFlaggedHosts[numHosts++] = el;
-	  el->magic = CONST_UNMAGIC_NUMBER; /* This means that this host os about to be freed */
-	  //remove_valid_ptr(el);
-	  next = el->next;
-
-	  if(prev != NULL)
-	    prev->next = next;
-	  else
-	    myGlobals.device[actDevice].hosts.hash_hostTraffic[idx] = next;
-
-          el->next = NULL;
-	  el = next;
+	    /* Host selected for deletion */
+	    theFlaggedHosts[numHosts++] = el;
+	    el->magic = CONST_UNMAGIC_NUMBER; /* This means that this host os about to be freed */
+	    //remove_valid_ptr(el);
+	    next = el->next;
+	    
+	    if(prev != NULL)
+	      prev->next = next;
+	    else
+	      myGlobals.device[actDevice].hosts.hash_hostTraffic[idx] = next;
+	    
+	    el->next = NULL;
+	    el = next;
 	  }
 	} else {
 	  /* Move to next host */
+	  updateCacheHostCounters(el);
+
 	  prev = el;
 	  el = el->next;
 	}
 
 	scannedHosts++;
 #ifdef MAX_HOSTS_PURGE_PER_CYCLE
-	if(numHosts >= MAX_HOSTS_PURGE_PER_CYCLE) break;
+	if(numHosts >= MAX_HOSTS_PURGE_PER_CYCLE)
+	  max_reached = 1;
 #endif
-	if(numHosts >= (maxHosts-1)) break;
-      } /* while */
+	if(numHosts >= (maxHosts-1))
+	  max_reached = 1;
 
-      if(numHosts >= (maxHosts-1)) {
-        break;
-      }
+#ifdef HAVE_REDIS
+	if(max_reached && (!myGlobals.redis.context))
+	  break;
+#else
+	if(max_reached)
+	  break;
+#endif
+      } /* while */
+      
+      if(numHosts >= (maxHosts-1))
+        max_reached = 1;      
     }
   }
 

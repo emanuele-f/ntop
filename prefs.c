@@ -61,11 +61,17 @@ static char*  short_options = "46a:bce:f:ghi:l:m:n:p:qr:st:w:x:zAB:C:D:F:M"
 #if defined(DARWIN) && (!defined(TIGER))
   "v"
 #endif
+#if defined(HAVE_REDIS)
+  "o:"
+#endif
   "O:P:Q:S:U:VX:W:";
 #elif defined(MAKE_WITH_SYSLOG)
 static char*  short_options = "46a:bcde:f:ghi:l:m:n:p:qr:st:u:w:x:zAB:C:D:F:IKLM" 
 #if defined(DARWIN) && (!defined(TIGER))
   "v"
+#endif
+#if defined(HAVE_REDIS)
+  "o:"
 #endif
   "O:P:Q:S:U:VX:W:";
 #else
@@ -95,8 +101,11 @@ static struct option const long_options[] = {
   { "pcap-log",                         required_argument, NULL, 'l' },
   { "local-subnets",                    required_argument, NULL, 'm' },
   { "numeric-ip-addresses",             required_argument, NULL, 'n' },
-  /* 'o' is free */
 
+#ifdef HAVE_REDIS
+  { "redis",                            required_argument, NULL, 'o' },
+#endif
+  
   { "protocols",                        required_argument, NULL, 'p' },
   { "create-suspicious-packets",        no_argument,       NULL, 'q' },
   { "refresh-time",                     required_argument, NULL, 'r' },
@@ -421,6 +430,24 @@ int parseOptions(int argc, char* argv[]) {
       stringSanityCheck(optarg, "-p | --protocols");
       myGlobals.runningPref.protoSpecs = strdup(optarg);
       break;
+
+#ifdef HAVE_REDIS
+    case 'o': /* Redis */
+      {
+	char opt[64], *c;
+	
+	snprintf(opt, sizeof(opt), "%s", optarg);
+	if((c = strchr(opt, ':')) != NULL) {
+	  c[0] = '\0';
+	  myGlobals.redis.host = strdup(optarg);
+	  myGlobals.redis.port = atoi(&c[1]);
+	} else {
+	  myGlobals.redis.host = strdup(optarg);
+	  myGlobals.redis.port = 6379;
+	}
+      }
+      break;
+#endif
 
     case 'q': /* save suspicious packets in a file in pcap (tcpdump) format */
       myGlobals.runningPref.enableSuspiciousPacketDump = 1;

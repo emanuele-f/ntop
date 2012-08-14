@@ -323,13 +323,8 @@ void processIpPkt(const u_char *bp, /* Pointer to IP */
     ctr.value = length;
   }
 
-  if(ip6) {
-    incrementHostTrafficCounter(srcHost, ipv6BytesSent, length);
-    incrementHostTrafficCounter(dstHost, ipv6BytesRcvd, length);
-  } else {
-    incrementHostTrafficCounter(srcHost, ipv4BytesSent, length);
-    incrementHostTrafficCounter(dstHost, ipv4BytesRcvd, length);
-  }
+  incrementHostTrafficCounter(srcHost, ipBytesSent, length);
+  incrementHostTrafficCounter(dstHost, ipBytesRcvd, length);
 
   if(subnetPseudoLocalHost(srcHost)) {
     if(subnetPseudoLocalHost(dstHost)) {

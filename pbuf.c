@@ -1550,8 +1550,8 @@ void processPacket(u_char *_deviceId,
 
 	  case ETHERTYPE_IPv6:
 	    processIpPkt(p+hlen, h, orig_p, hlen, length, ether_src, ether_dst, actualDeviceId, vlanId);
-	    incrementHostTrafficCounter(srcHost, ipv6BytesSent, length);
-	    incrementHostTrafficCounter(dstHost, ipv6BytesRcvd, length);
+	    incrementHostTrafficCounter(srcHost, ipBytesSent, length);
+	    incrementHostTrafficCounter(dstHost, ipBytesRcvd, length);
 	    incrementTrafficCounter(&myGlobals.device[actualDeviceId].ipv6Bytes, length);
 	    break;
 

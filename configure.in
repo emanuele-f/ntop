@@ -1769,6 +1769,11 @@ AC_MSG_RESULT(Please install GeoIP (http://www.maxmind.com/))
 exit 1
 fi
 
+AC_CHECK_LIB([hiredis], [redisCommand], AC_DEFINE_UNQUOTED(HAVE_REDIS, 1, [redis is present]))
+if test "x$ac_cv_lib_hiredis_redisCommand" = xyes; then :
+LIBS="$LIBS -lhiredis"
+fi
+
 cp "3rd_party/oui.txt.gz" .
 cp "3rd_party/specialMAC.txt.gz" .
 

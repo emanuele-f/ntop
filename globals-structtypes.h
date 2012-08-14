@@ -752,7 +752,7 @@ typedef struct hostTraffic {
   /* Don't change the recentl... to unsigned ! */
   int              recentlyUsedClientPorts[MAX_NUM_RECENT_PORTS], recentlyUsedServerPorts[MAX_NUM_RECENT_PORTS];
   int              otherIpPortsRcvd[MAX_NUM_RECENT_PORTS], otherIpPortsSent[MAX_NUM_RECENT_PORTS];
-  TrafficCounter   ipv4BytesSent, ipv4BytesRcvd, ipv6BytesSent, ipv6BytesRcvd;
+  TrafficCounter   ipBytesSent, ipBytesRcvd;
   TrafficCounter   tcpSentLoc, tcpSentRem, udpSentLoc, udpSentRem, icmpSent,icmp6Sent;
   TrafficCounter   tcpRcvdLoc, tcpRcvdFromRem, udpRcvdLoc, udpRcvdFromRem, icmpRcvd, icmp6Rcvd;
 
@@ -2163,6 +2163,16 @@ typedef struct ntopGlobals {
   /* RRD */
   time_t rrdTime;
   
+#ifdef HAVE_REDIS
+  /* Redis */
+  struct {
+    char *host;
+    int port;
+    redisContext *context;
+    PthreadMutex mutex;
+  } redis;
+#endif
+
   /* Message display */
   u_char lowMemoryMsgShown;
 

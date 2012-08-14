@@ -631,7 +631,7 @@ void printHeader(int reportType, int revertOrder, u_int column,
     safe_snprintf(__FILE__, __LINE__, buf, LEN_GENERAL_WORK_BUFFER,
 		  "<TH "TH_BG">%s11\">NetBios%s</A></TH>"
 		  "<TH "TH_BG">%s13\">GRE%s</A></TH>"
-		  "<TH "TH_BG">%s14\">IPv6%s</A></TH>"
+		  "<TH "TH_BG">%s14\">IP%s</A></TH>"
 		  "<TH "TH_BG">%s15\">STP%s</A></TH>",
 		  theAnchor[10], arrow[10],
 		  theAnchor[12], arrow[12],
@@ -1144,7 +1144,7 @@ int cmpFctn(const void *_a, const void *_b) {
       b_ = (*b)->greRcvd.value;
       break;
     case 14:
-      a_ = (*a)->ipv6BytesRcvd.value, b_ = (*b)->ipv6BytesRcvd.value;
+      a_ = (*a)->ipBytesRcvd.value, b_ = (*b)->ipBytesRcvd.value;
       break;
     case 15:
       a_ = (*a)->nonIPTraffic == NULL ? 0 : (*a)->nonIPTraffic->stpRcvd.value;
@@ -1183,7 +1183,7 @@ int cmpFctn(const void *_a, const void *_b) {
 	b_ = (*b)->l7.traffic[columnProtoId-1].bytesRcvd;
       }
     } else {
-      a_ = (*a)->ipv4BytesRcvd.value, b_ = (*b)->ipv4BytesRcvd.value;
+      a_ = (*a)->ipBytesRcvd.value, b_ = (*b)->ipBytesRcvd.value;
     }
     break;
 
@@ -1242,7 +1242,7 @@ int cmpFctn(const void *_a, const void *_b) {
       b_ = (*b)->greSent.value;
       break;
     case 14:
-      a_ = (*a)->ipv6BytesSent.value, b_ = (*b)->ipv6BytesSent.value;
+      a_ = (*a)->ipBytesSent.value, b_ = (*b)->ipBytesSent.value;
       break;
     case 15:
       a_ = (*a)->nonIPTraffic == NULL ? 0 : (*a)->nonIPTraffic->stpSent.value;
@@ -1281,7 +1281,7 @@ int cmpFctn(const void *_a, const void *_b) {
         b_ = (*b)->l7.traffic[columnProtoId-1].bytesSent;
       }
     } else {
-      a_ = (*a)->ipv4BytesSent.value, b_ = (*b)->ipv4BytesSent.value;
+      a_ = (*a)->ipBytesSent.value, b_ = (*b)->ipBytesSent.value;
     }
     break;
 
@@ -1346,7 +1346,7 @@ int cmpFctn(const void *_a, const void *_b) {
       b_ = (*b)->greSent.value + (*b)->greRcvd.value;
       break;
     case 14:
-      a_ = (*a)->ipv6BytesRcvd.value+(*a)->ipv6BytesSent.value, b_ = (*b)->ipv6BytesRcvd.value+(*b)->ipv6BytesSent.value;
+      a_ = (*a)->ipBytesRcvd.value+(*a)->ipBytesSent.value, b_ = (*b)->ipBytesRcvd.value+(*b)->ipBytesSent.value;
       break;
     case 15:
       a_ = (*a)->nonIPTraffic == NULL ? 0 : (*a)->nonIPTraffic->stpSent.value+(*a)->nonIPTraffic->stpRcvd.value;
@@ -1389,8 +1389,8 @@ int cmpFctn(const void *_a, const void *_b) {
 	b_ = (*b)->l7.traffic[columnProtoId-1].bytesSent + (*b)->l7.traffic[columnProtoId-1].bytesRcvd;
       }
     } else {
-      a_ = (*a)->ipv4BytesRcvd.value+(*a)->ipv4BytesSent.value;
-      b_ = (*b)->ipv4BytesRcvd.value+(*b)->ipv4BytesSent.value;
+      a_ = (*a)->ipBytesRcvd.value+(*a)->ipBytesSent.value;
+      b_ = (*b)->ipBytesRcvd.value+(*b)->ipBytesSent.value;
     }
     break;
 
@@ -2265,7 +2265,7 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
   ProtocolsList *protoList;
 
   totalSent = el->tcpSentLoc.value+el->tcpSentRem.value+el->udpSentLoc.value+el->udpSentRem.value;
-  totalSent += el->icmpSent.value+el->icmp6Sent.value+el->ipv6BytesSent.value;
+  totalSent += el->icmpSent.value+el->icmp6Sent.value+el->ipBytesSent.value;
   totalSent += el->greSent.value + el->ipsecSent.value;
 
   if(el->nonIPTraffic != NULL)
@@ -2274,7 +2274,7 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
 
   totalRcvd = el->tcpRcvdLoc.value+el->tcpRcvdFromRem.value;
   totalRcvd += el->udpRcvdLoc.value+el->udpRcvdFromRem.value;
-  totalRcvd += el->icmpRcvd.value+el->icmp6Rcvd.value+el->ipv6BytesRcvd.value;
+  totalRcvd += el->icmpRcvd.value+el->icmp6Rcvd.value+el->ipBytesRcvd.value;
   totalRcvd += el->greRcvd.value + el->ipsecRcvd.value;
 
   if(el->nonIPTraffic != NULL)
@@ -2345,10 +2345,10 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
                         (float)el->icmp6Rcvd.value/1024,
                         100*((float)SD(el->icmp6Rcvd.value, totalRcvd)));
 
-  printTableDoubleEntry(buf, sizeof(buf), "IPv6", CONST_COLOR_1, (float)el->ipv6BytesSent.value/1024,
-			100*((float)SD(el->ipv6BytesSent.value, totalSent)),
-			(float)el->ipv6BytesRcvd.value/1024,
-			100*((float)SD(el->ipv6BytesRcvd.value, totalRcvd)));
+  printTableDoubleEntry(buf, sizeof(buf), "IPv6", CONST_COLOR_1, (float)el->ipBytesSent.value/1024,
+			100*((float)SD(el->ipBytesSent.value, totalSent)),
+			(float)el->ipBytesRcvd.value/1024,
+			100*((float)SD(el->ipBytesRcvd.value, totalRcvd)));
 
   printTableDoubleEntry(buf, sizeof(buf), "GRE", CONST_COLOR_1, (float)el->greSent.value/1024,
 			100*((float)SD(el->greSent.value, totalSent)),
@@ -2400,12 +2400,12 @@ void printHostTrafficStats(HostTraffic *el, int actualDeviceId) {
   {
     totalSent = el->tcpSentLoc.value+el->tcpSentRem.value+
       el->udpSentLoc.value+el->udpSentRem.value+
-      el->icmpSent.value+el->icmp6Sent.value+el->ipv6BytesSent.value+
+      el->icmpSent.value+el->icmp6Sent.value+el->ipBytesSent.value+
       el->greSent.value+el->ipsecSent.value;
 
     totalRcvd = el->tcpRcvdLoc.value+el->tcpRcvdFromRem.value+
       el->udpRcvdLoc.value+el->udpRcvdFromRem.value+
-      el->icmpRcvd.value+el->icmp6Rcvd.value+el->ipv6BytesRcvd.value+
+      el->icmpRcvd.value+el->icmp6Rcvd.value+el->ipBytesRcvd.value+
       el->greRcvd.value+el->ipsecRcvd.value;
 
     if(el->nonIPTraffic) {
@@ -3808,7 +3808,7 @@ void printHostDetailedInfo(HostTraffic *el, int actualDeviceId) {
 			      "Local", "Rem", -1, percentage, 0, 0);
 
     if(el->bytesSent.value > 0) {
-      percentage = (((float)el->ipv4BytesSent.value*100)/el->bytesSent.value);
+      percentage = (((float)el->ipBytesSent.value*100)/el->bytesSent.value);
       printTableEntryPercentage(buf, sizeof(buf), "IP&nbsp;vs.&nbsp;Non-IP&nbsp;Sent",
 				"IP", "Non-IP", -1, percentage, 0, 0);
     }
@@ -3834,7 +3834,7 @@ void printHostDetailedInfo(HostTraffic *el, int actualDeviceId) {
 				"Local", "Rem", -1, percentage, 0, 0);
 
   if(el->bytesRcvd.value > 0) {
-    percentage = (((float)el->ipv4BytesRcvd.value*100)/el->bytesRcvd.value);
+    percentage = (((float)el->ipBytesRcvd.value*100)/el->bytesRcvd.value);
     printTableEntryPercentage(buf, sizeof(buf), "IP&nbsp;vs.&nbsp;Non-IP&nbsp;Rcvd",
 			      "IP", "Non-IP", -1, percentage, 0, 0);
   }

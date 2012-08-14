@@ -57,6 +57,7 @@ typedef struct {
 void cacheHostName(HostAddr *addr, char* symbolic) {
   HostNameCache name;
   datum data_data, key_data;
+  char buf[48];
 
   accessMutex(&myGlobals.serialLockMutex, "cacheHostName");
 
@@ -72,6 +73,7 @@ void cacheHostName(HostAddr *addr, char* symbolic) {
   // traceEvent(CONST_TRACE_INFO, "Cached host name %s", symbolic);
 
   releaseMutex(&myGlobals.serialLockMutex);
+  setCacheKeyValueString(_addrtostr(addr, buf, sizeof(buf)), "name", symbolic);
 }
 
 /* **************************************************** */
@@ -99,6 +101,12 @@ char* getHostNameFromCache(HostAddr *addr, char *buf, u_int buf_len) {
   releaseMutex(&myGlobals.serialLockMutex);
 
   // traceEvent(CONST_TRACE_INFO, "Resolved %s", ret ? ret : "<none>");
+
+  if(ret) {
+    char buf1[48];
+    
+    setCacheKeyValueString(_addrtostr(addr, buf1, sizeof(buf1)), "name", ret);
+  }
 
   return(ret);
 }

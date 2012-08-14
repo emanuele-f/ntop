@@ -596,10 +596,10 @@ void dumpNtopHashes(FILE *fDescr, char* options, int actualDeviceId) {
     if(checkFilter(filter, "pktsRcvd"))
       wrtLlongItm(fDescr, lang, "\t", "pktsRcvd", el->pktsRcvd, ',', numEntries);
 
-    if(checkFilter(filter, "ipv4BytesSent"))
-      wrtLlongItm(fDescr, lang, "\t", "ipv4BytesSent", el->ipv4BytesSent, ',', numEntries);
-    if(checkFilter(filter, "ipv4BytesRcvd"))
-      wrtLlongItm(fDescr, lang, "\t", "ipv4BytesRcvd", el->ipv4BytesRcvd, ',', numEntries);
+    if(checkFilter(filter, "ipBytesSent"))
+      wrtLlongItm(fDescr, lang, "\t", "ipBytesSent", el->ipBytesSent, ',', numEntries);
+    if(checkFilter(filter, "ipBytesRcvd"))
+      wrtLlongItm(fDescr, lang, "\t", "ipBytesRcvd", el->ipBytesRcvd, ',', numEntries);
 
     /* *************************************** */
 
@@ -673,11 +673,6 @@ void dumpNtopHashes(FILE *fDescr, char* options, int actualDeviceId) {
       if(checkFilter(filter, "peakThpt"))
 	wrtFloatItm(fDescr, lang, "\t", "peakThpt",    el->peakThpt, ',', numEntries);
     }
-
-    if(checkFilter(filter, "ipv6BytesSent"))
-      wrtLlongItm(fDescr, lang, "\t", "ipv6BytesSent", el->ipv6BytesSent, ',', numEntries);
-    if(checkFilter(filter, "ipv6BytesRcvd"))
-      wrtLlongItm(fDescr, lang, "\t", "ipv6BytesRcvd", el->ipv6BytesRcvd, ',', numEntries);
 
     ctr.value = el->tcpSentLoc.value+el->tcpSentRem.value;
     if(checkFilter(filter, "tcpBytesSent"))

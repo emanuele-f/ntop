@@ -427,6 +427,10 @@ ntop.h
 #include <openssl/err.h>
 #endif /* HAVE_OPENSSL */
 
+#ifdef HAVE_REDIS
+#include <hiredis/hiredis.h>
+#endif
+
 /* Compressed HTTP responses via zlib */
 #include <zlib.h>
 

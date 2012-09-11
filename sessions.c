@@ -1289,13 +1289,15 @@ static void handleHTTPSession(const struct pcap_pkthdr *h,
     }
   } else if(dport == IP_TCP_PORT_HTTP) {
     if(theSession->bytesProtoSent.value == 0) {
-      if((rcStr = (char*)malloc(packetDataLength+1)) == NULL) {
+      int http_len = min(packetDataLength, 1500);
+
+      if((rcStr = (char*)malloc(http_len+1)) == NULL) {
 	traceEvent (CONST_TRACE_WARNING, "handleHTTPSession: Unable to "
 		    "allocate memory, HTTP Session handling incomplete\n");
 	return;
       }
-      memcpy(rcStr, packetData, packetDataLength);
-      rcStr[packetDataLength] = '\0';
+      memcpy(rcStr, packetData, http_len);
+      rcStr[http_len] = '\0';
 
 #ifdef HTTP_DEBUG
       printf("HTTP_DEBUG: %s->%s [%s]\n",

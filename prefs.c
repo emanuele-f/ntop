@@ -171,7 +171,7 @@ static struct option const long_options[] = {
   { "disable-ndpi",                     no_argument,       NULL, 146 },
   { "disable-python",                   no_argument,       NULL, 147 },
   
-  { "skip-version-check",               required_argument, NULL, 150 },
+  { "skip-version-check",               no_argument,       NULL, 150 },
   { "known-subnets",                    required_argument, NULL, 151 },
 
   {NULL, 0, NULL, 0}

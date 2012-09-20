@@ -2167,7 +2167,7 @@ typedef struct ntopGlobals {
   /* Redis */
   struct {
     char *host;
-    int port;
+    u_int port;
     redisContext *context;
     PthreadMutex mutex;
   } redis;

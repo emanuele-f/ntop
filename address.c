@@ -962,9 +962,14 @@ static char* _res_skip(char *msg,
 /* ************************************ */
 
 void setHostName(HostTraffic *srcHost, char *name) {
-  u_short tmpStrLen = min(strlen(name), MAX_LEN_SYM_HOST_NAME);
-  strncpy(srcHost->hostResolvedName, name, tmpStrLen);
-  srcHost->hostResolvedName[tmpStrLen] = '\0';
+  if(strstr(name, "!") == NULL) {
+    u_short tmpStrLen = min(strlen(name), MAX_LEN_SYM_HOST_NAME);
+    
+    /* traceEvent(CONST_TRACE_WARNING, "%s [%s][%s][%s]", __FUNCTION__, srcHost->hostResolvedName,  srcHost->hostNumIpAddress, name); */
+    
+    strncpy(srcHost->hostResolvedName, name, tmpStrLen);
+    srcHost->hostResolvedName[tmpStrLen] = '\0';
+  }
 }
 
 /* ************************************ */

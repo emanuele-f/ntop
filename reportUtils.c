@@ -72,7 +72,7 @@ void formatUsageCounter(UsageCounter usageCtr,
 			Counter topValue,
 			/* If this value != 0 then a percentage is printed */
 			int actualDeviceId) {
-  char buf[LEN_GENERAL_WORK_BUFFER], formatBuf[32], hostLinkBuf[3*LEN_GENERAL_WORK_BUFFER];
+  char buf[LEN_GENERAL_WORK_BUFFER], formatBuf[32], hostLinkBuf[4*LEN_GENERAL_WORK_BUFFER];
   int i, sendHeader=0;
   HostTraffic *el;
 
@@ -2872,7 +2872,7 @@ HostTraffic* quickHostLink(HostSerialIndex theSerialIdx, int deviceId, HostTraff
 /* ************************************ */
 
 void printHostContactedPeers(HostTraffic *el, int actualDeviceId) {
-  char buf[LEN_GENERAL_WORK_BUFFER], hostLinkBuf[3*LEN_GENERAL_WORK_BUFFER];
+  char buf[LEN_GENERAL_WORK_BUFFER], hostLinkBuf[4*LEN_GENERAL_WORK_BUFFER];
   HostTraffic *theHost;
   u_int8_t header_sent;
 
@@ -4277,7 +4277,7 @@ void printSectionTitle(char *text) {
 void printHostsCharacterization(void) {
   u_int a=0, b=0, c=0, d=0, e=0, f=0, g=0, h=0, i=0, l=0, unhealthy=0, totHosts=0;
   HostTraffic *el;
-  char buf[LEN_GENERAL_WORK_BUFFER], hostLinkBuf[3*LEN_GENERAL_WORK_BUFFER], headerSent = 0;
+  char buf[LEN_GENERAL_WORK_BUFFER], hostLinkBuf[4*LEN_GENERAL_WORK_BUFFER], headerSent = 0;
 
   printHTMLheader("Local Hosts Characterization", NULL, 0);
 
@@ -4540,7 +4540,7 @@ void printHostsStats(int fingerprintRemote) {
       countNotIP=0,
       countUnknownFP=0,
       countCantResolve=0;
-  char buf[LEN_GENERAL_WORK_BUFFER], hostLinkBuf[3*LEN_GENERAL_WORK_BUFFER];
+  char buf[LEN_GENERAL_WORK_BUFFER], hostLinkBuf[4*LEN_GENERAL_WORK_BUFFER];
   char unknownFPs[LEN_GENERAL_WORK_BUFFER];
   int unknownFPsEtc=0;
 

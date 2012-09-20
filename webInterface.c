@@ -364,7 +364,7 @@ char* makeHostLink(HostTraffic *el, short mode,
     }
   } else {
     /* Got it? Use it! */
-    strncpy(symIp, el->hostResolvedName, sizeof(symIp));
+    // strncpy(symIp, el->hostResolvedName, sizeof(symIp));
 
     copyShortHostName(symIp, sizeof(symIp), el->hostResolvedName);
 
@@ -465,9 +465,10 @@ char* makeHostLink(HostTraffic *el, short mode,
   if(isPrinter(el))        printStr = "&nbsp;" CONST_IMG_PRINTER ; else printStr = "";
   if(isSMTPhost(el))       smtpStr = "&nbsp;" CONST_IMG_SMTP_SERVER ; else smtpStr = "";
   if(isHTTPhost(el)) {
-    httpStr = "&nbsp;" CONST_IMG_HTTP_SERVER ; 
+    char *name_to_use = strstr(symIp, "...") ? el->hostResolvedName : symIp; /* We need the long name */
 
-    httpSiteIcon(symIp, httpFavico, sizeof(httpFavico), 0);
+    httpStr = "&nbsp;" CONST_IMG_HTTP_SERVER;    
+    httpSiteIcon(name_to_use, httpFavico, sizeof(httpFavico), 0);
   } else 
     httpStr = "", httpFavico[0] = '\0';  
 
@@ -8044,7 +8045,7 @@ static void handleSingleWebConnection(fd_set *fdmask) {
 
     handleHTTPrequest(remote_ipaddr);
     closeNwSocket(&myGlobals.newSock);
-	shutdown(myGlobals.newSock, SHUT_RDWR);
+    shutdown(myGlobals.newSock, SHUT_RDWR);
   } else {
     traceEvent(CONST_TRACE_INFO, "Unable to accept HTTP(S) request (errno=%d: %s)", errno, strerror(errno));
   }

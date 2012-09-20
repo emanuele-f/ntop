@@ -1013,7 +1013,7 @@ void sendFile(char* fileName, int doNotUnlink) {
   if((fd = fopen(fileName, "rb")) != NULL) {
 
     for(;;) {
-      len = fread(tmpStr, sizeof(char), bufSize, fd);
+      len = (int)fread(tmpStr, sizeof(char), bufSize, fd);
       if(len > 0) {
 	sendStringLen(tmpStr, len);
 	totLen += len;

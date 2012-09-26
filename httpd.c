@@ -2199,6 +2199,15 @@ int isAllowedCommunity(char *community_name) {
   return(0);
 }
 
+/* **************************************** */
+
+/* Avoid cross-side scripting issues */
+void deXss(char *str) {
+  char *pct = strchr(str, '%');
+
+  if(pct != NULL)
+    pct[0] = '\0';
+}
 
 /* **************************************** */
 
@@ -2252,14 +2261,18 @@ static int returnHTTPPage(char* pageName,
 	sortedColumn = abs(idx);
       } else if(strncmp(tkn, "host=", 5) == 0) {
 	host = strdup(&tkn[5]);
+	deXss(host);
+	if(host) traceEvent(CONST_TRACE_WARNING, "host=%s", host);
       } else if(strncmp(tkn, "dom=", 4) == 0) {
 	domainNameParm = strdup(&tkn[4]);
+	deXss(domainNameParm);
       } else if(strncmp(tkn, "community=", 10) == 0) {
 	communityNameParm = strdup(&tkn[10]);
       } else if(strncmp(tkn, "netmode=", 8) == 0) {
 	networkMode = atoi(&tkn[8]);
       } else if(strncmp(tkn, "key=", 4) == 0) {
 	db_key = strdup(&tkn[4]);
+	deXss(db_key);
       } else if(strncmp(tkn, "val=", 4) == 0) {
 	u_int val = 0;
 	
@@ -2281,6 +2294,8 @@ static int returnHTTPPage(char* pageName,
 	  db_val = strdup(str_val);
 	} else
 	  db_val = strdup(&tkn[4]);
+
+	deXss(db_val);
       } else if(strncmp(tkn, "port=", 5) == 0) {
 	portNr = atoi(&tkn[5]);
       } else if(strncmp(tkn, "unit=", 5) == 0) {
@@ -2320,6 +2335,7 @@ static int returnHTTPPage(char* pageName,
     }
   }
 
+  
   /* Keep the myGlobals, local and prefsDB copies in sync */
   if(myGlobals.hostsDisplayPolicy != showHostsMode) {
     char tmp[8];

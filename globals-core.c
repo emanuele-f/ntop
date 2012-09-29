@@ -516,7 +516,7 @@ static void loadGeoIP(void) {
 /* ********************************* */
 
 static void debug_printf(u_int32_t protocol, void *id_struct, 
-			 ipq_log_level_t log_level, const char *format, ...) { ; }
+			 ndpi_log_level_t log_level, const char *format, ...) { ; }
 
 static void *malloc_wrapper(unsigned long size) { return malloc(size); }
 

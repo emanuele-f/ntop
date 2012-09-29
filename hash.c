@@ -419,6 +419,7 @@ int purgeIdleHosts(int actDevice) {
 
       while(el) {
 	if((!max_reached) 
+	   && (!myGlobals.runningPref.stickyHosts)
 	   && is_host_ready_to_purge(actDevice, el, now)) {
 	  if(!el->to_be_deleted) {
 	    el->to_be_deleted = 1; /* Delete it at the next run */

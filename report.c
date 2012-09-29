@@ -2462,9 +2462,9 @@ void makeDot() {
 
 void printHostsInfo(int sortedColumn, int revertOrder, int pageNum, int showBytes,
 		    int vlanId, int ifId, int knownSubnetId, int showL2Only) {
-  u_int idx, numEntries=0, maxHosts;
+  u_int idx, numEntries=0, maxHosts, numFound=0;
   int printedEntries=0;
-  unsigned short maxBandwidthUsage=1 /* avoid divisions by zero */;
+  u_short maxBandwidthUsage=1 /* avoid divisions by zero */;
   HostTraffic *el;
   HostTraffic** tmpTable;
   char buf[2*LEN_GENERAL_WORK_BUFFER], *arrowGif, *sign, *arrow[NUM_TABLE_COLUMNS],
@@ -2475,6 +2475,9 @@ void printHostsInfo(int sortedColumn, int revertOrder, int pageNum, int showByte
   u_char *vlanList, foundVlan = 0, vlanStr[16], ifStr[16], foundIf = 0, *ifList;
   u_int8_t *knownSubnets, selected;
 
+  traceEvent(CONST_TRACE_INFO, "%s(sortedColumn=%d, revertOrder=%d, pageNum=%d, showBytes=%d, vlanId=%d, ifId=%d, knownSubnetId=%d, showL2Only=%d)",
+	     __FUNCTION__, sortedColumn, revertOrder, pageNum, showBytes, vlanId, ifId, knownSubnetId, showL2Only);
+    
   vlanList = calloc(1, MAX_VLAN);
   if(vlanList == NULL) {
     traceEvent(CONST_TRACE_WARNING, "Unable to allocate memory for vlan list");
@@ -2496,8 +2499,6 @@ void printHostsInfo(int sortedColumn, int revertOrder, int pageNum, int showByte
     free(vlanList); free(ifList);
     return;
   }
-
-  ifId = abs(ifId);
 
   printHTMLheader("Host Information", NULL, 0);
 
@@ -2521,17 +2522,25 @@ void printHostsInfo(int sortedColumn, int revertOrder, int pageNum, int showByte
       el != NULL; el = getNextHost(myGlobals.actualReportDeviceId, el)) {
     unsigned short actUsage, actUsageS, actUsageR;
 
+    numFound++;
+
 #if 0
     traceEvent(CONST_TRACE_WARNING, "[%s][%s][%s]", 
 	       el->ethAddressString, el->hostNumIpAddress, el->hostResolvedName);
 #endif
 
     if(showL2Only) {
-      if(!el->l2Host) 
+      if(!el->l2Host) {
+	traceEvent(CONST_TRACE_INFO, "Skipping (1) [%s][%s][%s]",
+		   el->ethAddressString, el->hostNumIpAddress, el->hostResolvedName);
 	continue;
+      }
     } else {
-      if(el->l2Host)
+      if(el->l2Host) {
+	traceEvent(CONST_TRACE_INFO, "Skipping (2) [%s][%s][%s]",
+		   el->ethAddressString, el->hostNumIpAddress, el->hostResolvedName);
 	continue;
+      }
     }
 
     if(broadcastHost(el)) continue;
@@ -2580,6 +2589,8 @@ void printHostsInfo(int sortedColumn, int revertOrder, int pageNum, int showByte
     if(numEntries >= maxHosts)
       break;
   }
+
+  traceEvent(CONST_TRACE_INFO, "%s(numEntries=%d, maxHosts=%d, numFound=%d)", __FUNCTION__, numEntries, maxHosts, numFound);
 
   /* if(numEntries > 0) */ {
     int i;
@@ -3176,7 +3187,7 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
     }
 
   unescape(buf, sizeof(buf), host);
-
+  
   // traceEvent(CONST_TRACE_WARNING, "%s(%s)", __FUNCTION__, host);
 
   /* ****************************** */

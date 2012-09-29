@@ -865,8 +865,8 @@ typedef struct ipSession {
   struct {
     u_int8_t proto_guessed;
     u_int16_t major_proto;
-    struct ipoque_flow_struct *flow;
-    struct ipoque_id_struct *src, *dst;
+    struct ndpi_flow_struct *flow;
+    struct ndpi_id_struct *src, *dst;
   } l7;
 } IPSession;
 
@@ -1450,7 +1450,7 @@ typedef struct ntopInterface {
   
   struct {
     PthreadMutex l7Mutex;
-    struct ipoque_detection_module_struct *l7handler;
+    struct ndpi_detection_module_struct *l7handler;
     Counter *protoTraffic;
   } l7;
 } NtopInterface;

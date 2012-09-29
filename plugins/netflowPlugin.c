@@ -451,8 +451,8 @@ static void de_endianFlow(struct generic_netflow_record *record) {
   NTOHL(record->server_nw_latency_sec); NTOHL(record->server_nw_latency_usec);
   NTOHL(record->appl_latency_sec); NTOHL(record->appl_latency_usec);
 
-  if(record->l7_proto >= IPOQUE_MAX_SUPPORTED_PROTOCOLS)
-    record->l7_proto = IPOQUE_PROTOCOL_UNKNOWN; /* Just to be safe */
+  if(record->l7_proto >= NDPI_MAX_SUPPORTED_PROTOCOLS)
+    record->l7_proto = NDPI_PROTOCOL_UNKNOWN; /* Just to be safe */
 }
 
 /* *************************** */
@@ -805,7 +805,7 @@ if(myGlobals.runningPref.debugMode) {
     traceEvent(CONST_TRACE_ERROR, "************* AS %d/%d", srcHost->hostAS, dstHost->hostAS);
 #endif
 
-  if(major_proto == IPOQUE_PROTOCOL_UNKNOWN)
+  if(major_proto == NDPI_PROTOCOL_UNKNOWN)
     major_proto = ntop_guess_undetected_protocol(record->proto, 						 
 						 record->srcaddr, record->srcport, 
 						 record->dstaddr, record->dstport);
@@ -1114,7 +1114,7 @@ if(myGlobals.runningPref.debugMode) {
       updateSessionDelayStats(session);
     }
 
-    if(record->l7_proto == IPOQUE_PROTOCOL_UNKNOWN)
+    if(record->l7_proto == NDPI_PROTOCOL_UNKNOWN)
       session->l7.major_proto = 
 	ntop_guess_undetected_protocol(proto, 
 				       record->srcaddr, record->srcport, 
@@ -1690,7 +1690,7 @@ static void dissectFlow(u_int32_t netflow_device_ip,
 	      /* Defaults */
 	      memset(&record, 0, sizeof(record));
 	      record.vlanId = NO_VLAN; /* No VLAN */
-	      record.l7_proto = IPOQUE_PROTOCOL_UNKNOWN;
+	      record.l7_proto = NDPI_PROTOCOL_UNKNOWN;
 	      record.client_nw_latency_sec = record.client_nw_latency_usec = htonl(0);
 	      record.server_nw_latency_sec = record.server_nw_latency_usec = htonl(0);
 	      record.appl_latency_sec = record.appl_latency_usec = htonl(0);

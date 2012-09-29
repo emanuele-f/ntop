@@ -1941,7 +1941,7 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
     memset(theSession, 0, sizeof(IPSession));
     addedNewEntry = 1;
 
-    if(major_proto != IPOQUE_PROTOCOL_UNKNOWN) {
+    if(major_proto != NDPI_PROTOCOL_UNKNOWN) {
       theSession->l7.major_proto = major_proto;
     } else {
       rc = mapGlobalToLocalIdx(sport);
@@ -2546,41 +2546,41 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
 
   if(myGlobals.device[actualDeviceId].l7.l7handler
      && (theSession->pktRcvd < 20) && (theSession->pktSent < 20)) {
-    if((ip_offset > 0) && (theSession->l7.major_proto == IPOQUE_PROTOCOL_UNKNOWN)) {
+    if((ip_offset > 0) && (theSession->l7.major_proto == NDPI_PROTOCOL_UNKNOWN)) {
       u_int64_t when = ((u_int64_t) h->ts.tv_sec) * 1000 /* detection_tick_resolution */ + h->ts.tv_usec / 1000 /* (1000000 / detection_tick_resolution) */;
 
       accessMutex(&myGlobals.device[actualDeviceId].l7.l7Mutex, "l7Mutex");
-      theSession->l7.major_proto = ipoque_detection_process_packet(myGlobals.device[actualDeviceId].l7.l7handler,
+      theSession->l7.major_proto = ndpi_detection_process_packet(myGlobals.device[actualDeviceId].l7.l7handler,
 								   theSession->l7.flow, (u_int8_t *)&p[ip_offset],
 								   h->caplen-ip_offset, when,
 								   (sport == theSession->sport) ? theSession->l7.src : theSession->l7.dst,
 								   (sport == theSession->sport) ? theSession->l7.dst : theSession->l7.src);
       releaseMutex(&myGlobals.device[actualDeviceId].l7.l7Mutex);
 
-      if(theSession->l7.major_proto != IPOQUE_PROTOCOL_UNKNOWN) {
+      if(theSession->l7.major_proto != NDPI_PROTOCOL_UNKNOWN) {
 	/* traceEvent(CONST_TRACE_ERROR, "l7.major_proto=%d", theSession->l7.major_proto); */
 	freeOpenDPI(theSession);
 
 	switch(theSession->l7.major_proto) {
-	case IPOQUE_PROTOCOL_MAIL_SMTP:
+	case NDPI_PROTOCOL_MAIL_SMTP:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_SMTP, srcHost);
 	  break;
-	case IPOQUE_PROTOCOL_MAIL_POP:
+	case NDPI_PROTOCOL_MAIL_POP:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_POP, srcHost);
 	  break;
-	case IPOQUE_PROTOCOL_MAIL_IMAP:
+	case NDPI_PROTOCOL_MAIL_IMAP:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_IMAP, srcHost);
 	  break;
-	case IPOQUE_PROTOCOL_LDAP:
+	case NDPI_PROTOCOL_LDAP:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_DIRECTORY, srcHost);
 	  break;
-	case IPOQUE_PROTOCOL_FTP:
+	case NDPI_PROTOCOL_FTP:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_FTP, srcHost);
 	  break;
-	case IPOQUE_PROTOCOL_HTTP:
+	case NDPI_PROTOCOL_HTTP:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_HTTP, srcHost);
 	  break;
-	case IPOQUE_PROTOCOL_NETBIOS:
+	case NDPI_PROTOCOL_NETBIOS:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_WINS, srcHost);
 	  break;
 	case NTOP_PROTOCOL_FACEBOOK:
@@ -2593,7 +2593,7 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
       }
     }
   } else if((!theSession->l7.proto_guessed)
-	    && (theSession->l7.major_proto == IPOQUE_PROTOCOL_UNKNOWN)) {
+	    && (theSession->l7.major_proto == NDPI_PROTOCOL_UNKNOWN)) {
     theSession->l7.major_proto = 
       ntop_guess_undetected_protocol(proto, 
 				     srcHost->hostIp4Address.s_addr, sport, 
@@ -2601,7 +2601,7 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
     theSession->l7.proto_guessed = 1;
   }
 
-  if(theSession->l7.major_proto != IPOQUE_PROTOCOL_UNKNOWN)
+  if(theSession->l7.major_proto != NDPI_PROTOCOL_UNKNOWN)
     freeOpenDPI(theSession);
 
   myGlobals.device[actualDeviceId].l7.protoTraffic[theSession->l7.major_proto] += h->len;
@@ -2786,15 +2786,15 @@ char *getProtoName(u_int8_t proto, u_short protoId) {
   if((proto == IPPROTO_TCP) 
      || (proto == IPPROTO_UDP) 
      || (proto == 0 /* any */)) {
-    char *prot_long_str[] = { IPOQUE_PROTOCOL_LONG_STRING };
+    char *prot_long_str[] = { NDPI_PROTOCOL_LONG_STRING };
     
-    if(protoId < IPOQUE_MAX_SUPPORTED_PROTOCOLS)
+    if(protoId < NDPI_MAX_SUPPORTED_PROTOCOLS)
       return(prot_long_str[protoId]);
-    else if(protoId <= (IPOQUE_MAX_SUPPORTED_PROTOCOLS + myGlobals.numIpProtosToMonitor)) {
-      u_int id = protoId - IPOQUE_MAX_SUPPORTED_PROTOCOLS;
+    else if(protoId <= (NDPI_MAX_SUPPORTED_PROTOCOLS + myGlobals.numIpProtosToMonitor)) {
+      u_int id = protoId - NDPI_MAX_SUPPORTED_PROTOCOLS;
       return(myGlobals.ipTrafficProtosNames[id]);
     } else
-      return(prot_long_str[IPOQUE_PROTOCOL_UNKNOWN]);
+      return(prot_long_str[NDPI_PROTOCOL_UNKNOWN]);
   } else {
     return("");
   }

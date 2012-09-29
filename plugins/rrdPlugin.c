@@ -4782,9 +4782,9 @@ static void rrdUpdateIPHostStats(HostTraffic *el, int devIdx, u_int8_t is_subnet
 		    is_subnet_host ? "subnet" : "hosts",
 		    adjHostName);
 
-      for(j=0; j<IPOQUE_MAX_SUPPORTED_PROTOCOLS; j++) {
+      for(j=0; j<NDPI_MAX_SUPPORTED_PROTOCOLS; j++) {
 	char key[128];
-	char *prot_long_str[] = { IPOQUE_PROTOCOL_LONG_STRING };
+	char *prot_long_str[] = { NDPI_PROTOCOL_LONG_STRING };
 
 	if(el->l7.traffic[j].bytesSent) {
 	  safe_snprintf(__FILE__, __LINE__, key, sizeof(key), "%sBytesSent", prot_long_str[j]);
@@ -5287,12 +5287,12 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 	}
 
 	if(dumpDetail >= FLAG_RRD_DETAIL_MEDIUM) {
-	  char *prot_long_str[] = { IPOQUE_PROTOCOL_LONG_STRING };
+	  char *prot_long_str[] = { NDPI_PROTOCOL_LONG_STRING };
 
 	  safe_snprintf(__FILE__, __LINE__, rrdPath, sizeof(rrdPath), "%s/interfaces/%s/IP_",
 			myGlobals.rrdPath,  myGlobals.device[devIdx].uniqueIfName);
 
-	  for(j=0; j<IPOQUE_MAX_SUPPORTED_PROTOCOLS; j++) {
+	  for(j=0; j<NDPI_MAX_SUPPORTED_PROTOCOLS; j++) {
 	    TrafficCounter ctr;
 	    char tmpStr[128];
 

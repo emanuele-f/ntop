@@ -409,7 +409,7 @@ void initNtopGlobals(int argc, char * argv[], int argc_started, char *argv_start
   myGlobals.numPurgedHosts = myGlobals.numTerminatedSessions = 0;
 
   /* Dummy value just to be safe: it will be set later on */
-  myGlobals.l7.numSupportedProtocols = 2 * IPOQUE_MAX_SUPPORTED_PROTOCOLS;
+  myGlobals.l7.numSupportedProtocols = 2 * NDPI_MAX_SUPPORTED_PROTOCOLS;
 
   myGlobals.broadcastEntry = (HostTraffic*)malloc(sizeof(HostTraffic));
   memset(myGlobals.broadcastEntry, 0, sizeof(HostTraffic));
@@ -523,20 +523,20 @@ static void *malloc_wrapper(unsigned long size) { return malloc(size); }
 /* ********************************* */
 
 void initL7DeviceDiscovery(int deviceId) {
-  IPOQUE_PROTOCOL_BITMASK all;
+  NDPI_PROTOCOL_BITMASK all;
   u32 detection_tick_resolution = 1000;
 
   if(myGlobals.runningPref.disablenDPI) return;
 
-  myGlobals.device[deviceId].l7.l7handler = ipoque_init_detection_module(detection_tick_resolution, malloc_wrapper, debug_printf);
+  myGlobals.device[deviceId].l7.l7handler = ndpi_init_detection_module(detection_tick_resolution, malloc_wrapper, debug_printf);
   if(myGlobals.device[deviceId].l7.l7handler == NULL) {
     traceEvent(CONST_TRACE_ERROR, "Unable to initialize L7 engine: disabling L7 discovery for deviceId %u", deviceId);
     return;
   }
 
   // enable all protocols
-  IPOQUE_BITMASK_SET_ALL(all);
-  ipoque_set_protocol_detection_bitmask2(myGlobals.device[deviceId].l7.l7handler, &all);
+  NDPI_BITMASK_SET_ALL(all);
+  ndpi_set_protocol_detection_bitmask2(myGlobals.device[deviceId].l7.l7handler, &all);
 
   /* ************************** */
 
@@ -546,8 +546,8 @@ void initL7DeviceDiscovery(int deviceId) {
 /* ********************************* */
 
 static void initL7Discovery(void) {
-  myGlobals.l7.proto_size = ipoque_detection_get_sizeof_ipoque_id_struct();
-  myGlobals.l7.flow_struct_size = ipoque_detection_get_sizeof_ipoque_flow_struct();
+  myGlobals.l7.proto_size = ndpi_detection_get_sizeof_ndpi_id_struct();
+  myGlobals.l7.flow_struct_size = ndpi_detection_get_sizeof_ndpi_flow_struct();
 }
 
 /* ********************************* */
@@ -561,7 +561,7 @@ void initNtop(char *devices) {
   initIPServices();
   handleProtocols();
 
-  myGlobals.l7.numSupportedProtocols = IPOQUE_MAX_SUPPORTED_PROTOCOLS;
+  myGlobals.l7.numSupportedProtocols = NDPI_MAX_SUPPORTED_PROTOCOLS;
 
   if(myGlobals.numIpProtosToMonitor == 0)
     addDefaultProtocols();

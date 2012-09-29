@@ -605,14 +605,14 @@ void processIpPkt(const u_char *bp, /* Pointer to IP */
 			  dport, ntohs(ip6->ip6_plen), 0, 
 			  ip_offset, &tp, tcpDataLength,
 			  theData, actualDeviceId, &newSession, 
-			  IPOQUE_PROTOCOL_UNKNOWN, 1);
+			  NDPI_PROTOCOL_UNKNOWN, 1);
 	  else
 	    handleSession(h, p, nh, (off & 0x3fff), tp.th_win,
 			  srcHost, sport, dstHost,
 			  dport, ip_len, 0, 
 			  ip_offset, &tp, tcpDataLength,
 			  theData, actualDeviceId, &newSession, 
-			  IPOQUE_PROTOCOL_UNKNOWN, 1);
+			  NDPI_PROTOCOL_UNKNOWN, 1);
 	}
       }
     }
@@ -823,7 +823,7 @@ void processIpPkt(const u_char *bp, /* Pointer to IP */
 			  ip_offset, NULL, udpDataLength,
 			  (u_char*)(bp+hlen+sizeof(struct udphdr)),
 			  actualDeviceId, &newSession, 
-			  IPOQUE_PROTOCOL_UNKNOWN, 1);
+			  NDPI_PROTOCOL_UNKNOWN, 1);
 	  else
 	    handleSession(h, p, nh, (off & 0x3fff), 0,
 			  srcHost, sport, dstHost,
@@ -831,7 +831,7 @@ void processIpPkt(const u_char *bp, /* Pointer to IP */
 			  NULL, udpDataLength,
 			  (u_char*)(bp+hlen+sizeof(struct udphdr)),
 			  actualDeviceId, &newSession, 
-			  IPOQUE_PROTOCOL_UNKNOWN, 1);
+			  NDPI_PROTOCOL_UNKNOWN, 1);
 	}
 
 	newSession = 1; /* Trick to account flows anyway */

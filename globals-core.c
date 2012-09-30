@@ -524,7 +524,7 @@ static void *malloc_wrapper(unsigned long size) { return malloc(size); }
 
 void initL7DeviceDiscovery(int deviceId) {
   NDPI_PROTOCOL_BITMASK all;
-  u32 detection_tick_resolution = 1000;
+  u_int32_t detection_tick_resolution = 1000;
 
   if(myGlobals.runningPref.disablenDPI) return;
 

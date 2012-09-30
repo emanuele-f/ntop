@@ -2583,10 +2583,10 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
 	case NDPI_PROTOCOL_NETBIOS:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_WINS, srcHost);
 	  break;
-	case NTOP_PROTOCOL_FACEBOOK:
+	case NDPI_PROTOCOL_FACEBOOK:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_FACEBOOK_CLIENT, srcHost);
 	  break;
-	case NTOP_PROTOCOL_TWITTER:
+	case NDPI_PROTOCOL_TWITTER:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_TWITTER_CLIENT, srcHost);
 	  break;
 	}
@@ -2595,7 +2595,7 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
   } else if((!theSession->l7.proto_guessed)
 	    && (theSession->l7.major_proto == NDPI_PROTOCOL_UNKNOWN)) {
     theSession->l7.major_proto = 
-      ntop_guess_undetected_protocol(proto, 
+      ndpi_guess_undetected_protocol(proto, 
 				     srcHost->hostIp4Address.s_addr, sport, 
 				     dstHost->hostIp4Address.s_addr, dport);
     theSession->l7.proto_guessed = 1;

@@ -2202,7 +2202,7 @@ int isAllowedCommunity(char *community_name) {
 /* **************************************** */
 
 /* Avoid cross-side scripting issues */
-void deXss(char *str) {
+static void deXss(char *str) {
   char *pct = strchr(str, '%');
 
   if(pct != NULL)

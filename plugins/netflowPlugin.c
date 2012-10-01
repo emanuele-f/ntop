@@ -806,7 +806,7 @@ if(myGlobals.runningPref.debugMode) {
 #endif
 
   if(major_proto == NDPI_PROTOCOL_UNKNOWN)
-    major_proto = ntop_guess_undetected_protocol(record->proto, 						 
+    major_proto = ndpi_guess_undetected_protocol(record->proto, 						 
 						 record->srcaddr, record->srcport, 
 						 record->dstaddr, record->dstport);
 
@@ -1116,7 +1116,7 @@ if(myGlobals.runningPref.debugMode) {
 
     if(record->l7_proto == NDPI_PROTOCOL_UNKNOWN)
       session->l7.major_proto = 
-	ntop_guess_undetected_protocol(proto, 
+	ndpi_guess_undetected_protocol(proto, 
 				       record->srcaddr, record->srcport, 
 				       record->dstaddr, record->dstport);
     else

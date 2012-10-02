@@ -439,9 +439,14 @@ rm -f confdefs.h
 echo "9. Downloading nDPI..."
 
 NDPI_URL=https://svn.ntop.org/svn/ntop/trunk/nDPI/
+CHK_OUT_DIR=
+REV_NUM=5721
 if test -d nDPI; then
     echo "nDPI already available"
 else
+#
+#   "Ronald W. Henderson" <rwhalb@nycap.rr.com>
+#    svn export  --revision $REV_NUM  $NDPI_URL $CHK_OUT_DIR
     svn co $NDPI_URL
 fi
 

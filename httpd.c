@@ -3336,6 +3336,8 @@ static int checkHTTPpassword(char *theRequestedURL,
     strncpy(thePw, &outBuffer[i+1], thePwLen-1)[thePwLen-1] = '\0';
   }
 
+  if(user == NULL) user = "";
+
   if(strlen(user) >= sizeof(theHttpUser)) user[sizeof(theHttpUser)-1] = '\0';
   strcpy(theHttpUser, user);
 

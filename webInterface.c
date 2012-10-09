@@ -3439,12 +3439,6 @@ void printNtopConfigHInfo(int textPrintFlag) {
   printFeatureConfigInfo(textPrintFlag, "CONST_IP_L_2_R_HTML", "undefined");
 #endif
 
-#ifdef CONST_IP_PROTO_DISTRIB_HTML
-  printFeatureConfigInfo(textPrintFlag, "CONST_IP_PROTO_DISTRIB_HTML", CONST_IP_PROTO_DISTRIB_HTML);
-#else
-  printFeatureConfigInfo(textPrintFlag, "CONST_IP_PROTO_DISTRIB_HTML", "undefined");
-#endif
-
 #ifdef CONST_IP_PROTO_USAGE_HTML
   printFeatureConfigInfo(textPrintFlag, "CONST_IP_PROTO_USAGE_HTML", CONST_IP_PROTO_USAGE_HTML);
 #else

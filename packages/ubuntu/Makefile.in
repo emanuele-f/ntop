@@ -1,12 +1,12 @@
 NTOP_HOME=$(PWD)/../..
-NTOP_BUILD=${NTOP_HOME}/packages/ubuntu
+NTOP_BUILD=${NTOP_HOME}/packages/ubuntu/debian/tmp
 
 all:
 	rm -rf debian/tmp
 	cd $(NTOP_HOME); make distclean; ./configure --prefix=${NTOP_BUILD}/usr/local CFLAGS="-O2"; make install install-data-local
-	#cd ./debian/tmp; find usr -type d > ../dirs
+	cd ./debian/tmp; find usr -type d > ../dirs
 	@find ./debian -name "*~" -exec /bin/rm {} ';' 
-	dpkg-buildpackage -rfakeroot #-d # -us -uc 
+	dpkg-buildpackage -rfakeroot -d -us -uc 
 	@\rm -f ../ntop*dsc ../ntop*.gz ../ntop*changes 
 	@/bin/mv ../ntop*deb . 
 	@echo 

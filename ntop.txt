@@ -9,23 +9,24 @@ SSYYNNOOPPSSIISS
        nnttoopp  [@@ffiilleennaammee] [--aa|----aacccceessss--lloogg--ffiillee _<_p_a_t_h_>] [--bb|----ddiissaabbllee--ddeeccooddeerrss]
        [--cc|----ssttiicckkyy--hhoossttss]    [--ee|----mmaaxx--ttaabbllee--rroowwss]    [--ff|----ttrraaffffiicc--dduummpp--ffiillee
        _f_i_l_e_>]   [--gg|----ttrraacckk--llooccaall--hhoossttss]  [--hh|----hheellpp]  [--ll|----ppccaapp--lloogg  _<_p_a_t_h_>]
-       [--mm|----llooccaall--ssuubbnneettss _<_a_d_d_r_e_s_s_e_s_>] [--nn|----nnuummeerriicc--iipp--aaddddrreesssseess] [--pp|----pprroo--
-       ttooccoollss   _<_l_i_s_t_>]   [--qq|----ccrreeaattee--ssuussppiicciioouuss--ppaacckkeettss]  [--rr|----rreeffrreesshh--ttiimmee
-       _<_n_u_m_b_e_r_>]   [--ss|----nnoo--pprroommiissccuuoouuss]   [--tt|----ttrraaccee--lleevveell   _<_n_u_m_b_e_r_>]   [--xx
-       _<_m_a_x___n_u_m___h_a_s_h___e_n_t_r_i_e_s_>]  [--ww|----hhttttpp--sseerrvveerr  _<_p_o_r_t_>]  [--zz|----ddiissaabbllee--sseess--
-       ssiioonnss]   [--AA|----sseett--aaddmmiinn--ppaasssswwoorrdd   _p_a_s_s_w_o_r_d]   [--BB|----ffiilltteerr--eexxpprreessssiioonn
-       _e_x_p_r_e_s_s_i_o_n]  [--CC  _<_c_o_n_f_i_gmode>_]  [--DD|----ddoommaaiinn  _<_n_a_m_e_>]  [--FF|----ffllooww--ssppeecc
-       _<_s_p_e_c_s_>] [--MM|----nnoo--iinntteerrffaaccee--mmeerrggee] [--NN|----wwwwnn--mmaapp  _<_p_a_t_h_>]  [--OO|--------oouutt--
-       ppuutt--ppaacckkeett--ppaatthh  _<_p_a_t_h_>]  [--PP|----ddbb--ffiillee--ppaatthh  _<_p_a_t_h_>] [--QQ|----ssppooooll--ffiillee--
-       ppaatthh _<_p_a_t_h_>] [--UU|----mmaappppeerr _<_U_R_L_>] [--VV|----vveerrssiioonn]]  [--XX  _<_m_a_x___n_u_m___T_C_P___s_e_s_-
-       _s_i_o_n_s_>]    [----ddiissaabbllee--iinnssttaannttsseessssiioonnppuurrggee]   [----ddiissaabbllee--mmuutteexxeexxttrraaiinnffoo]
-       [----ddiissaabbllee--nnddppii] [----ddiissaabbllee--ppyytthhoonn] [----iinnssttaannccee] [----pp33pp--ccpp] [----pp33pp--uurrii]
-       [----sskkiipp--vveerrssiioonn--cchheecckk] [----ww33cc] [--44|----iippvv44]] [--66|----iippvv66]]
+       [--mm|----llooccaall--ssuubbnneettss      _<_a_d_d_r_e_s_s_e_s_>]       [--nn|----nnuummeerriicc--iipp--aaddddrreesssseess]
+       [--oo|----rreeddiiss  _<_h_o_s_t_:_p_o_r_t_>]  [--pp|----pprroottooccoollss  _<_l_i_s_t_>] [--qq|----ccrreeaattee--ssuussppii--
+       cciioouuss--ppaacckkeettss]   [--rr|----rreeffrreesshh--ttiimmee   _<_n_u_m_b_e_r_>]   [--ss|----nnoo--pprroommiissccuuoouuss]
+       [--tt|----ttrraaccee--lleevveell  _<_n_u_m_b_e_r_>]  [--xx  _<_m_a_x___n_u_m___h_a_s_h___e_n_t_r_i_e_s_>]  [--ww|----hhttttpp--
+       sseerrvveerr _<_p_o_r_t_>] [--zz|----ddiissaabbllee--sseessssiioonnss]  [--AA|----sseett--aaddmmiinn--ppaasssswwoorrdd  _p_a_s_s_-
+       _w_o_r_d]    [--BB|----ffiilltteerr--eexxpprreessssiioonn    _e_x_p_r_e_s_s_i_o_n]    [--CC    _<_c_o_n_f_i_gmode>_]
+       [--DD|----ddoommaaiinn _<_n_a_m_e_>] [--FF|----ffllooww--ssppeecc _<_s_p_e_c_s_>] [--MM|----nnoo--iinntteerrffaaccee--mmeerrggee]
+       [--NN|----wwwwnn--mmaapp _<_p_a_t_h_>] [--OO|--------oouuttppuutt--ppaacckkeett--ppaatthh _<_p_a_t_h_>] [--PP|----ddbb--ffiillee--
+       ppaatthh  _<_p_a_t_h_>]   [--QQ|----ssppooooll--ffiillee--ppaatthh   _<_p_a_t_h_>]   [--UU|----mmaappppeerr   _<_U_R_L_>]
+       [--VV|----vveerrssiioonn]]  [--XX  _<_m_a_x___n_u_m___T_C_P___s_e_s_s_i_o_n_s_>] [----ddiissaabbllee--iinnssttaannttsseessssiioonn--
+       ppuurrggee] [----ddiissaabbllee--mmuutteexxeexxttrraaiinnffoo]  [----ddiissaabbllee--nnddppii]  [----ddiissaabbllee--ppyytthhoonn]
+       [----iinnssttaannccee]   [----pp33pp--ccpp]  [----pp33pp--uurrii]  [----sskkiipp--vveerrssiioonn--cchheecckk]  [----ww33cc]
+       [--44|----iippvv44]] [--66|----iippvv66]]
 
        Unix options:
 
-       [--dd|----ddaaeemmoonn]  [--ii|----iinntteerrffaaccee _<_n_a_m_e_>] [--uu|----uusseerr _<_u_s_e_r_>] [--KK|----eennaabbllee--
-       ddeebbuugg] [--LL]  [----ppccaapp__sseettnnoonnbblloocckk]  [----uussee--ssyysslloogg==  _<_f_a_c_i_l_i_t_y_>]  [----wweebb--
+       [--dd|----ddaaeemmoonn] [--ii|----iinntteerrffaaccee _<_n_a_m_e_>] [--uu|----uusseerr _<_u_s_e_r_>]  [--KK|----eennaabbllee--
+       ddeebbuugg]  [--LL]  [----ppccaapp__sseettnnoonnbblloocckk]  [----uussee--ssyysslloogg==  _<_f_a_c_i_l_i_t_y_>] [----wweebb--
        sseerrvveerr--qquueeuuee _<_n_u_m_b_e_r_>]
 
        Windows option:
@@ -38,15 +39,15 @@ SSYYNNOOPPSSIISS
 
 
 DDEESSCCRRIIPPTTIIOONN
-       nnttoopp  shows the current network usage. It displays a list of hosts that
-       are currently using the network and reports information concerning  the
-       (IP  and non-IP) traffic generated and received by each host.  nnttoopp may
+       nnttoopp shows the current network usage. It displays a list of hosts  that
+       are  currently using the network and reports information concerning the
+       (IP and non-IP) traffic generated and received by each host.  nnttoopp  may
        operate as a front-end collector (sFlow and/or netFlow plugins) or as a
-       stand-alone  collector/display  program.  A  web  browser  is needed to
+       stand-alone collector/display program.  A  web  browser  is  needed  to
        access the information captured by the nnttoopp program.
 
-       nnttoopp is a hybrid layer 2 / layer 3 network monitor, that is by  default
-       it  uses the layer 2 Media Access Control (MAC) addresses AND the layer
+       nnttoopp  is a hybrid layer 2 / layer 3 network monitor, that is by default
+       it uses the layer 2 Media Access Control (MAC) addresses AND the  layer
        3 tcp/ip addresses.  nnttoopp is capable of associating the two, so that ip
        and non-ip traffic (e.g. arp, rarp) are combined for a complete picture
        of network activity.
@@ -55,34 +56,34 @@ DDEESSCCRRIIPPTTIIOONN
 
 CCOOMMMMAANNDD--LLIINNEE OOPPTTIIOONNSS
        @@ffiilleennaammee
-        The text of ffiilleennaammee is copied -  ignoring  line  breaks  and  comment
-        lines  (anything following a #) - into the command line.  nnttoopp behaves
-        as if all of the text had simply been typed directly  on  the  command
-        line.   For example, if the command line is "-t 3 @d -u ntop" and file
+        The  text  of  ffiilleennaammee  is  copied - ignoring line breaks and comment
+        lines (anything following a #) - into the command line.  nnttoopp  behaves
+        as  if  all  of the text had simply been typed directly on the command
+        line.  For example, if the command line is "-t 3 @d -u ntop" and  file
         d contains just the line '-d', then the effective command line is -t 3
-        -d  -u  ntop.   Multiple  @s are permitted. Nested @s (an @ inside the
+        -d -u ntop.  Multiple @s are permitted. Nested @s  (an  @  inside  the
         file) are not permitted.
 
-        Remember, most nnttoopp options are "sticky", that is  they  just  set  an
-        internal  flag.  Invoking  them  multiple  times doesn't change nnttoopp''ss
-        behavior. However, options that set a value,  such  as  --trace-level,
-        will  use  the  LAST value given: --trace-level 2 --trace-level 3 will
+        Remember,  most  nnttoopp  options  are "sticky", that is they just set an
+        internal flag. Invoking them  multiple  times  doesn't  change  nnttoopp''ss
+        behavior.  However,  options  that set a value, such as --trace-level,
+        will use the LAST value given: --trace-level 2  --trace-level  3  will
         run as --trace-level 3.
 
-        Beginning with 3.1, many command-line options may also be set via  the
-        web  browser  interface.  These changes take effect on the next run of
+        Beginning  with 3.1, many command-line options may also be set via the
+        web browser interface.  These changes take effect on the next  run  of
         and on each subsequent run until changed.
 
 
 
        --aa || ----aacccceessss--lloogg--ffiillee
         By default nnttoopp does not maintain a log of HTTP requests to the inter-
-        nal  web server.  Use this parameter to request logging and to specify
+        nal web server.  Use this parameter to request logging and to  specify
         the location of the file where these HTTP requests are logged.
 
-        Each log entry is in Apache-like style.  The only  difference  between
+        Each  log  entry is in Apache-like style.  The only difference between
         Apache and nnttoopp logs is that an additional column has been added which
-        has the time (in milliseconds) that nnttoopp needed to serve the  request.
+        has  the time (in milliseconds) that nnttoopp needed to serve the request.
         Log entries look like this:
 
         192.168.1.1 - - [04/Sep/2003:20:38:55 -0500] - "GET / HTTP/1.1" 200 1489 4
@@ -93,7 +94,7 @@ CCOOMMMMAANNDD--LLIINNEE OOPPTTIIOONNSS
         192.168.1.1 - - [04/Sep/2003:20:38:56 -0500] - "GET /home.html HTTP/1.1" 200 1100/3195 10
         192.168.1.1 - - [04/Sep/2003:20:38:56 -0500] - "GET /About.html HTTP/1.1" 200 2010 10
 
-        This  parameter is the complete file name of the access log.  In prior
+        This parameter is the complete file name of the access log.  In  prior
         releases it was erroneously called --access-log-path.
 
 
@@ -101,75 +102,75 @@ CCOOMMMMAANNDD--LLIINNEE OOPPTTIIOONNSS
         This parameter disables protocol decoders.
 
         Protocol decoders examine and collect information about layer 2 proto-
-        cols  such as NetBIOS or Netware SAP, as well as about specific tcp/ip
+        cols such as NetBIOS or Netware SAP, as well as about specific  tcp/ip
         (layer 3) protocols, such as DNS, http and ftp.
 
-        This support is specifically coded for each protocol and is  different
-        from  the  capability  to count raw information (packets and bytes) by
+        This  support is specifically coded for each protocol and is different
+        from the capability to count raw information (packets  and  bytes)  by
         protocol specified by the -p | --protocols parameter, below.
 
         Decoding protocols is a significant consumer of resources. If the nnttoopp
-        host  is  underpowered or monitoring a very busy network, you may wish
-        to disable protocol decoding via  this  parameter.   It  may  also  be
-        appropriate  to  use this parameter if you believe that nnttoopp has prob-
+        host is underpowered or monitoring a very busy network, you  may  wish
+        to  disable  protocol  decoding  via  this  parameter.  It may also be
+        appropriate to use this parameter if you believe that nnttoopp  has  prob-
         lems handling some protocols that occur on your network.
 
-        Even if decoding is disabled, ftp-data traffic  is  still  decoded  to
+        Even  if  decoding  is  disabled, ftp-data traffic is still decoded to
         look for passive ftp port commands.
 
 
        --cc || ----ssttiicckkyy--hhoossttss
-        Use  this  parameter to prevent idle hosts from being purged from mem-
+        Use this parameter to prevent idle hosts from being purged  from  mem-
         ory.
 
-        By default idle hosts are periodically purged from  memory.   An  idle
+        By  default  idle  hosts are periodically purged from memory.  An idle
         host is identified when no packets from or to that host have been mon-
-        itored  for  the  period   of   time   defined   by   the   value   of
+        itored   for   the   period   of   time   defined   by  the  value  of
         PARM_HOST_PURGE_MINIMUM_IDLE in globals-defines.h.
 
-        If  you use this option, all hosts - active and idle - are retained in
+        If you use this option, all hosts - active and idle - are retained  in
         memory for the duration of the nnttoopp run.
 
-        P2P users, port scans, popular web servers  and  other  activity  will
+        P2P  users,  port  scans,  popular web servers and other activity will
         cause nnttoopp to record data about a large number of hosts.  On an active
         network, this will consume a significant - and always growing - amount
-        of  memory.   It  is  strongly  recommended  that  you use a filtering
-        expression to limit the hosts which are stored if  you  use  --sticky-
+        of memory.  It is  strongly  recommended  that  you  use  a  filtering
+        expression  to  limit  the hosts which are stored if you use --sticky-
         hosts.
 
         The idle purge is a statistical one - a random selection of the eligi-
-        ble hosts will be purged during each cycle.  Thus it is possible on  a
-        busy  system  for an idle host to remain in the nnttoopp tables and appear
+        ble  hosts will be purged during each cycle.  Thus it is possible on a
+        busy system for an idle host to remain in the nnttoopp tables  and  appear
         'active' for some considerable time after it is truly idle.
 
 
        --dd || ----ddaaeemmoonn
-        This parameter causes ntop to become a daemon, i.e. a task which  runs
-        in  the  background without connection to a specific terminal.  To use
+        This  parameter causes ntop to become a daemon, i.e. a task which runs
+        in the background without connection to a specific terminal.   To  use
         nnttoopp other than as a casual monitoring tool, you probably will want to
         use this option.
 
-        WWAARRNNIINNGG::  If  you are running as a daemon, the messages from nnttoopp will
-        be 'printed' on to stdout and thus dropped.  You probably  don't  want
+        WWAARRNNIINNGG:: If you are running as a daemon, the messages from  nnttoopp  will
+        be  'printed'  on to stdout and thus dropped.  You probably don't want
         to do this.  So remember to also use the -L or --use-syslog options to
         save the messages into the system log.
 
 
        --ee || ----mmaaxx--ttaabbllee--rroowwss
-        This defines the maximum number of lines that  nnttoopp  will  display  on
+        This  defines  the  maximum  number of lines that nnttoopp will display on
         each generated HTML page. If there are more lines to be displayed than
-        this setting permits, only part of the data will be displayed.   There
-        will  be page forward/back arrows placed at the bottom of the page for
+        this  setting permits, only part of the data will be displayed.  There
+        will be page forward/back arrows placed at the bottom of the page  for
         navigation between pages.
 
 
        --ff || ----ttrraaffffiicc--dduummpp--ffiillee
-        By default, nnttoopp captures traffic from network interface cards  (NICs)
+        By  default, nnttoopp captures traffic from network interface cards (NICs)
         or from netFlow/sFlow probes.  However, nnttoopp can also read data from a
-        file - typically a tcpdump capture or the output from one of the  nnttoopp
+        file  - typically a tcpdump capture or the output from one of the nnttoopp
         packet capture options.
 
-        if  you specify -f, nnttoopp will not capture any traffic from NICs during
+        if you specify -f, nnttoopp will not capture any traffic from NICs  during
         or after the file has been read.  netFlow/sFlow capture - if enabled -
         would still be active.
 
@@ -177,14 +178,14 @@ CCOOMMMMAANNDD--LLIINNEE OOPPTTIIOONNSS
 
 
        --gg || ----ttrraacckk--llooccaall--hhoossttss
-        By  default,  nnttoopp tracks all hosts that it sees from packets captured
-        on the various NICs.  Use this parameter to tell nnttoopp to capture  data
-        only  about  local  hosts.   Local  hosts  are  defined  based  on the
-        addresses of the NICs and those networks identified as local  via  the
+        By default, nnttoopp tracks all hosts that it sees from  packets  captured
+        on  the various NICs.  Use this parameter to tell nnttoopp to capture data
+        only about  local  hosts.   Local  hosts  are  defined  based  on  the
+        addresses  of  the NICs and those networks identified as local via the
         -m | --local-subnets parameter.
 
-        This  parameter  is  useful  on  large networks or those that see many
-        hosts, (e.g. a border router  or  gateway),  where  information  about
+        This parameter is useful on large networks  or  those  that  see  many
+        hosts,  (e.g.  a  border  router  or gateway), where information about
         remote hosts is not desired/required to be tracked.
 
 
@@ -193,71 +194,78 @@ CCOOMMMMAANNDD--LLIINNEE OOPPTTIIOONNSS
 
 
        --ii || ----iinntteerrffaaccee
-        Specifies  the  network interface or interfaces to be used by nnttoopp for
+        Specifies the network interface or interfaces to be used by  nnttoopp  for
         network monitoring.
 
-        If multiple interfaces are used (this feature  is  available  only  if
-        ntop  is  compiled  with thread support) their names must be separated
+        If  multiple  interfaces  are  used (this feature is available only if
+        ntop is compiled with thread support) their names  must  be  separated
         with a comma. For instance -i "eth0,lo".
 
         If not specified, the default is the first Ethernet device, e.g. eth0.
         The specific device that is 'first' is highly system dependent.  Espe-
-        cially on systems where the  device  name  reflects  the  driver  name
+        cially  on  systems  where  the  device  name reflects the driver name
         instead of the type of interface.
 
-        By  default,  traffic  information  obtained  by all the interfaces is
+        By default, traffic information obtained  by  all  the  interfaces  is
         merged together as if the traffic was seen by only one interface.  Use
         the -M parameter to keep traffic separate by interface.
 
         If you do not want nnttoopp to monitor any interfaces, use -i none.
 
-        Under  Windows, the parameter value is either the number of the inter-
-        face or its name, e.g.   {6252C14C-44C9-49D9-BF59-B2DC18C7B811}.   Run
+        Under Windows, the parameter value is either the number of the  inter-
+        face  or  its name, e.g.  {6252C14C-44C9-49D9-BF59-B2DC18C7B811}.  Run
         nnttoopp -h to see a list of interface name-number mappings (at the end of
         the help information).
 
 
        --ll || ----ppccaapp--lloogg
         This parameter causes a dump file to be created of the network traffic
-        captured  by  nnttoopp  in tcpdump (pcap) format.  This file is useful for
-        debug, and may be read back into nnttoopp by the -f |  --traffic-dump-file
-        parameter.   The dump is made after processing any filter expression (
+        captured by nnttoopp in tcpdump (pcap) format.  This file  is  useful  for
+        debug,  and may be read back into nnttoopp by the -f | --traffic-dump-file
+        parameter.  The dump is made after processing any filter expression  (
         never even sees filtered packets).
 
-        The output file will  be  named  _<_p_a_t_h_>_/_<_l_o_g_>_._<_d_e_v_i_c_e_>_._p_c_a_p  (Windows:
-        _<_p_a_t_h_>_/_<_l_o_g_>_._p_c_a_p  ),  where  <path>  is defined by the -O | --output-
-        packet-path parameter and <log> is defined by  this  -l  |  --pcap-log
+        The  output  file  will  be named _<_p_a_t_h_>_/_<_l_o_g_>_._<_d_e_v_i_c_e_>_._p_c_a_p (Windows:
+        _<_p_a_t_h_>_/_<_l_o_g_>_._p_c_a_p ), where <path> is defined by  the  -O  |  --output-
+        packet-path  parameter  and  <log>  is defined by this -l | --pcap-log
         parameter.
 
 
        --mm || ----llooccaall--ssuubbnneettss
-        nnttoopp  determines  the ip addresses and netmasks for each active inter-
+        nnttoopp determines the ip addresses and netmasks for each  active  inter-
         face.  Any traffic on those networks is considered local.  This param-
-        eter  allows  the  user  to define additional networks and subnetworks
-        whose traffic is also considered local  in  nnttoopp  reports.  All  other
+        eter allows the user to define  additional  networks  and  subnetworks
+        whose  traffic  is  also  considered  local in nnttoopp reports. All other
         hosts are considered remote.
 
-        Commas  separate multiple network values.  Both netmask and CIDR nota-
-        tion   may   be   used,   even   mixed    together,    for    instance
+        Commas separate multiple network values.  Both netmask and CIDR  nota-
+        tion    may    be    used,   even   mixed   together,   for   instance
         "131.114.21.0/24,10.0.0.0/255.0.0.0".
 
-        The  local  subnet  - as defined by the interface address(es) - is/are
+        The local subnet - as defined by the interface  address(es)  -  is/are
         always local and do not need to be specified.  If you do give the same
-        value  as a NIC's local address, a harmless warning message is issued.
+        value as a NIC's local address, a harmless warning message is  issued.
 
 
        --nn || ----nnuummeerriicc--iipp--aaddddrreesssseess
-        By default, nnttoopp resolves IP addresses using a combination  of  active
-        (explicit)   DNS  queries  and  passive  sniffing.   Sniffing  of  DNS
-        responses occurs when nnttoopp receives a network  packet  containing  the
-        response  to some other user's DNS query.  nnttoopp captures this informa-
-        tion and enters it into nnttoopp''ss DNS cache, in  expectation  of  shortly
-        seeing  traffic  addressed  to  that host. This way nnttoopp significantly
+        By  default,  nnttoopp resolves IP addresses using a combination of active
+        (explicit)  DNS  queries  and  passive  sniffing.   Sniffing  of   DNS
+        responses  occurs  when  nnttoopp receives a network packet containing the
+        response to some other user's DNS query.  nnttoopp captures this  informa-
+        tion  and  enters  it into nnttoopp''ss DNS cache, in expectation of shortly
+        seeing traffic addressed to that host.  This  way  nnttoopp  significantly
         reduces the number of DNS queries it makes.
 
-        This parameter causes  nnttoopp  to  skip  DNS  resolution,  showing  only
-        numeric  IP  addresses instead of the symbolic names.  This option can
+        This  parameter  causes  nnttoopp  to  skip  DNS  resolution, showing only
+        numeric IP addresses instead of the symbolic names.  This  option  can
         useful when the DNS is not present or quite slow.
+
+
+       --oo || ----rreeddiiss
+        This parameter is used to instruct nnttoopp to dump host information/stats
+        onto the specified redis database so that you can use nnttoopp in  a  web-
+        less interface mode. For more information about redis, please refer to
+        http://redis.io/.
 
 
        --pp || ----pprroottooccoollss
@@ -459,8 +467,8 @@ CCOOMMMMAANNDD--LLIINNEE OOPPTTIIOONNSS
         If  -w  is set to 0 the web server will not listen for http:// connec-
         tions.
 
-        -W operates similarly, but controls the port for the https://  connec-
-        tions.
+        -W  operates  similarly,  but  controls  the  port  for  the  https://
+        connections.
 
         Some examples:
 
@@ -817,11 +825,11 @@ CCOOMMMMAANNDD--LLIINNEE OOPPTTIIOONNSS
         This  option  sets the non-blocking option (assuming it's available in
         the version of libpcap that is installed).
 
-        While this works around the problem  (by  turing  an  interupt  driven
-        process into a poll), it also MAY signifcantly increases the cpu usage
-        of nnttoopp..  Although it does not actually  interfere  with  other  work,
-        seeing  nnttoopp use 80-90% or more of the cpu is not uncommon - don't say
-        we didn't warn you.
+        While this works around the problem (by turing an interupt driven pro-
+        cess into a poll), it also MAY signifcantly increases the cpu usage of
+        nnttoopp..  Although it does not actually interfere with other work, seeing
+        nnttoopp  use  80-90%  or  more  of the cpu is not uncommon - don't say we
+        didn't warn you.
 
         TTHHIISS OOPPTTIIOONN IISS OOFFFFIICCIIAALLLLYY UUNNSSUUPPPPOORRTTEEDD and used at your own risk.  Read
         the docs/FAQ write-up.

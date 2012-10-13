@@ -7,16 +7,7 @@ Group:          Applications/Internet
 # Confirmed from fedora legal 488717
 License:        GPLv2 and BSD with advertising
 URL:            http://www.ntop.org
-Source0:        http://downloads.sourceforge.net/ntop/ntop-%{version}.tar.gz
-Source1:        ntop.service
-Source2:        ntop.conf
-Source3:        http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
-Source4:        http://www.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz
-# Source: wget -O etter.finger.os.gz http://ettercap.cvs.sourceforge.net/ettercap/ettercap_ng/share?rev=HEAD
-Source5:        etter.finger.os.gz
-# svn export -r 5614 https://svn.ntop.org/svn/ntop/trunk/nDPI/
-# tar -czvf nDPI-svn5614.tar.gz nDPI
-Source6:        nDPI-svn5614.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  autoconf, automake, pkgconfig, libtool, groff, wget
 BuildRequires:  gdbm-devel, rrdtool-devel, openssl-devel
 BuildRequires:  net-snmp-devel
@@ -28,11 +19,11 @@ Requires(preun): chkconfig
 Requires(preun): initscripts
 
 Requires:       initscripts
-Requires(post): systemd-sysv
+#Requires(post): systemd-sysv
 Requires(post): openssl >= 0.9.7f-4, /bin/cat
-Requires(post): systemd-units
-Requires(preun): systemd-units
-Requires(postun): systemd-units
+#Requires(post): systemd-units
+#Requires(preun): systemd-units
+#Requires(postun): systemd-units
 
 %description
 ntop is a network traffic probe that shows the network usage, similar to what
@@ -55,55 +46,31 @@ make ntop easy to use and suitable for monitoring various kind of networks.
 ntop should be manually started the first time so that the administrator
 password can be selected.
 
-
 %prep
+
 %setup -q -n ntop-%{version}
-cp %SOURCE3 ./ && gunzip GeoLiteCity.dat.gz
-cp %SOURCE4 ./ && gunzip GeoIPASNum.dat.gz
-cp %SOURCE6 ./ && tar -xpvf %SOURCE6
-
-# executable bits are set on some config files and docs that go into
-# %%{_sysconfdir}/ntop and %%{_datadir}, and some debug source files.  Remove
-# the execute bits - in the build directory
-find . \( -name \*\.gz -o -name \*\.c -o -name \*\.h -o -name \*\.pdf \
-     -o -name \*\.dtd -o -name \*\.html -o -name \*\.js \) -print     \
-     | xargs chmod a-x
-
-%build
-#run ntop own autoconf wrapper
-./autogen.sh --noconfig
-
-%{configure} --enable-snmp                             \
-             --disable-static
-#rpath problem
-sed -i -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-
-make %{?_smp_mflags}
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL='install -p'
+# cleanup
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT
 
-# Now add init, conf
-install -d $RPM_BUILD_ROOT/%{_unitdir}
-install -p -m 0755 %SOURCE1 $RPM_BUILD_ROOT/%{_unitdir}/ntop.service
-install -p -m 0644 %SOURCE2 $RPM_BUILD_ROOT/%{_sysconfdir}/ntop.conf
+# install
+mv $HOME/rpmbuild/BUILD/ntop-%{version}/* $RPM_BUILD_ROOT
 
-### CLEAN UP ###
-# remove libtool archives and -devel type stuff (but leave dlopened modules)
-find $RPM_BUILD_ROOT -name \*\.la -print | xargs rm -f
-# these are not dlopened modules, but -devel cruft
-rm -f $RPM_BUILD_ROOT/%{_libdir}/lib{myrrd,ntop,ntopreport,*Plugin*}.so
-rm -f $RPM_BUILD_ROOT/%{_libdir}/lib{myrrd,ntop,ntopreport,*Plugin*}.a
-# remove empty file
-rm -f $RPM_BUILD_ROOT/%{_datadir}/ntop/html/ntop.html
-# fix permissions
-chmod 0755 $RPM_BUILD_ROOT/%{_libdir}/ntop/plugins/*
-# create files to be %ghost'ed - %ghost'ed files must exist in the buildroot
-install -d $RPM_BUILD_ROOT/%{_localstatedir}/lib/ntop/rrd
-install -d $RPM_BUILD_ROOT/%{_localstatedir}/lib/ntop/rrd/{flows,graphics,interfaces}
-touch      $RPM_BUILD_ROOT/%{_localstatedir}/lib/ntop/{addressQueue,dnsCache,fingerprint,LsWatch,macPrefix,ntop_pw,prefsCache}.db
-#remove expired certificate
-rm -rf  $RPM_BUILD_ROOT/%{_sysconfdir}/ntop/ntop-cert.pem
+mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ntop-%{version}
+cp $HOME/ntop/AUTHORS $HOME/ntop/COPYING $HOME/ntop/MANIFESTO $HOME/ntop/README $HOME/ntop/SUPPORT_NTOP.txt $HOME/ntop/THANKS $RPM_BUILD_ROOT/usr/share/doc/ntop-%{version}
+mkdir -p $RPM_BUILD_ROOT/etc/ntop $RPM_BUILD_ROOT/usr/share/man/man8
+cp $HOME/ntop/ntop.8 $RPM_BUILD_ROOT/usr/share/man/man8
+cp $HOME/ntop/packages/rpm/ntop.conf $RPM_BUILD_ROOT/etc
+# Needed dirs
+mkdir -p $RPM_BUILD_ROOT/usr/lib64/ntop
+mkdir -p $RPM_BUILD_ROOT/usr/share/ntop
+mkdir -p $RPM_BUILD_ROOT/var/lib/ntop
+mkdir -p $RPM_BUILD_ROOT/var/lib/ntop/rrd
+
+# remove junk
+find $RPM_BUILD_ROOT -name "*.a" -exec /bin/rm {} ';'
 
 %pre
 if [ $1 = 1 ]; then
@@ -165,28 +132,18 @@ fi
 /bin/systemctl try-restart ntop.service >/dev/null 2>&1 || :
 
 %files
-%doc AUTHORS ChangeLog COPYING MANIFESTO
-%doc docs/BUG_REPORT docs/database/README
-%doc docs/FAQarchive docs/FAQ docs/HACKING docs/KNOWN_BUGS docs/TODO
-%doc docs/1STRUN.txt NEWS README SUPPORT_NTOP.txt THANKS
+#%doc AUTHORS COPYING MANIFESTO README SUPPORT_NTOP.txt THANKS
 %config(noreplace) %{_sysconfdir}/ntop.conf
 %config(noreplace) %{_sysconfdir}/ntop
-%{_unitdir}/ntop.service
-%{_sbindir}/*
-%{_libdir}/*.so
+#%{_unitdir}/ntop.service
 %{_libdir}/ntop
 %{_mandir}/man8/*
 %{_datadir}/ntop
 %defattr(0755,ntop,ntop,-)
 %dir %{_localstatedir}/lib/ntop
+%{_usr}/local
+%{_usr}/share/doc
 %defattr(0644,root,root,-)
-%ghost %{_localstatedir}/lib/ntop/addressQueue.db
-%ghost %{_localstatedir}/lib/ntop/dnsCache.db
-%ghost %{_localstatedir}/lib/ntop/fingerprint.db
-%ghost %{_localstatedir}/lib/ntop/LsWatch.db
-%ghost %{_localstatedir}/lib/ntop/macPrefix.db
-%ghost %{_localstatedir}/lib/ntop/ntop_pw.db
-%ghost %{_localstatedir}/lib/ntop/prefsCache.db
 # This will catch all the directories in flows/graphics/interfaces.  If
 # %ghost'ed files are added under these, this will have to be changed to %dir
 # and more directives for directories under these will have to be added.

@@ -445,13 +445,8 @@ census-fail:
 census-ok:
 	@echo "This option is no longer available... thanks for trying"
 
-# Create ntop's package for Debian GNU/Linux using Official scripts
-# Please keep silent the building process.
-QUIET  = 1> /dev/null 2>&1
-deb-official:
-	@echo "Making Debian package using scripts in packages/debian.official/. Please be patient..."
-	@fakeroot make -f packages/debian.official/rules binary $(QUIET)
-	@rm -f packages/debian.official/files packages/debian.official/ntop.substvars
-	@version=`head -1 packages/debian.official/changelog | cut -d " " -f 2 | sed -e 's|(||' | sed -e 's|)||'` && mv ../ntop_$$version_*.deb packages/debian.official/
-	@rm -rf packages/debian.official/ntop
-	@echo "Your Debian package is under packages/debian.official/"
+build-rpm:
+	mkdir -p $(HOME)/ntop/$(PROGRAM)
+	make install DESTDIR=$(HOME)/ntop/$(PROGRAM) INSTALL='install -p'
+	rpmbuild -bb ./packages/rpm/ntop.spec
+

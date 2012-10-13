@@ -448,5 +448,6 @@ census-ok:
 build-rpm:
 	mkdir -p $(HOME)/ntop/$(PROGRAM)
 	make install DESTDIR=$(HOME)/ntop/$(PROGRAM) INSTALL='install -p'
+	tar cvfz $(HOME)/rpmbuild/SOURCES/$(PROGRAM).tar.gz $(PROGRAM)
 	rpmbuild -bb ./packages/rpm/ntop.spec
 

@@ -568,7 +568,7 @@ elif test ".${PCAP_ROOT}" != .; then
      test -r $PCAP_ROOT/lib/libpcap.a &&
      test -r $PCAP_ROOT/include/pcap.h; then
        PCAP_ROOT=`cd ${PCAP_ROOT} && pwd`
-       CORELIBS="${CORELIBS} -L ${PCAP_ROOT}/lib -lpcap"
+       CORELIBS="${CORELIBS} -L${PCAP_ROOT}/lib -lpcap"
        INCS="${INCS} -I ${PCAP_ROOT}/include"
        AC_MSG_RESULT([found in $PCAP_ROOT])
   else

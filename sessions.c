@@ -2604,13 +2604,15 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
 
   myGlobals.device[actualDeviceId].l7.protoTraffic[theSession->l7.major_proto] += h->len;
 
-  if(myGlobals.l7.numSupportedProtocols > theSession->l7.major_proto) {
-    srcHost->l7.traffic[theSession->l7.major_proto].bytesSent += h->len;
-    dstHost->l7.traffic[theSession->l7.major_proto].bytesRcvd += h->len;
-  } else
-    traceEvent(CONST_TRACE_WARNING, "Internal error: protocol overflow [%u/%u] (too many protocols)",
-	       theSession->l7.major_proto, myGlobals.l7.numSupportedProtocols);
-
+  if(srcHost->l7.traffic) {
+    if(myGlobals.l7.numSupportedProtocols > theSession->l7.major_proto) {
+      srcHost->l7.traffic[theSession->l7.major_proto].bytesSent += h->len;
+      dstHost->l7.traffic[theSession->l7.major_proto].bytesRcvd += h->len;
+    } else
+      traceEvent(CONST_TRACE_WARNING, "Internal error: protocol overflow [%u/%u] (too many protocols)",
+		 theSession->l7.major_proto, myGlobals.l7.numSupportedProtocols);
+  }
+  
   /* Immediately free the session */
   if(theSession->sessionState == FLAG_STATE_TIMEOUT) {
     if(myGlobals.device[actualDeviceId].sessions[idx] == theSession) {

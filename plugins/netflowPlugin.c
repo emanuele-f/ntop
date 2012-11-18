@@ -806,13 +806,13 @@ if(myGlobals.runningPref.debugMode) {
 #endif
 
   if(major_proto == NDPI_PROTOCOL_UNKNOWN)
-    major_proto = ndpi_guess_undetected_protocol(record->proto, 						 
-						 record->srcaddr, record->srcport, 
+    major_proto = ndpi_guess_undetected_protocol(record->proto,
+						 record->srcaddr, record->srcport,
 						 record->dstaddr, record->dstport);
 
   memset(&h, 0, sizeof(h));
   h.len = record->sentOctets + record->rcvdOctets;
-  handleSession((const struct pcap_pkthdr*)&h, NULL, 
+  handleSession((const struct pcap_pkthdr*)&h, NULL,
 		record->proto, 0, 0,
 		srcHost, sport,
 		dstHost, dport,
@@ -1115,9 +1115,9 @@ if(myGlobals.runningPref.debugMode) {
     }
 
     if(record->l7_proto == NDPI_PROTOCOL_UNKNOWN)
-      session->l7.major_proto = 
-	ndpi_guess_undetected_protocol(proto, 
-				       record->srcaddr, record->srcport, 
+      session->l7.major_proto =
+	ndpi_guess_undetected_protocol(proto,
+				       record->srcaddr, record->srcport,
 				       record->dstaddr, record->dstport);
     else
       session->l7.major_proto = record->l7_proto;
@@ -1715,7 +1715,14 @@ static void dissectFlow(u_int32_t netflow_device_ip,
 		if(fields[fieldId].isPenField == 0) {
 		  switch(fields[fieldId].fieldType) {
 		  case 1: /* IN_BYTES */
-		    memcpy(&record.rcvdOctets, &buffer[displ], 4);
+		    if(fields[fieldId].fieldLen == 8) {
+		      /* 
+			 PaloAlto devices uses 8 for size, ignore first 4 bytes) 
+			 Courtesy of Luc Willems <luc.willems@it4y.eu>
+		       */
+		      memcpy(&record.rcvdOctets, &buffer[displ+4], 4);
+		    } else
+		      memcpy(&record.rcvdOctets, &buffer[displ], 4);
 		    break;
 		  case 2: /* IN_PKTS */
 		    memcpy(&record.rcvdPkts, &buffer[displ], 4);
@@ -1790,12 +1797,12 @@ static void dissectFlow(u_int32_t netflow_device_ip,
 		  case 85: /* NF_F_FLOW_BYTES */
 		    {
 		      u_int32_t value32;
-		      
+
 		      if(fields[fieldId].fieldLen == 8) {
 			/* Barracuda Networks: we ignore the first 32 bits */
 			memcpy(&value32, &buffer[displ+4], 4);
 		      } else {
-			/* Cisco (4 bytes) 
+			/* Cisco (4 bytes)
 			   http://www.cisco.com/en/US/docs/security/asa/asa82/netflow/netflow.pdf
 			*/
 			memcpy(&value32, &buffer[displ], 4);
@@ -1865,7 +1872,7 @@ static void dissectFlow(u_int32_t netflow_device_ip,
 		       15        variable         String   RequestedURL
 		    */
 
-		  case 13: 
+		  case 13:
 		    {
 		      char *dstAddress = &buffer[displ+1];
 		      in_addr_t addr = inet_addr(dstAddress);
@@ -1955,7 +1962,7 @@ static void dissectFlow(u_int32_t netflow_device_ip,
                 u_int16_t tmpPort;
                 u_int32_t tmpAS;
                 u_int32_t tmpAddr;
-                u_int8_t  tmp6[16];   
+                u_int8_t  tmp6[16];
 
 		record.sentPkts   = record.rcvdPkts;
 		record.sentOctets = record.rcvdOctets;

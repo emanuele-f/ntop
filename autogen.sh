@@ -451,11 +451,18 @@ else
 fi
 
 dnl> nDPI compilation
-if test -f NDPI_LIB; then
+if test -f ./nDPI/src/lib/.libs/libndpi.a; then
     echo "nDPI already compiled"
 else
     echo "10. Compiling nDPI..."
     cd nDPI; ./configure --with-pic; make; cd ..
+
+    if test -f ./nDPI/src/lib/.libs/libndpi.a; then
+	echo "nDPI compiled succesfully"
+    else
+	echo "nDPI compilation failed: please check errors"
+	exit
+    fi
 fi
 
 

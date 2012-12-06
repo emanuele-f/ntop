@@ -2596,7 +2596,7 @@ static int updateRRD(char *hostPath, char *key, Counter value, int isCounter, ch
       rrdDumpInterval = short_step ? (2*dumpShortInterval) : dumpInterval;
       step = rrdDumpInterval;
 
-      topValue = 1000000000 /* 1 Gbit/s */;
+      topValue = 10000000000 /* 10 Gbit/s */;
 
       if(strstr(key, "throughput")) {
 	; /* Nothing to do as throughput is saved in Mbps */

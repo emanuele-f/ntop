@@ -4784,15 +4784,15 @@ static void rrdUpdateIPHostStats(HostTraffic *el, int devIdx, u_int8_t is_subnet
 
       for(j=0; j<NDPI_MAX_SUPPORTED_PROTOCOLS; j++) {
 	char key[128];
-	char *prot_long_str[] = { NDPI_PROTOCOL_LONG_STRING };
+	char *name = ndpi_get_proto_name(myGlobals.device[devIdx].l7.l7handler, j);
 
 	if(el->l7.traffic[j].bytesSent) {
-	  safe_snprintf(__FILE__, __LINE__, key, sizeof(key), "%sBytesSent", prot_long_str[j]);
+	  safe_snprintf(__FILE__, __LINE__, key, sizeof(key), "%sBytesSent", name);
 	  updateCounter(rrdPath, key, el->l7.traffic[j].bytesSent, 0);
 	}
 
 	if(el->l7.traffic[j].bytesRcvd) {
-	  safe_snprintf(__FILE__, __LINE__, key, sizeof(key), "%sBytesRcvd", prot_long_str[j]);
+	  safe_snprintf(__FILE__, __LINE__, key, sizeof(key), "%sBytesRcvd", name);
 	  updateCounter(rrdPath, key, el->l7.traffic[j].bytesRcvd, 0);
 	}
       }
@@ -5287,8 +5287,6 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 	}
 
 	if(dumpDetail >= FLAG_RRD_DETAIL_MEDIUM) {
-	  char *prot_long_str[] = { NDPI_PROTOCOL_LONG_STRING };
-
 	  safe_snprintf(__FILE__, __LINE__, rrdPath, sizeof(rrdPath), "%s/interfaces/%s/IP_",
 			myGlobals.rrdPath,  myGlobals.device[devIdx].uniqueIfName);
 
@@ -5297,7 +5295,8 @@ static void* rrdMainLoop(void* notUsed _UNUSED_) {
 	    char tmpStr[128];
 
 	    ctr.value = myGlobals.device[devIdx].l7.protoTraffic[j];
-	    safe_snprintf(__FILE__, __LINE__, tmpStr, sizeof(tmpStr), "%sBytes", prot_long_str[j]);
+	    safe_snprintf(__FILE__, __LINE__, tmpStr, sizeof(tmpStr), "%sBytes", 
+			  ndpi_get_proto_name(myGlobals.device[devIdx].l7.l7handler, j));
 	    updateCounter(rrdPath, tmpStr, ctr.value, 0);
 	  }	  
 	}

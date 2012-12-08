@@ -2593,7 +2593,7 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
   } else if((!theSession->l7.proto_guessed)
 	    && (theSession->l7.major_proto == NDPI_PROTOCOL_UNKNOWN)) {
     theSession->l7.major_proto = 
-      ndpi_guess_undetected_protocol(proto, 
+      ndpi_guess_undetected_protocol(myGlobals.device[actualDeviceId].l7.l7handler, proto, 
 				     srcHost->hostIp4Address.s_addr, sport, 
 				     dstHost->hostIp4Address.s_addr, dport);
     theSession->l7.proto_guessed = 1;
@@ -2786,15 +2786,13 @@ char *getProtoName(u_int8_t proto, u_short protoId) {
   if((proto == IPPROTO_TCP) 
      || (proto == IPPROTO_UDP) 
      || (proto == 0 /* any */)) {
-    char *prot_long_str[] = { NDPI_PROTOCOL_LONG_STRING };
-    
     if(protoId < NDPI_MAX_SUPPORTED_PROTOCOLS)
-      return(prot_long_str[protoId]);
+      return(ndpi_get_proto_name(myGlobals.device[0 /* actualDeviceId */].l7.l7handler, protoId));
     else if(protoId <= (NDPI_MAX_SUPPORTED_PROTOCOLS + myGlobals.numIpProtosToMonitor)) {
       u_int id = protoId - NDPI_MAX_SUPPORTED_PROTOCOLS;
       return(myGlobals.ipTrafficProtosNames[id]);
     } else
-      return(prot_long_str[NDPI_PROTOCOL_UNKNOWN]);
+      return(ndpi_get_proto_name(myGlobals.device[0 /* actualDeviceId */].l7.l7handler, NDPI_PROTOCOL_UNKNOWN));
   } else {
     return("");
   }

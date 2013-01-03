@@ -1600,11 +1600,6 @@ void handleNtopConfig(char* url, UserPrefDisplayPage configScr,
     CONFIG_RADIO_OPTION("All",		     NTOP_PREF_NUMERIC_IP, dnsResolutionForAll,		    pref->numericFlag == dnsResolutionForAll);
     sendString("</TD></TR>\n");
 
-    CONFIG_STR_ENTRY(DARK_BG, "TCP/UDP Protocols To Monitor (-p)",
-		     NTOP_PREF_PROTOSPECS, 50, pref->protoSpecs,
-		     "format is &lt;label&gt;=&lt;protocol list&gt; [, &lt;"
-		     "label&gt;=&lt;protocol list&gt;] OR a filename"
-		     "of a file containing such a format");
     CONFIG_STR_ENTRY(DARK_BG, "P3P-CP", NTOP_PREF_P3PCP, 50,
 		     pref->P3Pcp,
 		     "Return value for p3p compact policy header");

@@ -382,63 +382,9 @@ to http://redis.io/.
 .It2 -p --protocols
 This parameter is used to specify the TCP/UDP protocols that
 .B ntop
-will monitor. The format is <label>=<protocol list> [, <label>=<protocol list>], where
-label is used to symbolically identify the <protocol list>. The format of <protocol list>
-is <protocol>[|<protocol>], where <protocol> is either a valid protocol specified inside the
-/etc/services file or a numeric port range (e.g. 80, or 6000-6500). 
-
-A simple example is --protocols="HTTP=http|www|https|3128,FTP=ftp|ftp-data", which
-reduces the protocols displayed on the "IP" pages to three:
-
-.nf
-Host                      Domain Data          HTTP   FTP   Other IP
-ns2.attbi.com             <flag>  954 63.9 %      0     0        954
-64.124.83.112.akamai.com  <flag>  240 16.1 %    240     0          0
-64.124.83.99.akamai.com   <flag>  240 16.1 %    240     0          0
-toolbarqueries.google.com <flag>   60 4.0 %      60     0          0
-.fi
-
-If the <protocol list> is very long you may store it in a file (for instance protocol.list).
-To do so, specify the file name instead of the <protocol list> on the command line.  e.g.
-.B ntop -p protocol.list
-
-If the -p parameter is omitted the following default value is used: 
-
-.nf
-  FTP=ftp|ftp-data
-  HTTP=http|www|https|3128     3128 is Squid, the HTTP cache
-  DNS=name|domain
-  Telnet=telnet|login
-  NBios-IP=netbios-ns|netbios-dgm|netbios-ssn
-  Mail=pop-2|pop-3|pop3|kpop|smtp|imap|imap2
-  DHCP-BOOTP=67-68
-  SNMP=snmp|snmp-trap
-  NNTP=nntp
-  NFS=mount|pcnfs|bwnfs|nfsd|nfsd-status
-  X11=6000-6010
-  SSH=22
-
-  Peer-to-Peer Protocols
-  ----------------------
-  Gnutella=6346|6347|6348
-  Kazaa=1214
-  WinMX=6699|7730
-  DirectConnect=0      Dummy port as this is a pure P2P protocol
-  eDonkey=4661-4665
-
-  Instant Messenger
-  -----------------
-  Messenger=1863|5000|5001|5190-5193
-.fi
-
-NOTE: To resolve protocol names to port numbers, they must be specified in
-the system file used to list tcp/udp protocols and ports, which is typically
-/etc/services file.  You will have to match the names in that file, exactly.  
-Missing or unspecified (non-standard) ports must be specified by number, such
-as 3128 in our examples above.
-
-If you have a file named /etc/protocols, don't get confused by it, as that's
-the Ethernet protocol numbers, which are not what you're looking for.
+will monitor. The format is <tcp|udp>:<port>,<tcp|udp>:<port>,.....@<proto> where
+<port> is a port number and <proto> is a name of a protocol supported by nDPI protocol.
+As example see https://svn.ntop.org/svn/ntop/trunk/nDPI/example/protos.txt
 
 .It2 -q --create-suspicious-packets
 This parameter tells 

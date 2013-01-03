@@ -450,139 +450,18 @@ void createPortHash(void) {
 /* **************************************** */
 
 void handleProtocols(void) {
-  char *proto, *buffer=NULL, *strtokState = NULL,
-	   *bufferCurrent, *bufferWork, tmpStr[512];
-  FILE *fd;
-
-  /* myGlobals.protoSpecs is either
-     1) a list in the form proto=port[|port][,...]
-     2) the name of a file containing a list in the same format.
-     Modification:  Allow the file to have multiple lines, each in
-     the "standard" format.
-     Also, ignore standard Linux comments...
-  */
-
-  if((!myGlobals.runningPref.protoSpecs)
-     || (!myGlobals.runningPref.protoSpecs[0]))
+  if((!myGlobals.runningPref.protoSpecs) || (!myGlobals.runningPref.protoSpecs[0]))
     return;
+  else {
+    u_int deviceId;
 
-   safe_snprintf(__FILE__, __LINE__, tmpStr, sizeof(tmpStr),
-                  "%s", myGlobals.runningPref.protoSpecs);
-
-  revertSlashIfWIN32(tmpStr, 0);
-  fd = fopen(tmpStr, "rb");
-
-  if(fd == NULL) {
-    traceEvent(CONST_TRACE_INFO, "PROTO_INIT: Processing protocol list: '%s'", tmpStr);
-    proto = strtok_r(tmpStr, ",", &strtokState);
-  } else {
-    struct stat buf;
-
-    if(stat(tmpStr, &buf) != 0) {
-      fclose(fd);
-      traceEvent(CONST_TRACE_ERROR, "PROTO_INIT: Unable to get information about file '%s'",
-		 tmpStr);
-      return;
-    }
-
-    bufferCurrent = buffer = (char*)malloc(buf.st_size+8) /* just to be safe */;
-
-    traceEvent(CONST_TRACE_ALWAYSDISPLAY, "PROTO_INIT: Processing protocol file: '%s', size: %ld",
-	       tmpStr, (long)(buf.st_size+8));
-
-    for (;;) {
-      bufferCurrent = fgets(bufferCurrent, (int)buf.st_size, fd);
-      /* On EOF, we're finished */
-      if(bufferCurrent == NULL) {
-	break;
-      }
-
-      /* otherwise, bufferCurrent points to the just read line in the file,
-	 of the form:
-	 [protocol=protocol[|protocol][,]] [# comment]
-      */
-
-      /* Strip out any comments */
-      bufferWork = strchr(bufferCurrent, '#');
-      if(bufferWork != NULL) {
-	bufferWork[0] = '\n';
-	bufferWork[1] = '\0';
-      }
-
-      /*
-	Replace the \n by a comma, so at the end the buffer will
-	look indistinguishable from a single line file...
-      */
-      bufferWork = strchr(bufferCurrent, '\n');
-      if(bufferWork != NULL) {
-	bufferWork[0] = ',';
-	bufferWork[1] = '\0';
-      }
-
-    bufferWork = strchr(bufferCurrent, '\r');
-      if(bufferWork != NULL) {
-	bufferWork[0] = ',';
-	bufferWork[1] = '\0';
-      }
-      /* Move pointer to end-of-string for read of next line */
-      bufferCurrent = strchr(bufferCurrent, '\0');
-    }
-
-    fclose(fd);
-
-    /* remove trailing carriage return */
-    if(buffer[strlen(buffer)-1] == '\n')
-      buffer[strlen(buffer)-1] = 0;
-
-    proto = strtok_r(buffer, ",", &strtokState);
+    traceEvent(CONST_TRACE_INFO, "Loading nDPI protocol/port mapping from %s",
+	       myGlobals.runningPref.protoSpecs);
+	
+    for(deviceId=0; deviceId<myGlobals.numDevices; deviceId++)      
+      ndpi_load_protocols_file(myGlobals.device[deviceId].l7.l7handler, 
+			       myGlobals.runningPref.protoSpecs);
   }
-
-  while(proto != NULL) {
-    char* protoName;
-    int len, i, ignore_protocol;
-
-    ignore_protocol = 0;
-
-    len = (int)strlen(proto);
-    for(i=0; i<len; i++) {
-      if(iscntrl(proto[i]) || (!isascii(proto[i]))) {
-	ignore_protocol = 1;
-      }
-    }
-
-    if(!ignore_protocol) {
-      char protoStr[256] = { '\0' };
-
-      protoName = strchr(proto, '=');
-
-      if(protoName == NULL)
-	traceEvent(CONST_TRACE_INFO,
-		   "PROTO_INIT: Unknown protocol '%s'. It has been ignored",
-		   proto);
-      else {
-	protoName[0] = '\0';
-	strncpy(protoStr, &protoName[1], sizeof(protoStr));
-	len = (int)strlen(protoStr);
-
-	if(protoStr[len-1] != '|') {
-	  /* Make sure that the string ends with '|' */
-	  protoStr[len] = '|';
-	  protoStr[len+1] = '\0';
-	}
-
-#ifdef DEBUG
-	traceEvent(CONST_TRACE_INFO, "          %30s %s", proto, protoStr);
-#endif
-
-	handleProtocolList(proto, protoStr);
-      }
-    }
-
-    proto = strtok_r(NULL, ",", &strtokState);
-  }
-
-  if(buffer != NULL)
-    free(buffer);
 }
 
 /* **************************************** */

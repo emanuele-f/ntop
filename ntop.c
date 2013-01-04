@@ -449,23 +449,6 @@ void createPortHash(void) {
 
 /* **************************************** */
 
-void handleProtocols(void) {
-  if((!myGlobals.runningPref.protoSpecs) || (!myGlobals.runningPref.protoSpecs[0]))
-    return;
-  else {
-    u_int deviceId;
-
-    traceEvent(CONST_TRACE_INFO, "Loading nDPI protocol/port mapping from %s",
-	       myGlobals.runningPref.protoSpecs);
-	
-    for(deviceId=0; deviceId<myGlobals.numDevices; deviceId++)      
-      ndpi_load_protocols_file(myGlobals.device[deviceId].l7.l7handler, 
-			       myGlobals.runningPref.protoSpecs);
-  }
-}
-
-/* **************************************** */
-
 void addDefaultProtocols(void) {
   handleProtocolList("DNS",      "name|domain|");
   handleProtocolList("NetBios",  "netbios-ns|netbios-dgm|netbios-ssn|445|");

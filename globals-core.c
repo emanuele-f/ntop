@@ -526,7 +526,9 @@ void initL7DeviceDiscovery(int deviceId) {
   NDPI_PROTOCOL_BITMASK all;
   u_int32_t detection_tick_resolution = 1000;
 
-  if(myGlobals.runningPref.disablenDPI) return;
+  if(myGlobals.runningPref.disablenDPI
+     || (myGlobals.device[deviceId].l7.l7handler != NULL))
+    return;
 
   myGlobals.device[deviceId].l7.l7handler = ndpi_init_detection_module(detection_tick_resolution, malloc_wrapper, debug_printf);
   if(myGlobals.device[deviceId].l7.l7handler == NULL) {
@@ -537,6 +539,15 @@ void initL7DeviceDiscovery(int deviceId) {
   // enable all protocols
   NDPI_BITMASK_SET_ALL(all);
   ndpi_set_protocol_detection_bitmask2(myGlobals.device[deviceId].l7.l7handler, &all);
+
+  if(myGlobals.runningPref.protoSpecs != NULL) {
+    if(deviceId == 0)
+      traceEvent(CONST_TRACE_INFO, "Loading nDPI protocol/port mapping from %s",
+		 myGlobals.runningPref.protoSpecs);
+    
+    ndpi_load_protocols_file(myGlobals.device[deviceId].l7.l7handler, 
+			     myGlobals.runningPref.protoSpecs);
+  }
 }
 
 /* ********************************* */
@@ -555,7 +566,6 @@ void initNtop(char *devices) {
   revertSlashIfWIN32(myGlobals.spoolPath, 0);
 
   initIPServices();
-  handleProtocols();
 
   myGlobals.l7.numSupportedProtocols = NDPI_MAX_SUPPORTED_PROTOCOLS;
 

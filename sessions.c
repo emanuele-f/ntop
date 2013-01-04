@@ -1943,46 +1943,39 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
 
     if(major_proto != NDPI_PROTOCOL_UNKNOWN) {
       theSession->l7.major_proto = major_proto;
+
+      // traceEvent(CONST_TRACE_WARNING, "Guess [sport=%u][dport=%u][%u]", sport, dport, major_proto);
     } else {
-      rc = mapGlobalToLocalIdx(sport);
-      if(rc == -1) 
-	rc = mapGlobalToLocalIdx(dport);
+      if(myGlobals.device[actualDeviceId].l7.l7handler != NULL) {
+	static u_int8_t once = 0;
 
-      if(rc > 0) {
-	/* We have found a protocol defined thus we map the protocol */
-	theSession->l7.major_proto = rc;
-      } else {
-	if(myGlobals.device[actualDeviceId].l7.l7handler != NULL) {
-	  static u_int8_t once = 0;
-
-	  if((theSession->l7.flow = calloc(1, myGlobals.l7.flow_struct_size)) == NULL) {
-	    if(!once) {
-	      traceEvent(CONST_TRACE_ERROR, "NULL theSession (not enough memory?)");
-	      once = 1;
-	    }
-
-	    free(theSession);
-	    releaseMutex(&myGlobals.sessionsMutex[mutex_idx]);
-	    return(NULL);
+	if((theSession->l7.flow = calloc(1, myGlobals.l7.flow_struct_size)) == NULL) {
+	  if(!once) {
+	    traceEvent(CONST_TRACE_ERROR, "NULL theSession (not enough memory?)");
+	    once = 1;
 	  }
 
-	  theSession->l7.src = calloc(1, myGlobals.l7.proto_size);
-	  theSession->l7.dst = calloc(1, myGlobals.l7.proto_size);
+	  free(theSession);
+	  releaseMutex(&myGlobals.sessionsMutex[mutex_idx]);
+	  return(NULL);
+	}
 
-	  if((theSession->l7.src == NULL) || (theSession->l7.dst == NULL)) {
-	    if(!once) {
-	      traceEvent(CONST_TRACE_ERROR, "NULL theSession (not enough memory?)");
-	      once = 1;
-	    }
+	theSession->l7.src = calloc(1, myGlobals.l7.proto_size);
+	theSession->l7.dst = calloc(1, myGlobals.l7.proto_size);
 
-	    if(theSession->l7.src) { free(theSession->l7.src); theSession->l7.src = NULL; }
-	    if(theSession->l7.dst) { free(theSession->l7.dst); theSession->l7.dst = NULL; }
-	    free(theSession->l7.flow); theSession->l7.flow = NULL;
-	    free(theSession);
-
-	    releaseMutex(&myGlobals.sessionsMutex[mutex_idx]);
-	    return(NULL);
+	if((theSession->l7.src == NULL) || (theSession->l7.dst == NULL)) {
+	  if(!once) {
+	    traceEvent(CONST_TRACE_ERROR, "NULL theSession (not enough memory?)");
+	    once = 1;
 	  }
+
+	  if(theSession->l7.src) { free(theSession->l7.src); theSession->l7.src = NULL; }
+	  if(theSession->l7.dst) { free(theSession->l7.dst); theSession->l7.dst = NULL; }
+	  free(theSession->l7.flow); theSession->l7.flow = NULL;
+	  free(theSession);
+
+	  releaseMutex(&myGlobals.sessionsMutex[mutex_idx]);
+	  return(NULL);
 	}
       }
     }
@@ -2592,10 +2585,9 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
     }
   } else if((!theSession->l7.proto_guessed)
 	    && (theSession->l7.major_proto == NDPI_PROTOCOL_UNKNOWN)) {
-    theSession->l7.major_proto = 
-      ndpi_guess_undetected_protocol(myGlobals.device[actualDeviceId].l7.l7handler, proto, 
-				     srcHost->hostIp4Address.s_addr, sport, 
-				     dstHost->hostIp4Address.s_addr, dport);
+    theSession->l7.major_proto = ndpi_guess_undetected_protocol(myGlobals.device[actualDeviceId].l7.l7handler, proto, 
+								srcHost->hostIp4Address.s_addr, sport, 
+								dstHost->hostIp4Address.s_addr, dport);
     theSession->l7.proto_guessed = 1;
   }
 

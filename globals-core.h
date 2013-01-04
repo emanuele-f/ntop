@@ -383,7 +383,6 @@ extern void *pcapDispatch(void *_i);
 extern void daemonizeUnderUnix(void);
 extern void detachFromTerminalUnderUnix(int);
 extern void createPortHash(void);
-extern void handleProtocols(void);
 extern void addDefaultProtocols(void);
 extern int mapGlobalToLocalIdx(int port);
 extern void *scanIdleLoop(void *notUsed);

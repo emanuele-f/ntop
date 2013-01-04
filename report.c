@@ -4154,6 +4154,14 @@ void printActiveSessions(int actualDeviceId, int pageNum, HostTraffic *el) {
 	if(myGlobals.actTime < session->lastSeen)
 	  session->lastSeen = myGlobals.actTime;
 
+	if((!session->l7.proto_guessed)
+	   && (session->l7.major_proto == NDPI_PROTOCOL_UNKNOWN)) {
+	  session->l7.major_proto = ndpi_guess_undetected_protocol(myGlobals.device[actualDeviceId].l7.l7handler, session->proto, 
+								   session->initiator->hostIp4Address.s_addr, session->sport, 
+								   session->remotePeer->hostIp4Address.s_addr, session->dport);
+	  session->l7.proto_guessed = 1;
+	}
+
 	safe_snprintf(__FILE__, __LINE__, buf, sizeof(buf),
 		      "<TD "TD_BG" ALIGN=RIGHT NOWRAP>%s</TD>"
 		      "<TD "TD_BG" ALIGN=RIGHT NOWRAP>%s</TD>"

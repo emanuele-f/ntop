@@ -36,7 +36,9 @@ binary-arch: build install
 	dh_installinit
 	dh_installman
 #	dh_installdebconf -n
-	mkdir -p ./debian/usr/local/var/ntop/rrd
+	mkdir -p ./debian/usr/local/var/ntop/rrd ./debian/etc/init.d ./debian/etc/init
+	cp ../etc/init.d/ntop ./debian/etc/init.d
+	cp ../etc/init/ntop.conf ./debian/etc/init
 	cd ./debian; tar --exclude='.svn' -c -f - ./usr/  | (cd ./tmp/ ; tar xfp -)
 	cd ./debian; tar --exclude='.svn' -c -f - ./etc/  | (cd ./tmp/ ; tar xfp -)
 	-find ./debian/tmp -name "*.a" -exec /bin/rm -rf {} ';'

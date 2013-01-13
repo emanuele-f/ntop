@@ -563,12 +563,14 @@ PACKAGE_URL=''
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+PFRING_SVN_RELEASE
+SVN_RELEASE
 KERNEL
 DATE
 EXTN
-SVN_RELEASE
+MACHINE
 PFRING_VERS
-VERS
+NTOP_VERS
 target_alias
 host_alias
 build_alias
@@ -1650,9 +1652,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-VERS=`cat ../../version.c | grep version | head -1 | cut -d \" -f 2`
+NTOP_VERS=`cat ../../version.c | grep version | head -1 | cut -d \" -f 2`
 PFRING_VERS=`cat $HOME/PF_RING/kernel/linux/pf_ring.h | grep RING_VERSION | head -1 | cut -d '"' -f 2`
 SVN_RELEASE=`svn info . | grep "^Revision"|cut -d " " -f 2`
+PFRING_SVN_RELEASE=`svn info $HOME/PF_RING | grep "^Revision"|cut -d " " -f 2`
 MACHINE=`uname -m`
 
 if test $MACHINE = "x86_64"; then
@@ -1663,6 +1666,8 @@ fi
 
 DATE=`date -R`
 KERNEL=`uname -r`
+
+
 
 
 
@@ -2850,5 +2855,3 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
-
-`make clean`

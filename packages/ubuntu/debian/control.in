@@ -2,11 +2,11 @@ Source: ntop
 Section: free
 Priority: optional
 Maintainer: Luca Deri <deri@ntop.org>
-Standards-Version: @VERS@
+Standards-Version: @NTOP_VERS@
 Build-Depends: 
 Build-Conflicts:
 
 Package: ntop
 Architecture: @EXTN@
-Depends: debconf (>= 0.2.26), librrd4, libgdbm3, libpcre3, pfring (=@PFRING_VERS@-1)
+Depends: debconf (>= 0.2.26), librrd4, libgdbm3, libpcre3, pfring (=@PFRING_VERS@-@PFRING_SVN_RELEASE@)
 Description: display network usage in top-like format through a web browser.

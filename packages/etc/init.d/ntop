@@ -11,18 +11,14 @@ SPOOL_DIR=$PERSISTENT_DIR/spool
 ####################
 
 start_ntop() {
-   start-stop-daemon --start --quiet --name $APPNAME --background --exec $NTOP_PATH @$NTOP_CONF > /dev/null
+   start-stop-daemon --start --make-pidfile --pidfile $NTOP_PIDFILE --quiet --name $APPNAME --background --exec $NTOP_PATH @$NTOP_CONF > /dev/null
    return 0
 }
 
 ####################
 
 stop_ntop() {
-    if [ -f $NTOP_PIDFILE ]; then
-	PID=$(cat $NTOP_PIDFILE)
-	kill $PID
-	/bin/rm $NTOP_PIDFILE
-    fi
+    start-stop-daemon --stop --pidfile $NTOP_PIDFILE --retry=TERM/30/KILL/5
 }
 
 ####################

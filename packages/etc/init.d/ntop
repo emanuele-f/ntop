@@ -11,14 +11,25 @@ SPOOL_DIR=$PERSISTENT_DIR/spool
 ####################
 
 start_ntop() {
-   start-stop-daemon --start --make-pidfile --pidfile $NTOP_PIDFILE --quiet --name $APPNAME --background --exec $NTOP_PATH @$NTOP_CONF > /dev/null
+    if [ -f /etc/ntop/ntop.start ]; then
+	echo "Starting ntop..."
+	start-stop-daemon --start --make-pidfile --pidfile $NTOP_PIDFILE --quiet --name $APPNAME --background --exec $NTOP_PATH @$NTOP_CONF > /dev/null
+    else
+	echo "ntop won't start: missing /etc/ntop/ntop.start file"
+    fi
+
    return 0
 }
 
 ####################
 
 stop_ntop() {
-    start-stop-daemon --stop --pidfile $NTOP_PIDFILE --retry=TERM/30/KILL/5
+    if [ -f /etc/ntop/ntop.start ]; then
+	echo "Stopping ntop..."
+	start-stop-daemon --stop --pidfile $NTOP_PIDFILE --retry=TERM/30/KILL/5
+    else
+	echo "ntop won't stop: missing /etc/ntop/ntop.start file"
+    fi
 }
 
 ####################
@@ -53,28 +64,26 @@ default_ntop() {
 
 case "$1" in
   start)
-	echo -n "Starting ntop "
 	default_ntop;
 	start_ntop;
-	echo " Done."
+	echo "Done"
 	;;
   stop)
-        echo -n "Stopping ntop "
        	stop_ntop;
-	echo " Done."
+	echo "Done"
 	;;
 
   default)
         echo -n "Defaulting ntop "
        	default_ntop;
-	echo " Done."
+	echo "Done"
 	;;
 
   restart)
         echo -n "Restarting ntop "
 	stop_ntop;
 	start_ntop;
-	echo " Done."
+	echo "Done"
 	;;
   launch)
 	if [ -z "$2" ]; then
@@ -84,7 +93,7 @@ case "$1" in
 	echo -n "Launching ntop "
 	start-stop-daemon --start --quiet --background --exec $NTOP_PATH -- $2 > /dev/null
 	sleep 3
-	echo " Done."
+	echo "Done"
 	;;
 
     kill)
@@ -98,7 +107,7 @@ case "$1" in
 	if [ $rc -gt 0 ]; then
 	    kill -9 $pid > /dev/null
 	    wait_for_deaddaemon $pid
-	    echo " Done."
+	    echo "Done"
 	    exit 0
 	else
 	    echo

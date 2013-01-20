@@ -1,4 +1,4 @@
-ntop (@NTOP_VERS@-@SVN_RELEASE@) table; urgency=high
+ntop5 (@NTOP_VERS@-@SVN_RELEASE@) table; urgency=high
    * Last packaged version
 
  -- Luca Deri <deri@ntop.org>  @DATE@

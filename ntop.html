@@ -1,5 +1,5 @@
 <!-- Creator     : groff version 1.18.1.4 -->
-<!-- CreationDate: Sat Oct 13 13:30:14 2012 -->
+<!-- CreationDate: Sun Jan 20 12:09:23 2013 -->
 <html>
 <head>
 <meta name="generator" content="groff -Thtml, see www.gnu.org">
@@ -582,71 +582,11 @@ http://redis.io/.</p>
 <td width="86%">
 <p>This parameter is used to specify the TCP/UDP protocols
 that <b>ntop</b> will monitor. The format is
-&lt;label&gt;=&lt;protocol list&gt; [,
-&lt;label&gt;=&lt;protocol list&gt;], where label is used to
-symbolically identify the &lt;protocol list&gt;. The format
-of &lt;protocol list&gt; is
-&lt;protocol&gt;[|&lt;protocol&gt;], where &lt;protocol&gt;
-is either a valid protocol specified inside the
-/etc/services file or a numeric port range (e.g. 80, or
-6000-6500).</p>
-<!-- INDENTATION -->
-<p>A simple example is
---protocols=&quot;HTTP=http|www|https|3128,FTP=ftp|ftp-data&quot;,
-which reduces the protocols displayed on the &quot;IP&quot;
-pages to three:</p>
-<!-- INDENTATION -->
-<pre>Host                      Domain Data          HTTP   FTP   Other IP
-ns2.attbi.com             &lt;flag&gt;  954 63.9 %      0     0        954
-64.124.83.112.akamai.com  &lt;flag&gt;  240 16.1 %    240     0          0
-64.124.83.99.akamai.com   &lt;flag&gt;  240 16.1 %    240     0          0
-toolbarqueries.google.com &lt;flag&gt;   60 4.0 %      60     0          0
-</pre>
-<!-- INDENTATION -->
-<p>If the &lt;protocol list&gt; is very long you may store
-it in a file (for instance protocol.list). To do so, specify
-the file name instead of the &lt;protocol list&gt; on the
-command line. e.g. <b>ntop -p protocol.list</b></p>
-<!-- INDENTATION -->
-<p>If the -p parameter is omitted the following default
-value is used:</p>
-<!-- INDENTATION -->
-<pre>  FTP=ftp|ftp-data
-  HTTP=http|www|https|3128     3128 is Squid, the HTTP cache
-  DNS=name|domain
-  Telnet=telnet|login
-  NBios-IP=netbios-ns|netbios-dgm|netbios-ssn
-  Mail=pop-2|pop-3|pop3|kpop|smtp|imap|imap2
-  DHCP-BOOTP=67-68
-  SNMP=snmp|snmp-trap
-  NNTP=nntp
-  NFS=mount|pcnfs|bwnfs|nfsd|nfsd-status
-  X11=6000-6010
-  SSH=22
-
- Peer-to-Peer Protocols
-  ----------------------
-  Gnutella=6346|6347|6348
-  Kazaa=1214
-  WinMX=6699|7730
-  DirectConnect=0      Dummy port as this is a pure P2P protocol
-  eDonkey=4661-4665
-
- Instant Messenger
-  -----------------
-  Messenger=1863|5000|5001|5190-5193
-</pre>
-<!-- INDENTATION -->
-<p>NOTE: To resolve protocol names to port numbers, they
-must be specified in the system file used to list tcp/udp
-protocols and ports, which is typically /etc/services file.
-You will have to match the names in that file, exactly.
-Missing or unspecified (non-standard) ports must be
-specified by number, such as 3128 in our examples above.</p>
-<!-- INDENTATION -->
-<p>If you have a file named /etc/protocols, don&rsquo;t get
-confused by it, as that&rsquo;s the Ethernet protocol
-numbers, which are not what you&rsquo;re looking for.</p>
+&lt;tcp|udp&gt;:&lt;port&gt;,&lt;tcp|udp&gt;:&lt;port&gt;,.....@&lt;proto&gt;
+where &lt;port&gt; is a port number and &lt;proto&gt; is a
+name of a protocol supported by nDPI protocol. As example
+see
+https://svn.ntop.org/svn/ntop/trunk/nDPI/example/protos.txt</p>
 </td>
 </table>
 <!-- INDENTATION -->

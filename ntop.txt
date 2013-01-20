@@ -270,62 +270,10 @@ CCOOMMMMAANNDD--LLIINNEE OOPPTTIIOONNSS
 
        --pp || ----pprroottooccoollss
         This parameter is used to specify the TCP/UDP protocols that nnttoopp will
-        monitor.  The  format  is <label>=<protocol list> [, <label>=<protocol
-        list>], where label is used to  symbolically  identify  the  <protocol
-        list>. The format of <protocol list> is <protocol>[|<protocol>], where
-        <protocol> is either a valid protocol specified inside  the  /etc/ser-
-        vices file or a numeric port range (e.g. 80, or 6000-6500).
-
-        A simple example is --protocols="HTTP=http|www|https|3128,FTP=ftp|ftp-
-        data", which reduces the protocols displayed  on  the  "IP"  pages  to
-        three:
-
-        Host                      Domain Data          HTTP   FTP   Other IP
-        ns2.attbi.com             <flag>  954 63.9 %      0     0        954
-        64.124.83.112.akamai.com  <flag>  240 16.1 %    240     0          0
-        64.124.83.99.akamai.com   <flag>  240 16.1 %    240     0          0
-        toolbarqueries.google.com <flag>   60 4.0 %      60     0          0
-
-        If  the  <protocol  list> is very long you may store it in a file (for
-        instance protocol.list).  To do so, specify the file name  instead  of
-        the <protocol list> on the command line.  e.g.  nnttoopp --pp pprroottooccooll..lliisstt
-
-        If the -p parameter is omitted the following default value is used:
-
-          FTP=ftp|ftp-data
-          HTTP=http|www|https|3128     3128 is Squid, the HTTP cache
-          DNS=name|domain
-          Telnet=telnet|login
-          NBios-IP=netbios-ns|netbios-dgm|netbios-ssn
-          Mail=pop-2|pop-3|pop3|kpop|smtp|imap|imap2
-          DHCP-BOOTP=67-68
-          SNMP=snmp|snmp-trap
-          NNTP=nntp
-          NFS=mount|pcnfs|bwnfs|nfsd|nfsd-status
-          X11=6000-6010
-          SSH=22
-
-          Peer-to-Peer Protocols
-          ----------------------
-          Gnutella=6346|6347|6348
-          Kazaa=1214
-          WinMX=6699|7730
-          DirectConnect=0      Dummy port as this is a pure P2P protocol
-          eDonkey=4661-4665
-
-          Instant Messenger
-          -----------------
-          Messenger=1863|5000|5001|5190-5193
-
-        NOTE:  To  resolve protocol names to port numbers, they must be speci-
-        fied in the system file used to  list  tcp/udp  protocols  and  ports,
-        which  is  typically  /etc/services  file.  You will have to match the
-        names in that file, exactly.  Missing  or  unspecified  (non-standard)
-        ports must be specified by number, such as 3128 in our examples above.
-
-        If you have a file named /etc/protocols, don't get confused by it,  as
-        that's  the Ethernet protocol numbers, which are not what you're look-
-        ing for.
+        monitor. The format is <tcp|udp>:<port>,<tcp|udp>:<port>,.....@<proto>
+        where <port> is a port number and <proto> is a name of a protocol sup-
+        ported      by      nDPI      protocol.       As      example      see
+        https://svn.ntop.org/svn/ntop/trunk/nDPI/example/protos.txt
 
 
        --qq || ----ccrreeaattee--ssuussppiicciioouuss--ppaacckkeettss
@@ -467,8 +415,8 @@ CCOOMMMMAANNDD--LLIINNEE OOPPTTIIOONNSS
         If  -w  is set to 0 the web server will not listen for http:// connec-
         tions.
 
-        -W  operates  similarly,  but  controls  the  port  for  the  https://
-        connections.
+        -W operates similarly, but controls the port for the https://  connec-
+        tions.
 
         Some examples:
 
@@ -739,10 +687,10 @@ CCOOMMMMAANNDD--LLIINNEE OOPPTTIIOONNSS
 
        ----ddiissaabbllee--iinnssttaannttsseessssiioonnppuurrggee
         nnttoopp sets completed sessions as 'timed out' and then purge them almost
-        instantly, which is not the behavior you might expect from the discus-
-        sions  about purge timeouts.  This switch makes ntop respect the time-
-        outs for completed sessions.  It is NOT the default because a busy web
-        server  may  have  100s  or 1000s of completed sessions and this would
+        instantly, which is  not  the  behavior  you  might  expect  from  the
+        discussions  about purge timeouts.  This switch makes ntop respect the
+        timeouts for completed sessions.  It is NOT the default because a busy
+        web server may have 100s or 1000s of completed sessions and this would
         significantly increase the amount of memory nnttoopp uses.
 
 

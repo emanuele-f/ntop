@@ -1,5 +1,5 @@
 %define _hardened_build 1
-Name:           ntop
+Name:           ntop5
 Version:        5.0.2
 Release:        2%{?dist}
 Summary:        A network traffic probe similar to the UNIX top command
@@ -48,7 +48,7 @@ password can be selected.
 
 %prep
 
-%setup -q -n ntop-%{version}
+%setup -q -n ntop5-%{version}
 
 %install
 # cleanup
@@ -56,10 +56,10 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
 
 # install
-mv $HOME/rpmbuild/BUILD/ntop-%{version}/* $RPM_BUILD_ROOT
+mv $HOME/rpmbuild/BUILD/ntop5-%{version}/* $RPM_BUILD_ROOT
 
-mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ntop-%{version}
-cp $HOME/ntop/AUTHORS $HOME/ntop/COPYING $HOME/ntop/MANIFESTO $HOME/ntop/README $HOME/ntop/SUPPORT_NTOP.txt $HOME/ntop/THANKS $RPM_BUILD_ROOT/usr/share/doc/ntop-%{version}
+mkdir -p $RPM_BUILD_ROOT/usr/share/doc/ntop5-%{version}
+cp $HOME/ntop/AUTHORS $HOME/ntop/COPYING $HOME/ntop/MANIFESTO $HOME/ntop/README $HOME/ntop/SUPPORT_NTOP.txt $HOME/ntop/THANKS $RPM_BUILD_ROOT/usr/share/doc/ntop5-%{version}
 mkdir -p $RPM_BUILD_ROOT/etc/ntop $RPM_BUILD_ROOT/usr/share/man/man8
 cp $HOME/ntop/ntop.8 $RPM_BUILD_ROOT/usr/share/man/man8
 cp $HOME/ntop/packages/rpm/ntop.conf $RPM_BUILD_ROOT/etc

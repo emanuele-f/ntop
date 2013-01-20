@@ -13,6 +13,12 @@ SPOOL_DIR=$PERSISTENT_DIR/spool
 start_ntop() {
     if [ -f /etc/ntop/ntop.start ]; then
 	echo "Starting ntop..."
+
+	if [ ! -f /usr/local/share/ntop/ntop_pw.db ]; then
+	    echo "Set the ntop password for user 'admin' to 'admin'"
+	    ntop -P /usr/local/share/ntop --set-admin-password=admin
+	fi
+
 	start-stop-daemon --start --make-pidfile --pidfile $NTOP_PIDFILE --quiet --name $APPNAME --background --exec $NTOP_PATH @$NTOP_CONF > /dev/null
     else
 	echo "ntop won't start: missing /etc/ntop/ntop.start file"

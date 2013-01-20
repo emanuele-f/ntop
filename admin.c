@@ -988,6 +988,8 @@ static void addKeyIfMissing(char* key, char* value,
     /* If not existing, then add user 'admin' and ask for password  */
 
     if(userQuestion != NULL) {
+      u_short num_loops = 0;
+
       if(myGlobals.runningPref.daemonMode) {
 	/*
 	 * We need a password for the admin user, but the user requested
@@ -1006,7 +1008,7 @@ static void addKeyIfMissing(char* key, char* value,
       while(pw1[0] == '\0') {
         thePw = getpass(userQuestion);
 #ifdef WIN32
-        if( (isWinNT()) || (strlen(thePw) >= 5) ) {
+        if((isWinNT()) || (strlen(thePw) >= 5) ) {
 #else
         if(strlen(thePw) >= 5) {
 #endif
@@ -1024,7 +1026,15 @@ static void addKeyIfMissing(char* key, char* value,
             sleep(1); /* It avoids message loops */
           }
         } else {
-	  printf("Password too short (5 characters or more). Please try again.\n");
+	  printf("Password too short (5 characters or more). Please try again (%d attempts so far).\n", num_loops);
+	}
+
+	num_loops++;
+	
+	if(num_loops >= 3) {
+	  printf("Too many attempts: setting the password to 'admin'.\n");
+	  thePw = "admin";
+	  break;
 	}
       }
 

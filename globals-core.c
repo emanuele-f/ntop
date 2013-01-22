@@ -409,7 +409,7 @@ void initNtopGlobals(int argc, char * argv[], int argc_started, char *argv_start
   myGlobals.numPurgedHosts = myGlobals.numTerminatedSessions = 0;
 
   /* Dummy value just to be safe: it will be set later on */
-  myGlobals.l7.numSupportedProtocols = 2 * NDPI_MAX_SUPPORTED_PROTOCOLS;
+  myGlobals.l7.numSupportedProtocols = 2 * ndpi_get_num_supported_protocols();
 
   myGlobals.broadcastEntry = (HostTraffic*)malloc(sizeof(HostTraffic));
   memset(myGlobals.broadcastEntry, 0, sizeof(HostTraffic));
@@ -567,7 +567,7 @@ void initNtop(char *devices) {
 
   initIPServices();
 
-  myGlobals.l7.numSupportedProtocols = NDPI_MAX_SUPPORTED_PROTOCOLS;
+  myGlobals.l7.numSupportedProtocols = ndpi_get_num_supported_protocols();
 
   if(myGlobals.numIpProtosToMonitor == 0)
     addDefaultProtocols();

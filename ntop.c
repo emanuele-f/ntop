@@ -371,7 +371,7 @@ static int handleProtocolList(char* protoName, char *protocolList) {
 #endif
   }
 
-  myGlobals.l7.numSupportedProtocols = NDPI_MAX_SUPPORTED_PROTOCOLS + myGlobals.numIpProtosToMonitor;
+  myGlobals.l7.numSupportedProtocols = ndpi_get_num_supported_protocols() + myGlobals.numIpProtosToMonitor;
 
 #ifdef DEBUG
   traceEvent(CONST_TRACE_INFO, "handleProtocolList(%s) = %d", protoName, rc);

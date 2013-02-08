@@ -519,6 +519,7 @@ static void debug_printf(u_int32_t protocol, void *id_struct,
 			 ndpi_log_level_t log_level, const char *format, ...) { ; }
 
 static void *malloc_wrapper(unsigned long size) { return malloc(size); }
+static void free_wrapper(void *ptr) { free(ptr); }
 
 /* ********************************* */
 
@@ -530,7 +531,7 @@ void initL7DeviceDiscovery(int deviceId) {
      || (myGlobals.device[deviceId].l7.l7handler != NULL))
     return;
 
-  myGlobals.device[deviceId].l7.l7handler = ndpi_init_detection_module(detection_tick_resolution, malloc_wrapper, debug_printf);
+  myGlobals.device[deviceId].l7.l7handler = ndpi_init_detection_module(detection_tick_resolution, malloc_wrapper, free_wrapper, debug_printf);
   if(myGlobals.device[deviceId].l7.l7handler == NULL) {
     traceEvent(CONST_TRACE_ERROR, "Unable to initialize L7 engine: disabling L7 discovery for deviceId %u", deviceId);
     return;

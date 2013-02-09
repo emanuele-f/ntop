@@ -56,7 +56,7 @@ dnl>
 dnl> generate the config header
 dnl>
 umask 002
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS(config.h)
 
 HAS_ERROR=
 HAS_WARNING=

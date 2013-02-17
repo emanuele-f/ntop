@@ -3316,7 +3316,10 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
 	     "<div id=\"tabs\" style=\"width: 100%; \">\n"
 	     "    <ul>\n");
 
-  if(have_sessions && (myGlobals.runningPref.disablePython != TRUE))
+  if(have_sessions 
+     && (myGlobals.runningPref.disablePython != TRUE)
+     && (myGlobals.runningPref.disablenDPI != TRUE)
+     )
     sendString("    <li><a href=\"#tabs-0\">Overview</a></li>\n");
   
 
@@ -3376,7 +3379,9 @@ void printAllSessionsHTML(char* host, int actualDeviceId, int sortedColumn,
 
   sendString("</ul>\n");
 
-  if(have_sessions && (myGlobals.runningPref.disablePython != TRUE)) {
+  if(have_sessions 
+     && (myGlobals.runningPref.disablePython != TRUE)
+     && (myGlobals.runningPref.disablenDPI != TRUE)) {
     sendString("\n\n<!------ DIV ------>\n");
     sendString("\n\n<div id=\"tabs-0\">\n");
     {

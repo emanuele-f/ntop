@@ -527,8 +527,7 @@ void initL7DeviceDiscovery(int deviceId) {
   NDPI_PROTOCOL_BITMASK all;
   u_int32_t detection_tick_resolution = 1000;
 
-  if(myGlobals.runningPref.disablenDPI
-     || (myGlobals.device[deviceId].l7.l7handler != NULL))
+  if(myGlobals.device[deviceId].l7.l7handler != NULL)
     return;
 
   myGlobals.device[deviceId].l7.l7handler = ndpi_init_detection_module(detection_tick_resolution, malloc_wrapper, free_wrapper, debug_printf);

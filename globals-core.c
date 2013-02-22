@@ -541,12 +541,13 @@ void initL7DeviceDiscovery(int deviceId) {
   ndpi_set_protocol_detection_bitmask2(myGlobals.device[deviceId].l7.l7handler, &all);
 
   if(myGlobals.runningPref.protoSpecs != NULL) {
-    if(deviceId == 0)
+    if(deviceId == 0) {
       traceEvent(CONST_TRACE_INFO, "Loading nDPI protocol/port mapping from %s",
 		 myGlobals.runningPref.protoSpecs);
-    
-    ndpi_load_protocols_file(myGlobals.device[deviceId].l7.l7handler, 
-			     myGlobals.runningPref.protoSpecs);
+      
+      ndpi_load_protocols_file(myGlobals.device[deviceId].l7.l7handler, 
+			       myGlobals.runningPref.protoSpecs);
+    }
   }
 }
 

@@ -1905,8 +1905,6 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
 
   if(!found) {
     /* New Session */
-    int rc;
-
     (*newSession) = 1; /* This is a new session */
     incrementTrafficCounter(&myGlobals.device[actualDeviceId].tcpGlobalTrafficStats.totalFlows,
 			    2 /* 2 x monodirectional flows */);
@@ -2575,9 +2573,11 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
 	case NDPI_PROTOCOL_NETBIOS:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_WINS, srcHost);
 	  break;
+#if 0
 	case NDPI_PROTOCOL_FACEBOOK:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_FACEBOOK_CLIENT, srcHost);
 	  break;
+#endif
 	case NDPI_PROTOCOL_TWITTER:
 	  setHostFlag(FLAG_HOST_TYPE_SVC_TWITTER_CLIENT, srcHost);
 	  break;

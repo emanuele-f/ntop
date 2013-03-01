@@ -1243,7 +1243,7 @@ void sendJSLibraries(int graph_mode) {
     sendString("<script type=\"text/javascript\" src=\"/domTT.js\"></script>\n");
     sendString("<script type=\"text/javascript\">var domTT_styleClass = 'niceTitle';</script>\n");
     /* JQuery */
-    sendString("<link rel=\"stylesheet\" type=\"text/css\" href=\"jquery-ui-1.8.16.custom.css\">\n");
+    sendString("<link rel=\"stylesheet\" type=\"text/css\" href=\"/jquery-ui-1.8.16.custom.css\">\n");
     /* JQuery UI */
     sendString("<script type=\"text/javascript\" src=\"/jquery-ui-1.8.16.custom.min.js\"></script>\n");    
     //  }

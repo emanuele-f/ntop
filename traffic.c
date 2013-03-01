@@ -131,7 +131,7 @@ static void updateTopThpt(TopTalkers *talkers,
 
 void updateDeviceThpt(int deviceToUpdate, int quickUpdate) {
   int i;
-  time_t timeDiff, timeMinDiff, timeHourDiff=0, totalTime, when;
+  time_t timeDiff, timeMinDiff, time5MinDiff, timeHourDiff=0, totalTime, when;
   HostTraffic *el;
   short updateMinThpt=0, updateHourThpt=0;
   TopTalkers lastMinTalkers, lastHourTalkers;
@@ -192,10 +192,10 @@ void updateDeviceThpt(int deviceToUpdate, int quickUpdate) {
     myGlobals.device[deviceToUpdate].lastMinThptUpdate = myGlobals.actTime;
   }
 
-  if((timeMinDiff = myGlobals.actTime-myGlobals.device[deviceToUpdate].lastFiveMinsThptUpdate) >= 300 /* 5 minutes */) {
+  if((time5MinDiff = myGlobals.actTime-myGlobals.device[deviceToUpdate].lastFiveMinsThptUpdate) >= 300 /* 5 minutes */) {
     myGlobals.device[deviceToUpdate].lastFiveMinsEthernetBytes.value =
       myGlobals.device[deviceToUpdate].ethernetBytes.value - myGlobals.device[deviceToUpdate].lastFiveMinsEthernetBytes.value;
-    myGlobals.device[deviceToUpdate].lastFiveMinsThptUpdate = timeMinDiff;
+    myGlobals.device[deviceToUpdate].lastFiveMinsThptUpdate = time5MinDiff;
     myGlobals.device[deviceToUpdate].lastFiveMinsThpt =
       (float)myGlobals.device[deviceToUpdate].lastFiveMinsEthernetBytes.value/
       (float)myGlobals.device[deviceToUpdate].lastFiveMinsThptUpdate;
@@ -252,8 +252,8 @@ void updateDeviceThpt(int deviceToUpdate, int quickUpdate) {
 
     /* 1 Minute Throughput */
     if(updateMinThpt) {
-      el->averageRcvdThpt = (float)(((float)el->bytesRcvdSession.value)/totalTime);
-      el->averageSentThpt = (float)(((float)el->bytesSentSession.value)/totalTime);
+      el->averageRcvdThpt = (float)(((float)el->bytesRcvdSession.value)/timeMinDiff);
+      el->averageSentThpt = (float)(((float)el->bytesSentSession.value)/timeMinDiff);
 
       updateTopThpt(&lastMinTalkers, el->serialHostIndex, el->averageSentThpt, el->averageRcvdThpt);
 

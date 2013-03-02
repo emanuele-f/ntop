@@ -434,10 +434,10 @@ int parseOptions(int argc, char* argv[]) {
 #ifdef HAVE_REDIS
     case 'o': /* Redis */
       {
-	char opt[64], *c;
+	char optv[64], *c;
 	
-	snprintf(opt, sizeof(opt), "%s", optarg);
-	if((c = strchr(opt, ':')) != NULL) {
+	snprintf(optv, sizeof(optv), "%s", optarg);
+	if((c = strchr(optv, ':')) != NULL) {
 	  c[0] = '\0';
 	  myGlobals.redis.host = strdup(optarg);
 	  myGlobals.redis.port = atoi(&c[1]);

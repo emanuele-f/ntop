@@ -133,6 +133,13 @@ void extend8021Qmtu(void) {
 #endif
 }
 
+/* ********************************* */
+
+static void initL7Discovery(void) {
+  myGlobals.l7.proto_size = ndpi_detection_get_sizeof_ndpi_id_struct();
+  myGlobals.l7.flow_struct_size = ndpi_detection_get_sizeof_ndpi_flow_struct();
+}
+
 /* ************************************ */
 
 /*
@@ -409,12 +416,12 @@ void initNtopGlobals(int argc, char * argv[], int argc_started, char *argv_start
   myGlobals.numPurgedHosts = myGlobals.numTerminatedSessions = 0;
 
   /* Dummy value just to be safe: it will be set later on */
-  myGlobals.l7.numSupportedProtocols = 2 * ndpi_get_num_supported_protocols();
+  initL7Discovery();  
+  myGlobals.l7.numSupportedProtocols = 2 * ndpi_get_num_supported_protocols(myGlobals.device[0].l7.l7handler);
 
   myGlobals.broadcastEntry = (HostTraffic*)malloc(sizeof(HostTraffic));
   memset(myGlobals.broadcastEntry, 0, sizeof(HostTraffic));
-  myGlobals.broadcastEntry->l7.traffic = (ProtoTraffic*)calloc(myGlobals.l7.numSupportedProtocols+1, 
-							       sizeof(ProtoTraffic));
+  myGlobals.broadcastEntry->l7.traffic = (ProtoTraffic*)calloc(myGlobals.l7.numSupportedProtocols+1, sizeof(ProtoTraffic));
   resetHostsVariables(myGlobals.broadcastEntry);
 
   /* Set address to FF:FF:FF:FF:FF:FF */
@@ -553,13 +560,6 @@ void initL7DeviceDiscovery(int deviceId) {
 
 /* ********************************* */
 
-static void initL7Discovery(void) {
-  myGlobals.l7.proto_size = ndpi_detection_get_sizeof_ndpi_id_struct();
-  myGlobals.l7.flow_struct_size = ndpi_detection_get_sizeof_ndpi_flow_struct();
-}
-
-/* ********************************* */
-
 void initNtop(char *devices) {
   char value[32];
 
@@ -567,8 +567,6 @@ void initNtop(char *devices) {
   revertSlashIfWIN32(myGlobals.spoolPath, 0);
 
   initIPServices();
-
-  myGlobals.l7.numSupportedProtocols = ndpi_get_num_supported_protocols();
 
   if(myGlobals.numIpProtosToMonitor == 0)
     addDefaultProtocols();
@@ -584,6 +582,7 @@ void initNtop(char *devices) {
     initPassiveSessions();
 
   initL7Discovery();
+  myGlobals.l7.numSupportedProtocols = ndpi_get_num_supported_protocols(myGlobals.device[0].l7.l7handler);
 
   /* ********************************** */
 

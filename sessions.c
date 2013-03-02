@@ -2779,10 +2779,10 @@ char *getProtoName(u_int8_t proto, u_short protoId) {
   if((proto == IPPROTO_TCP) 
      || (proto == IPPROTO_UDP) 
      || (proto == 0 /* any */)) {
-    if(protoId < ndpi_get_num_supported_protocols())
+    if(protoId < ndpi_get_num_supported_protocols(myGlobals.device[0 /* actualDeviceId */].l7.l7handler))
       return(ndpi_get_proto_name(myGlobals.device[0 /* actualDeviceId */].l7.l7handler, protoId));
-    else if(protoId <= (ndpi_get_num_supported_protocols() + myGlobals.numIpProtosToMonitor)) {
-      u_int id = protoId - ndpi_get_num_supported_protocols();
+    else if(protoId <= (ndpi_get_num_supported_protocols(myGlobals.device[0 /* actualDeviceId */].l7.l7handler) + myGlobals.numIpProtosToMonitor)) {
+      u_int id = protoId - ndpi_get_num_supported_protocols(myGlobals.device[0 /* actualDeviceId */].l7.l7handler);
       return(myGlobals.ipTrafficProtosNames[id]);
     } else
       return(ndpi_get_proto_name(myGlobals.device[0 /* actualDeviceId */].l7.l7handler, NDPI_PROTOCOL_UNKNOWN));

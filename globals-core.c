@@ -417,6 +417,7 @@ void initNtopGlobals(int argc, char * argv[], int argc_started, char *argv_start
 
   /* Dummy value just to be safe: it will be set later on */
   initL7Discovery();  
+  initL7DeviceDiscovery(0);
   myGlobals.l7.numSupportedProtocols = 2 * ndpi_get_num_supported_protocols(myGlobals.device[0].l7.l7handler);
 
   myGlobals.broadcastEntry = (HostTraffic*)malloc(sizeof(HostTraffic));

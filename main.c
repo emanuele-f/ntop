@@ -128,6 +128,10 @@ void usage(FILE * fp) {
   fprintf(fp, "    [-F <spec>      | --flow-spec <specs>]                %sFlow specs (see man page)\n", newLine);
 
 #ifndef WIN32
+  fprintf(fp, "    [-G <path>      | --pid-file <path>]                  %sPut the PID in the specified file\n", newLine);
+#endif
+
+#ifndef WIN32
   fprintf(fp, "    [-K             | --enable-debug]                     %sEnable debug mode\n", newLine);
 #ifdef MAKE_WITH_SYSLOG
   fprintf(fp, "    [-L]                                                  %sDo logging via syslog\n", newLine);

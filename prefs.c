@@ -66,7 +66,7 @@ static char*  short_options = "46a:bce:f:ghi:l:m:n:p:qr:st:w:x:zAB:C:D:F:M"
 #endif
   "O:P:Q:S:U:VX:W:";
 #elif defined(MAKE_WITH_SYSLOG)
-static char*  short_options = "46a:bcde:f:ghi:l:m:n:p:qr:st:u:w:x:zAB:C:D:F:IKLM" 
+static char*  short_options = "46a:bcde:f:ghi:l:m:n:p:qr:st:u:w:x:zAB:C:D:F:G:IKLM" 
 #if defined(DARWIN) && (!defined(TIGER))
   "v"
 #endif
@@ -75,7 +75,7 @@ static char*  short_options = "46a:bcde:f:ghi:l:m:n:p:qr:st:u:w:x:zAB:C:D:F:IKLM
 #endif
   "O:P:Q:S:U:VX:W:";
 #else
-static char*  short_options = "46a:bcde:f:ghi:l:m:n:p:qr:st:u:w:x:zAB:C:D:F:IKM"
+static char*  short_options = "46a:bcde:f:ghi:l:m:n:p:qr:st:u:w:x:zAB:C:D:F:G:IKM"
 #if defined(DARWIN) && (!defined(TIGER))
   "v"
 #endif
@@ -127,6 +127,10 @@ static struct option const long_options[] = {
   { "domain",                           required_argument, NULL, 'D' },
 
   { "flow-spec",                        required_argument, NULL, 'F' },
+  
+#ifndef WIN32
+  { "pid-file",                         required_argument, NULL, 'G' },
+#endif
 
 #ifndef WIN32
   { "debug",                            no_argument,       NULL, 'K' },
@@ -550,6 +554,12 @@ int parseOptions(int argc, char* argv[]) {
       stringSanityCheck(optarg, "-F | --flow-spec");
       myGlobals.runningPref.flowSpecs = strdup(optarg);
       break;
+
+#ifndef WIN32
+    case 'G':
+      myGlobals.runningPref.pidPath = strdup(optarg);
+      break;
+#endif
 
 #ifndef WIN32
     case 'K':

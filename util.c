@@ -4564,21 +4564,25 @@ void addPortToList(HostTraffic *host, int *thePorts /* 0...MAX_NUM_RECENT_PORTS 
 void saveNtopPid(void) {
   FILE *fd;
 
-  memset(&myGlobals.pidFileName, 0, sizeof(myGlobals.pidFileName));
   myGlobals.basentoppid = getpid();
-  safe_snprintf(__FILE__, __LINE__, myGlobals.pidFileName, sizeof(myGlobals.pidFileName), "%s/%s",
-		getuid() ?
-		/* We're not root */ myGlobals.dbPath :
-		/* We are root */ DEFAULT_NTOP_PID_DIRECTORY,
-		DEFAULT_NTOP_PIDFILE);
-  fd = fopen(myGlobals.pidFileName, "wb");
+
+  if (myGlobals.runningPref.pidPath == NULL) {
+    memset(&myGlobals.pidFileName, 0, sizeof(myGlobals.pidFileName));
+    safe_snprintf(__FILE__, __LINE__, myGlobals.pidFileName, sizeof(myGlobals.pidFileName), "%s/%s",
+		  getuid() ?
+		  /* We're not root */ myGlobals.dbPath :
+		  /* We are root */ DEFAULT_NTOP_PID_DIRECTORY,
+		  DEFAULT_NTOP_PIDFILE);
+    myGlobals.runningPref.pidPath = &myGlobals.pidFileName;
+  }
+  fd = fopen(myGlobals.runningPref.pidPath, "w");
 
   if(fd == NULL) {
-    traceEvent(CONST_TRACE_WARNING, "INIT: Unable to create pid file (%s)", myGlobals.pidFileName);
+    traceEvent(CONST_TRACE_WARNING, "INIT: Unable to create pid file %s: %s", myGlobals.runningPref.pidPath, strerror(errno));
   } else {
     fprintf(fd, "%d\n", myGlobals.basentoppid);
     fclose(fd);
-    traceEvent(CONST_TRACE_INFO, "INIT: Created pid file (%s)", myGlobals.pidFileName);
+    traceEvent(CONST_TRACE_INFO, "INIT: Created pid file %s", myGlobals.runningPref.pidPath);
   }
 }
 
@@ -4587,11 +4591,11 @@ void saveNtopPid(void) {
 void removeNtopPid(void) {
   int rc;
 
-  if(myGlobals.pidFileName[0] != '\0') {
-    if((rc = unlink(myGlobals.pidFileName)) == 0) {
-      traceEvent(CONST_TRACE_INFO, "TERM: Removed pid file (%s)", myGlobals.pidFileName);
+  if(myGlobals.runningPref.pidPath != NULL) {
+    if((rc = unlink(myGlobals.runningPref.pidPath)) == 0) {
+      traceEvent(CONST_TRACE_INFO, "TERM: Removed pid file %s", myGlobals.runningPref.pidPath);
     } else {
-      traceEvent(CONST_TRACE_WARNING, "TERM: Unable to remove pid file (%s)", myGlobals.pidFileName);
+      traceEvent(CONST_TRACE_WARNING, "TERM: Unable to remove pid file %s: %s", myGlobals.runningPref.pidPath, strerror(errno));
     }
   }
 }

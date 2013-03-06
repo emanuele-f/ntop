@@ -1846,6 +1846,10 @@ typedef struct _userPref {
   char domainName[MAXHOSTNAMELEN];  /* -D | --domain */
   char *flowSpecs;               /* -F | --flow-spec */
 
+#ifndef WIN32
+  char *pidPath;                 /* -G | --pid-file */
+#endif
+
   bool debugMode;                /* -K | --enable-debug */
 #ifndef WIN32
   int  useSyslog;                /* -L | --use-syslog*/

@@ -659,6 +659,10 @@ int main(int argc, char *argv[]) {
     traceEvent(CONST_TRACE_NOISY, "Plugins started... continuing with initialization");
   }
 
+#ifndef WIN32
+  saveNtopPid();
+#endif
+
   checkUserIdentity(userSpecified);
 
   addDefaultAdminUser();
@@ -687,10 +691,6 @@ int main(int argc, char *argv[]) {
   traceEvent(CONST_TRACE_NOISY, "MEMORY:     or %.2fMB for %d interfaces",
 	     xvertDOT00MB(myGlobals.numDevices*sizeof(NtopInterface)),
 	     myGlobals.numDevices);
-
-#ifndef WIN32
-  saveNtopPid();
-#endif
 
   /*
    * OK, ntop is up... if we have't failed during init, start running with the actual packet capture...

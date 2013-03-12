@@ -445,9 +445,15 @@ census-fail:
 census-ok:
 	@echo "This option is no longer available... thanks for trying"
 
+# el6 = CentOS/RedHat 6
 build-rpm:
 	mkdir -p $(HOME)/ntop/$(PROGRAM)
 	make install DESTDIR=$(HOME)/ntop/$(PROGRAM) INSTALL='install -p'
 	tar cvfz $(HOME)/rpmbuild/SOURCES/$(PROGRAM).tar.gz $(PROGRAM)
 	rpmbuild -bb ./packages/rpm/ntop.spec
+	./packages/rpm/rpm-sign.exp $(HOME)/rpmbuild/RPMS/$(PLATFORM)/ntop5-$(PACKAGE_VERSION)-2.el6.$(build_cpu).rpm
+	@echo ""
+	@echo "Package contents:"
+	@rpm -qpl $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)
+	@echo "The package is now available in $(HOME)/rpmbuild/RPMS/$(PLATFORM)/ntop5-$(PACKAGE_VERSION)*.rpm"
 

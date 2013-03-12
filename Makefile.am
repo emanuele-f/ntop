@@ -454,6 +454,6 @@ build-rpm:
 	./packages/rpm/rpm-sign.exp $(HOME)/rpmbuild/RPMS/$(build_cpu)/ntop5-$(PACKAGE_VERSION)-2.el6.$(build_cpu).rpm
 	@echo ""
 	@echo "Package contents:"
-	@rpm -qpl $(HOME)/rpmbuild/RPMS/$(PLATFORM)/$(PACKAGE)
+	@rpm -qpl $(HOME)/rpmbuild/RPMS/$(build_cpu)/ntop5-$(PACKAGE_VERSION)-2.el6.$(build_cpu).rpm
 	@echo "The package is now available in $(HOME)/rpmbuild/RPMS/$(build_cpu)/ntop5-$(PACKAGE_VERSION)*.rpm"
 

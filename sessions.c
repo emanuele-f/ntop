@@ -2548,7 +2548,8 @@ static IPSession* handleTCPUDPSession(u_int proto, const struct pcap_pkthdr *h,
 								 (sport == theSession->sport) ? theSession->l7.dst : theSession->l7.src);
 
       if(theSession->l7.major_proto != NDPI_PROTOCOL_UNKNOWN) {
-	/* traceEvent(CONST_TRACE_ERROR, "l7.major_proto=%d", theSession->l7.major_proto); */
+	/* traceEvent(CONST_TRACE_ERROR, "l7.major_proto=%d", theSession->l7.major_proto);  */
+
 	freeOpenDPI(theSession);
 
 	switch(theSession->l7.major_proto) {

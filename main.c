@@ -176,6 +176,9 @@ void usage(FILE * fp) {
 #ifdef WIN32
   printAvailableInterfaces();
 #endif
+
+  initL7DeviceDiscovery(0);
+  ndpi_dump_protocols(myGlobals.device[0].l7.l7handler);
 }
 
 /* *********************************** */

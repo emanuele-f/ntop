@@ -25,6 +25,9 @@ update-rc.d ntop defaults 93 >/dev/null
 # Stop ntop (if any)
 /etc/init.d/ntop stop
 
+mkdir -p /usr/local/share/ntop/rrd
+mkdir -p /var/log/ntop/rrd
+
 # Set the administrator password
 /etc/init.d/ntop start
 
